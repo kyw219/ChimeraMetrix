@@ -9,28 +9,111 @@ import { BacktestLoadingPipeline } from "@/components/BacktestLoadingPipeline";
 import { Button } from "@/components/ui/button";
 import { Image, FileText, Hash, Clock, Loader2, Zap, Sparkles } from "lucide-react";
 import { mockAnalysis, mockStrategy } from "@/lib/mockData";
+import { useToast } from "@/hooks/use-toast";
+
+// API Base URL
+const API_BASE_URL = window.location.origin;
 
 export default function Upload() {
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [file, setFile] = useState<File | null>(null);
   const [platform, setPlatform] = useState("youtube");
   const [strategy, setStrategy] = useState<any>(null);
+  const [analysis, setAnalysis] = useState<any>(null);
+  const [sessionId, setSessionId] = useState<string | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [isRunningBacktest, setIsRunningBacktest] = useState(false);
 
   const handleGenerateStrategy = async () => {
-    setIsGenerating(true);
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-    setStrategy(mockStrategy);
-    setIsGenerating(false);
+    if (!file) return;
     
-    // Auto-scroll to Recommended Strategy section
-    setTimeout(() => {
-      const strategySection = document.getElementById('recommended-strategy');
-      if (strategySection) {
-        strategySection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    setIsGenerating(true);
+    console.log('🚀 Starting video analysis...');
+    console.log('📁 File:', file.name, file.size, 'bytes');
+    console.log('🎯 Platform:', platform);
+    console.log('🌐 API URL:', `${API_BASE_URL}/api/analyze`);
+    
+    try {
+      // Step 1: Analyze video
+      const formData = new FormData();
+      formData.append('video', file);
+      formData.append('platform', platform);
+
+      console.log('📤 Uploading video to backend...');
+      const analyzeResponse = await fetch(`${API_BASE_URL}/api/analyze`, {
+        method: 'POST',
+        body: formData,
+      });
+
+      console.log('📥 Analyze response status:', analyzeResponse.status);
+      const analyzeData = await analyzeResponse.json();
+      console.log('📊 Analyze response data:', analyzeData);
+
+      if (!analyzeData.success) {
+        throw new Error(analyzeData.error?.message || 'Failed to analyze video');
       }
-    }, 100);
+
+      const { sessionId: newSessionId, features } = analyzeData.data;
+      setSessionId(newSessionId);
+      setAnalysis(features);
+      console.log('✅ Video analyzed successfully!');
+      console.log('🔑 Session ID:', newSessionId);
+      console.log('🎬 Features:', features);
+
+      // Step 2: Generate strategy
+      console.log('🎨 Generating strategy...');
+      const strategyResponse = await fetch(`${API_BASE_URL}/api/generate-strategy`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          sessionId: newSessionId,
+          features,
+          platform,
+        }),
+      });
+
+      console.log('📥 Strategy response status:', strategyResponse.status);
+      const strategyData = await strategyResponse.json();
+      console.log('📊 Strategy response data:', strategyData);
+
+      if (!strategyData.success) {
+        throw new Error(strategyData.error?.message || 'Failed to generate strategy');
+      }
+
+      setStrategy(strategyData.data.strategy);
+      console.log('✅ Strategy generated successfully!');
+      console.log('💡 Strategy:', strategyData.data.strategy);
+
+      toast({
+        title: "Success!",
+        description: "AI strategy generated successfully",
+      });
+      
+      // Auto-scroll to Recommended Strategy section
+      setTimeout(() => {
+        const strategySection = document.getElementById('recommended-strategy');
+        if (strategySection) {
+          strategySection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }, 100);
+    } catch (error) {
+      console.error('❌ Error:', error);
+      toast({
+        title: "Error",
+        description: error instanceof Error ? error.message : 'Failed to generate strategy',
+        variant: "destructive",
+      });
+      
+      // Fallback to mock data
+      console.log('⚠️ Falling back to mock data');
+      setAnalysis(mockAnalysis);
+      setStrategy(mockStrategy);
+    } finally {
+      setIsGenerating(false);
+    }
   };
 
   const handleStartBacktest = () => {
@@ -117,7 +200,7 @@ export default function Upload() {
                 Video Feature Extraction
               </h2>
               <VideoAnalysisCard 
-                data={mockAnalysis}
+                data={analysis || mockAnalysis}
                 isLoading={false}
               />
             </div>
