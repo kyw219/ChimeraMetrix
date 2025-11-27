@@ -70,11 +70,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     let statusCode: number = STATUS_CODES.INTERNAL_SERVER_ERROR;
     if (error instanceof Error) {
       if (error.message.includes('validation') || error.message.includes('Invalid')) {
-        statusCode = STATUS_CODES as number.BAD_REQUEST;
+        statusCode = STATUS_CODES.BAD_REQUEST;
       } else if (error.message.includes('too large')) {
-        statusCode = STATUS_CODES as number.PAYLOAD_TOO_LARGE;
+        statusCode = STATUS_CODES.PAYLOAD_TOO_LARGE;
       } else if (error.message.includes('API') || error.message.includes('Gemini')) {
-        statusCode = STATUS_CODES as number.BAD_GATEWAY;
+        statusCode = STATUS_CODES.BAD_GATEWAY;
       }
     }
 

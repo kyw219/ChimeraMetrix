@@ -1,5 +1,5 @@
 import { IncomingMessage, ServerResponse } from 'http';
-import { formatErrorResponse, STATUS_CODES, logger } from './errors';
+import { UnauthorizedError, logger } from './errors';
 
 /**
  * Get allowed origins from environment

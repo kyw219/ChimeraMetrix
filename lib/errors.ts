@@ -1,15 +1,15 @@
 import { ErrorResponse } from '../types';
 
 export const STATUS_CODES = {
-  OK: 200 as number,
-  BAD_REQUEST: 400 as number,
-  FORBIDDEN: 403 as number,
-  NOT_FOUND: 404 as number,
-  PAYLOAD_TOO_LARGE: 413 as number,
-  INTERNAL_SERVER_ERROR: 500 as number,
-  BAD_GATEWAY: 502 as number,
-  SERVICE_UNAVAILABLE: 503 as number,
-  GATEWAY_TIMEOUT: 504 as number,
+  OK: 200,
+  BAD_REQUEST: 400,
+  FORBIDDEN: 403,
+  NOT_FOUND: 404,
+  PAYLOAD_TOO_LARGE: 413,
+  INTERNAL_SERVER_ERROR: 500,
+  BAD_GATEWAY: 502,
+  SERVICE_UNAVAILABLE: 503,
+  GATEWAY_TIMEOUT: 504,
 };
 
 export class ValidationError extends Error {

@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
 import { SessionData } from '../types';
-import { formatErrorResponse, STATUS_CODES, logger } from './errors';
+import { NotFoundError, logger } from './errors';
 
 export class SessionManager {
   private sessions: Map<string, SessionData>;

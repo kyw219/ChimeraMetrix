@@ -82,11 +82,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     let statusCode: number = STATUS_CODES.INTERNAL_SERVER_ERROR;
     if (error instanceof Error) {
       if (error.message.includes('not found') || error.message.includes('expired')) {
-        statusCode = STATUS_CODES as number.NOT_FOUND;
+        statusCode = STATUS_CODES.NOT_FOUND;
       } else if (error.message.includes('validation') || error.message.includes('Invalid')) {
-        statusCode = STATUS_CODES as number.BAD_REQUEST;
+        statusCode = STATUS_CODES.BAD_REQUEST;
       } else if (error.message.includes('API') || error.message.includes('Gemini')) {
-        statusCode = STATUS_CODES as number.BAD_GATEWAY;
+        statusCode = STATUS_CODES.BAD_GATEWAY;
       }
     }
 

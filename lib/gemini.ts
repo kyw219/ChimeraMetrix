@@ -7,7 +7,7 @@ import {
   PerformanceDrivers,
   SimilarityQuery,
 } from '../types';
-import { formatErrorResponse, STATUS_CODES, logger } from './errors';
+import { APIError, logger } from './errors';
 
 export class GeminiClient {
   private genAI: GoogleGenerativeAI;

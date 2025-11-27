@@ -3,7 +3,7 @@ import { IncomingMessage } from 'http';
 import { promises as fs } from 'fs';
 import path from 'path';
 import { validateVideoFile, sanitizeFileName } from './validators';
-import { formatErrorResponse, STATUS_CODES, logger } from './errors';
+import { ValidationError, logger } from './errors';
 
 export interface ParsedFormData {
   video: Buffer;

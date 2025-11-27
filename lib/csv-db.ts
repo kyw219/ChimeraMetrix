@@ -5,7 +5,7 @@ import {
   TimeSeriesData,
   AggregatedMetrics,
 } from '../types';
-import { formatErrorResponse, STATUS_CODES, logger } from './errors';
+import { NotFoundError, logger } from './errors';
 
 interface CSVRow {
   video_id: string;
@@ -81,7 +81,11 @@ export class CSVDatabase {
   async getAllVideoMetadata(): Promise<VideoMetadata[]> {
     await this.ensureInitialized();
 
-    return this.data!.map((row) => ({
+    if (!this.data) {
+      throw new Error('CSV data not initialized');
+    }
+
+    return this.data.map((row) => ({
       videoId: row.video_id,
       platform: row.platform,
       category: row.category,
