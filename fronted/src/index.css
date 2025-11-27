@@ -1,0 +1,117 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
+All colors MUST be HSL.
+*/
+
+@layer base {
+  :root {
+    /* ChimeraMatrix Dark Theme - Layered Shaded Blocks */
+    --background: 220 20% 6%;
+    --foreground: 210 40% 92%;
+
+    --card: 220 18% 10%;
+    --card-foreground: 210 40% 92%;
+
+    --popover: 220 18% 12%;
+    --popover-foreground: 210 40% 92%;
+
+    --primary: 172 100% 56%;
+    --primary-foreground: 220 20% 6%;
+
+    --secondary: 220 15% 14%;
+    --secondary-foreground: 210 40% 92%;
+
+    --muted: 220 15% 14%;
+    --muted-foreground: 215 15% 60%;
+
+    --accent: 246 100% 72%;
+    --accent-foreground: 220 20% 6%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 0 0% 100% / 0.05;
+    --input: 0 0% 100% / 0.05;
+    --ring: 172 100% 56%;
+
+    --radius: 0.75rem;
+
+    --sidebar-background: 220 22% 5%;
+    --sidebar-foreground: 210 40% 85%;
+    --sidebar-primary: 172 100% 56%;
+    --sidebar-primary-foreground: 220 20% 6%;
+    --sidebar-accent: 220 18% 10%;
+    --sidebar-accent-foreground: 172 100% 56%;
+    --sidebar-border: 0 0% 100% / 0.03;
+    --sidebar-ring: 172 100% 56%;
+
+    /* Custom dashboard tokens */
+    --success: 142 76% 50%;
+    --success-foreground: 220 20% 6%;
+    --warning: 38 92% 58%;
+    --warning-foreground: 220 20% 6%;
+    --info: 199 100% 65%;
+    --info-foreground: 220 20% 6%;
+    
+    /* Chart colors - Neon palette */
+    --chart-1: 172 100% 56%;
+    --chart-2: 246 100% 72%;
+    --chart-3: 199 100% 65%;
+    --chart-4: 142 76% 50%;
+    --chart-5: 38 92% 58%;
+    
+    /* Layered backgrounds for depth */
+    --panel-bg: 220 18% 10%;
+    --subpanel-bg: 220 16% 13%;
+    --module-bg: 220 15% 16%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "cv11", "ss01";
+    font-variation-settings: "opsz" auto;
+  }
+  
+  /* Glow effects for technical feel */
+  .glow-primary {
+    box-shadow: 0 0 24px hsl(var(--primary) / 0.4);
+  }
+  
+  .glow-accent {
+    box-shadow: 0 0 24px hsl(var(--accent) / 0.4);
+  }
+  
+  .glow-soft {
+    box-shadow: 0 0 32px hsl(var(--primary) / 0.2);
+  }
+  
+  /* Shaded panels with depth */
+  .panel-base {
+    background: hsl(var(--panel-bg));
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
+  }
+  
+  .subpanel {
+    background: hsl(var(--subpanel-bg));
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
+  }
+  
+  .module-block {
+    background: hsl(var(--module-bg));
+  }
+
+  @keyframes dash {
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+}
