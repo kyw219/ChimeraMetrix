@@ -69,6 +69,7 @@ export default function Upload() {
       console.log('📊 Analyze response data:', analyzeData);
 
       if (!analyzeData.success) {
+        console.error('❌ Backend error:', analyzeData.error);
         throw new Error(analyzeData.error?.message || 'Failed to analyze video');
       }
 
