@@ -58,7 +58,7 @@ export class CSVDatabase {
 
       logger.info('CSV database initialized', {
         path: this.csvPath,
-        rows: this.data.length,
+        rows: this.data?.length || 0,
       });
     } catch (error) {
       logger.error('Failed to load CSV database', { error });
