@@ -1,0 +1,29 @@
+{
+  "enabled": true,
+  "name": "Clean Code Enforcer",
+  "description": "Reminds the AI agent to keep code clean, short, and minimal when editing any code files. Prevents overcoding and ensures only necessary changes are made.",
+  "version": "1",
+  "when": {
+    "type": "fileEdited",
+    "patterns": [
+      "**/*.ts",
+      "**/*.tsx",
+      "**/*.js",
+      "**/*.jsx",
+      "**/*.py",
+      "**/*.java",
+      "**/*.cpp",
+      "**/*.c",
+      "**/*.go",
+      "**/*.rs",
+      "**/*.rb",
+      "**/*.php",
+      "**/*.swift",
+      "**/*.kt"
+    ]
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "IMPORTANT: Keep your code clean, short, and minimal. Only make necessary edits. Do not overcode or add unnecessary complexity. Focus on simplicity and clarity."
+  }
+}
