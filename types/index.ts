@@ -134,38 +134,10 @@ export interface ErrorResponse {
 }
 
 export type ApiResponse<T = any> = SuccessResponse<T> | ErrorResponse;
-quest {
-  video: Buffer;
-  platform: 'youtube' | 'tiktok' | 'shorts';
-}
 
-export interface AnalyzeResponse {
-  sessionId: string;
-  features: VideoFeatures;
-}
-
-export interface GenerateStrategyRequest {
-  sessionId: string;
-  features: VideoFeatures;
-  platform: string;
-}
-
+// Additional response types
 export interface GenerateStrategyResponse {
   strategy: Strategy;
-}
-
-export interface RegenerateStrategyRequest {
-  sessionId: string;
-  features: VideoFeatures;
-  platform: string;
-  field?: 'cover' | 'title' | 'hashtags' | 'postingTime';
-}
-
-export interface BacktestRequest {
-  sessionId: string;
-  strategy: Strategy;
-  features: VideoFeatures;
-  platform: string;
 }
 
 export interface SimilarVideo {
@@ -174,12 +146,6 @@ export interface SimilarVideo {
   similarity: number;
   ctr: string;
   views24h: string;
-}
-
-export interface BacktestResponse {
-  predictions: AggregatedMetrics;
-  matchedVideos: SimilarVideo[];
-  performanceDrivers: PerformanceDrivers;
 }
 
 // Session Types
