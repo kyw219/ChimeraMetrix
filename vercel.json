@@ -1,0 +1,11 @@
+{
+  "buildCommand": "cd fronted && npm install && npm run build",
+  "outputDirectory": "fronted/dist",
+  "installCommand": "cd fronted && npm install",
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}

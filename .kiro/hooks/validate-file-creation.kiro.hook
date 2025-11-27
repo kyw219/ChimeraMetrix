@@ -1,0 +1,16 @@
+{
+  "enabled": true,
+  "name": "Validate File Creation",
+  "description": "Whenever a file is created, review whether the file creation is necessary and ensure we're not over-coding or creating redundant files",
+  "version": "1",
+  "when": {
+    "type": "fileCreated",
+    "patterns": [
+      "**/*"
+    ]
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "A new file has been created. Review this file creation and determine:\n1. Is this file necessary for the current task/feature?\n2. Does this file duplicate functionality that already exists elsewhere in the codebase?\n3. Could the functionality be added to an existing file instead?\n4. Are we over-engineering or over-coding this solution?\n\nIf the file creation seems unnecessary or redundant, suggest alternatives or recommend removing it. If it's justified, briefly confirm why it's needed."
+  }
+}
