@@ -28,10 +28,41 @@ export default function Upload() {
   const handleGenerateStrategy = async () => {
     if (!file) return;
     
+    console.log('='.repeat(60));
+    console.log('🎬 VIDEO UPLOAD WORKFLOW STARTED');
+    console.log('='.repeat(60));
+    
+    // Step 0: Check backend health
+    console.log('\n📋 Step 0: Checking backend health...');
+    try {
+      const healthResponse = await fetch(`${API_BASE_URL}/api/health`);
+      const healthData = await healthResponse.json();
+      console.log('✅ Backend health:', healthData);
+      console.log('   - Has Gemini Key:', healthData.environment.hasGeminiKey);
+      console.log('   - Gemini Model:', healthData.environment.geminiModel);
+      console.log('   - Allowed Origins:', healthData.environment.allowedOrigins);
+      
+      if (!healthData.environment.hasGeminiKey) {
+        console.error('❌ CRITICAL: Gemini API key is not configured!');
+        toast({
+          title: "Configuration Error",
+          description: "Backend is missing Gemini API key. Please check Vercel environment variables.",
+          variant: "destructive",
+        });
+        setAnalysis(mockAnalysis);
+        setStrategy(mockStrategy);
+        return;
+      }
+    } catch (error) {
+      console.error('❌ Health check failed:', error);
+    }
+    
     // Check file size (Vercel free tier limit is 4.5MB)
     const maxSize = 4.5 * 1024 * 1024; // 4.5MB in bytes
+    const fileSizeMB = (file.size / (1024 * 1024)).toFixed(2);
+    console.log(`\n📏 File size check: ${fileSizeMB}MB (max: 4.5MB)`);
+    
     if (file.size > maxSize) {
-      const fileSizeMB = (file.size / (1024 * 1024)).toFixed(2);
       toast({
         title: "File Too Large",
         description: `Your video is ${fileSizeMB}MB. Due to Vercel's free tier limits, please use a video smaller than 4.5MB for now. We're working on supporting larger files!`,
@@ -47,8 +78,11 @@ export default function Upload() {
     }
     
     setIsGenerating(true);
-    console.log('🚀 Starting video analysis...');
-    console.log('📁 File:', file.name, file.size, 'bytes');
+    console.log('\n🚀 Step 1: Starting video analysis...');
+    console.log('📁 File details:');
+    console.log('   - Name:', file.name);
+    console.log('   - Size:', file.size, 'bytes', `(${fileSizeMB}MB)`);
+    console.log('   - Type:', file.type);
     console.log('🎯 Platform:', platform);
     console.log('🌐 API URL:', `${API_BASE_URL}/api/analyze`);
     
@@ -58,53 +92,90 @@ export default function Upload() {
       formData.append('video', file);
       formData.append('platform', platform);
 
-      console.log('📤 Uploading video to backend...');
+      console.log('\n📤 Uploading video to backend...');
+      console.log('   - FormData keys:', Array.from(formData.keys()));
+      
       const analyzeResponse = await fetch(`${API_BASE_URL}/api/analyze`, {
         method: 'POST',
         body: formData,
       });
 
-      console.log('📥 Analyze response status:', analyzeResponse.status);
-      const analyzeData = await analyzeResponse.json();
-      console.log('📊 Analyze response data:', analyzeData);
+      console.log('\n📥 Analyze response received:');
+      console.log('   - Status:', analyzeResponse.status, analyzeResponse.statusText);
+      console.log('   - Headers:', Object.fromEntries(analyzeResponse.headers.entries()));
+      
+      let analyzeData;
+      try {
+        analyzeData = await analyzeResponse.json();
+        console.log('📊 Analyze response data:', JSON.stringify(analyzeData, null, 2));
+      } catch (parseError) {
+        console.error('❌ Failed to parse response as JSON:', parseError);
+        const text = await analyzeResponse.text();
+        console.error('   - Raw response:', text);
+        throw new Error('Invalid JSON response from server');
+      }
 
       if (!analyzeData.success) {
-        console.error('❌ Backend error:', analyzeData.error);
+        console.error('\n❌ Backend returned error:');
+        console.error('   - Code:', analyzeData.error?.code);
+        console.error('   - Message:', analyzeData.error?.message);
+        console.error('   - Details:', analyzeData.error?.details);
         throw new Error(analyzeData.error?.message || 'Failed to analyze video');
       }
 
       const { sessionId: newSessionId, features } = analyzeData.data;
       setSessionId(newSessionId);
       setAnalysis(features);
-      console.log('✅ Video analyzed successfully!');
+      console.log('\n✅ Video analyzed successfully!');
       console.log('🔑 Session ID:', newSessionId);
-      console.log('🎬 Features:', features);
+      console.log('🎬 Features extracted:');
+      console.log('   - Category:', features.category);
+      console.log('   - Emotion:', features.emotion);
+      console.log('   - Visual Style:', features.visualStyle);
+      console.log('   - Keywords:', features.keywords);
+      console.log('   - Audience:', features.audience);
+      console.log('   - Hook Type:', features.hookType);
 
       // Step 2: Generate strategy
-      console.log('🎨 Generating strategy...');
+      console.log('\n🎨 Step 2: Generating strategy...');
+      const strategyPayload = {
+        sessionId: newSessionId,
+        features,
+        platform,
+      };
+      console.log('📤 Strategy request payload:', JSON.stringify(strategyPayload, null, 2));
+      
       const strategyResponse = await fetch(`${API_BASE_URL}/api/generate-strategy`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          sessionId: newSessionId,
-          features,
-          platform,
-        }),
+        body: JSON.stringify(strategyPayload),
       });
 
-      console.log('📥 Strategy response status:', strategyResponse.status);
+      console.log('\n📥 Strategy response received:');
+      console.log('   - Status:', strategyResponse.status, strategyResponse.statusText);
+      
       const strategyData = await strategyResponse.json();
-      console.log('📊 Strategy response data:', strategyData);
+      console.log('📊 Strategy response data:', JSON.stringify(strategyData, null, 2));
 
       if (!strategyData.success) {
+        console.error('\n❌ Strategy generation failed:');
+        console.error('   - Error:', strategyData.error);
         throw new Error(strategyData.error?.message || 'Failed to generate strategy');
       }
 
       setStrategy(strategyData.data.strategy);
-      console.log('✅ Strategy generated successfully!');
-      console.log('💡 Strategy:', strategyData.data.strategy);
+      console.log('\n✅ Strategy generated successfully!');
+      console.log('💡 Strategy details:');
+      console.log('   - Cover:', strategyData.data.strategy.cover?.substring(0, 50) + '...');
+      console.log('   - Title:', strategyData.data.strategy.title);
+      console.log('   - Hashtags:', strategyData.data.strategy.hashtags);
+      console.log('   - Posting Time:', strategyData.data.strategy.postingTime);
+
+      console.log('\n' + '='.repeat(60));
+      console.log('🎉 WORKFLOW COMPLETED SUCCESSFULLY!');
+      console.log('='.repeat(60));
 
       toast({
         title: "Success!",
@@ -119,7 +190,13 @@ export default function Upload() {
         }
       }, 100);
     } catch (error) {
-      console.error('❌ Error:', error);
+      console.error('\n' + '='.repeat(60));
+      console.error('❌ WORKFLOW FAILED');
+      console.error('='.repeat(60));
+      console.error('Error type:', error?.constructor?.name);
+      console.error('Error message:', error instanceof Error ? error.message : String(error));
+      console.error('Error stack:', error instanceof Error ? error.stack : 'N/A');
+      
       toast({
         title: "Error",
         description: error instanceof Error ? error.message : 'Failed to generate strategy',
@@ -127,11 +204,12 @@ export default function Upload() {
       });
       
       // Fallback to mock data
-      console.log('⚠️ Falling back to mock data');
+      console.log('\n⚠️ Falling back to mock data for demo purposes');
       setAnalysis(mockAnalysis);
       setStrategy(mockStrategy);
     } finally {
       setIsGenerating(false);
+      console.log('\n🏁 Workflow ended\n');
     }
   };
 
