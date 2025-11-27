@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
 import { SessionData } from '../types';
-import { NotFoundError, Logger } from './errors';
+import { formatErrorResponse, STATUS_CODES, logger } from './errors';
 
 export class SessionManager {
   private sessions: Map<string, SessionData>;
@@ -24,7 +24,7 @@ export class SessionManager {
       lastAccessedAt: now,
     });
 
-    Logger.info('Session created', { sessionId });
+    logger.info('Session created', { sessionId });
     return sessionId;
   }
 
@@ -45,7 +45,7 @@ export class SessionManager {
       lastAccessedAt: Date.now(),
     });
 
-    Logger.debug('Session data updated', { sessionId });
+    logger.debug('Session data updated', { sessionId });
   }
 
   /**
@@ -84,7 +84,7 @@ export class SessionManager {
    */
   deleteSession(sessionId: string): void {
     this.sessions.delete(sessionId);
-    Logger.info('Session deleted', { sessionId });
+    logger.info('Session deleted', { sessionId });
   }
 
   /**
@@ -102,7 +102,7 @@ export class SessionManager {
     }
 
     if (cleanedCount > 0) {
-      Logger.info('Expired sessions cleaned up', { count: cleanedCount });
+      logger.info('Expired sessions cleaned up', { count: cleanedCount });
     }
 
     return cleanedCount;
@@ -120,7 +120,7 @@ export class SessionManager {
    */
   clearAll(): void {
     this.sessions.clear();
-    Logger.warn('All sessions cleared');
+    logger.warn('All sessions cleared');
   }
 }
 

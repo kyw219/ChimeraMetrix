@@ -7,13 +7,12 @@ import {
   PerformanceDrivers,
   SimilarityQuery,
 } from '../types';
-import { APIError, Logger } from './errors';
+import { formatErrorResponse, STATUS_CODES, logger } from './errors';
 
 export class GeminiClient {
   private genAI: GoogleGenerativeAI;
   private model: any;
   private maxRetries: number = 3;
-  private timeout: number = 30000; // 30 seconds
 
   constructor(apiKey?: string) {
     const key = apiKey || process.env.GEMINI_API_KEY;
@@ -42,7 +41,7 @@ export class GeminiClient {
       }
 
       const delay = Math.pow(2, attempt) * 1000; // 0s, 1s, 2s
-      Logger.warn(`Retry attempt ${attempt + 1} after ${delay}ms`, { error });
+      logger.warn(`Retry attempt ${attempt + 1} after ${delay}ms`, { error });
       await new Promise((resolve) => setTimeout(resolve, delay));
       return this.retryWithBackoff(fn, attempt + 1);
     }
@@ -80,10 +79,10 @@ Provide only the JSON response, no additional text.`;
         const text = response.text();
         const features = JSON.parse(text);
 
-        Logger.info('Video analyzed successfully', { platform });
+        logger.info('Video analyzed successfully', { platform });
         return features as VideoFeatures;
       } catch (error) {
-        Logger.error('Video analysis failed', { error });
+        logger.error('Video analysis failed', { error });
         throw new APIError('Failed to analyze video', 502);
       }
     });
@@ -115,10 +114,10 @@ Provide only the JSON response, no additional text.`;
         const text = response.text();
         const strategy = JSON.parse(text);
 
-        Logger.info('Strategy generated successfully', { platform });
+        logger.info('Strategy generated successfully', { platform });
         return strategy as Strategy;
       } catch (error) {
-        Logger.error('Strategy generation failed', { error });
+        logger.error('Strategy generation failed', { error });
         throw new APIError('Failed to generate strategy', 502);
       }
     });
@@ -131,7 +130,7 @@ Provide only the JSON response, no additional text.`;
     // Note: Gemini API doesn't support image generation yet
     // This is a placeholder that returns a URL format
     // In production, integrate with an image generation API
-    Logger.info('Cover image generation requested', { description });
+    logger.info('Cover image generation requested', { description });
     return `https://placeholder.com/cover?desc=${encodeURIComponent(description)}`;
   }
 
@@ -155,10 +154,10 @@ Provide a concise description (2-3 sentences).`;
         const response = await result.response;
         const text = response.text();
 
-        Logger.info('Image converted to text', { imageUrl });
+        logger.info('Image converted to text', { imageUrl });
         return text;
       } catch (error) {
-        Logger.error('Image to text conversion failed', { error });
+        logger.error('Image to text conversion failed', { error });
         throw new APIError('Failed to convert image to text', 502);
       }
     });
@@ -217,10 +216,10 @@ Provide only the JSON array, no additional text. MUST return exactly 5 results.`
           };
         });
 
-        Logger.info('Similar videos found', { count: enriched.length });
+        logger.info('Similar videos found', { count: enriched.length });
         return enriched;
       } catch (error) {
-        Logger.error('Similarity matching failed', { error });
+        logger.error('Similarity matching failed', { error });
         throw new APIError('Failed to find similar videos', 502);
       }
     });
@@ -270,10 +269,10 @@ Provide only the JSON response, no additional text.`;
         const text = response.text();
         const drivers = JSON.parse(text);
 
-        Logger.info('Performance drivers analyzed');
+        logger.info('Performance drivers analyzed');
         return drivers as PerformanceDrivers;
       } catch (error) {
-        Logger.error('Performance driver analysis failed', { error });
+        logger.error('Performance driver analysis failed', { error });
         throw new APIError('Failed to analyze performance drivers', 502);
       }
     });

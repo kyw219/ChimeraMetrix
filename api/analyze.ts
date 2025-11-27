@@ -3,7 +3,7 @@ import { FileUploadHandler } from '../lib/file-handler';
 import { GeminiClient } from '../lib/gemini';
 import { sessionManager } from '../lib/session';
 import { applyCorsAndSecurity } from '../lib/cors';
-import { formatErrorResponse, sanitizeError, STATUS_CODES, Logger } from '../lib/errors';
+import { formatErrorResponse, formatErrorResponse, STATUS_CODES, logger } from '../lib/errors';
 import { validatePlatform } from '../lib/validators';
 import { AnalyzeResponse } from '../types';
 
@@ -20,7 +20,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return;
     }
 
-    Logger.info('Video analysis request received');
+    logger.info('Video analysis request received');
 
     // Parse form data
     const fileHandler = new FileUploadHandler();
@@ -35,7 +35,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return;
     }
 
-    Logger.info('Video file validated', { filename, size, platform });
+    logger.info('Video file validated', { filename, size, platform });
 
     // Analyze video using Gemini
     const geminiClient = new GeminiClient();
@@ -48,7 +48,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     // Clean up temporary file
     await fileHandler.cleanup(videoPath);
 
-    Logger.info('Video analysis completed', { sessionId });
+    logger.info('Video analysis completed', { sessionId });
 
     // Return response
     const response: AnalyzeResponse = {
@@ -61,20 +61,20 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       data: response,
     });
   } catch (error) {
-    Logger.error('Video analysis failed', { error });
+    logger.error('Video analysis failed', { error });
 
-    const isProduction = process.env.NODE_ENV === 'production';
-    const errorResponse = sanitizeError(error as Error, isProduction);
+    const isDev = process.env.NODE_ENV !== 'production';
+    const errorResponse = formatErrorResponse(error as Error, isDev);
 
     // Determine status code
-    let statusCode = STATUS_CODES.INTERNAL_SERVER_ERROR;
+    let statusCode: number = STATUS_CODES.INTERNAL_SERVER_ERROR;
     if (error instanceof Error) {
       if (error.message.includes('validation') || error.message.includes('Invalid')) {
-        statusCode = STATUS_CODES.BAD_REQUEST;
+        statusCode = STATUS_CODES as number.BAD_REQUEST;
       } else if (error.message.includes('too large')) {
-        statusCode = STATUS_CODES.PAYLOAD_TOO_LARGE;
+        statusCode = STATUS_CODES as number.PAYLOAD_TOO_LARGE;
       } else if (error.message.includes('API') || error.message.includes('Gemini')) {
-        statusCode = STATUS_CODES.BAD_GATEWAY;
+        statusCode = STATUS_CODES as number.BAD_GATEWAY;
       }
     }
 

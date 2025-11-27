@@ -2,7 +2,7 @@ import { VercelRequest, VercelResponse } from '@vercel/node';
 import { GeminiClient } from '../lib/gemini';
 import { sessionManager } from '../lib/session';
 import { applyCorsAndSecurity } from '../lib/cors';
-import { formatErrorResponse, sanitizeError, STATUS_CODES, Logger } from '../lib/errors';
+import { formatErrorResponse, STATUS_CODES, logger } from '../lib/errors';
 import { validateRequestBody, validatePlatform, validateSessionId } from '../lib/validators';
 import { RegenerateStrategyRequest, GenerateStrategyResponse, Strategy } from '../types';
 
@@ -19,22 +19,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return;
     }
 
-    Logger.info('Strategy regeneration request received');
+    logger.info('Strategy regeneration request received');
 
     // Validate request body
-    const validation = validateRequestBody<RegenerateStrategyRequest>(
+    const { sessionId, features, platform, field } = validateRequestBody<RegenerateStrategyRequest>(
       req.body,
       ['sessionId', 'features', 'platform']
     );
-
-    if (!validation.valid) {
-      res.status(STATUS_CODES.BAD_REQUEST).json(
-        formatErrorResponse(new Error(validation.error))
-      );
-      return;
-    }
-
-    const { sessionId, features, platform, field } = validation.data!;
 
     // Validate session ID format
     if (!validateSessionId(sessionId)) {
@@ -71,7 +62,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return;
     }
 
-    Logger.info('Regenerating strategy', { sessionId, field: field || 'all' });
+    logger.info('Regenerating strategy', { sessionId, field: field || 'all' });
 
     const geminiClient = new GeminiClient();
     let updatedStrategy: Strategy;
@@ -91,14 +82,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         updatedStrategy.coverImageUrl = coverImageUrl;
       }
 
-      Logger.info('Field regenerated', { sessionId, field });
+      logger.info('Field regenerated', { sessionId, field });
     } else {
       // Regenerate entire strategy
       updatedStrategy = await geminiClient.generateStrategy(features, platform);
       const coverImageUrl = await geminiClient.generateCoverImage(updatedStrategy.cover);
       updatedStrategy.coverImageUrl = coverImageUrl;
 
-      Logger.info('Entire strategy regenerated', { sessionId });
+      logger.info('Entire strategy regenerated', { sessionId });
     }
 
     // Store updated strategy in session
@@ -117,20 +108,20 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       data: response,
     });
   } catch (error) {
-    Logger.error('Strategy regeneration failed', { error });
+    logger.error('Strategy regeneration failed', { error });
 
-    const isProduction = process.env.NODE_ENV === 'production';
-    const errorResponse = sanitizeError(error as Error, isProduction);
+    const isDev = process.env.NODE_ENV !== "production";
+    const errorResponse = formatErrorResponse(error as Error, isDev);
 
     // Determine status code
-    let statusCode = STATUS_CODES.INTERNAL_SERVER_ERROR;
+    let statusCode: number = STATUS_CODES.INTERNAL_SERVER_ERROR;
     if (error instanceof Error) {
       if (error.message.includes('not found') || error.message.includes('expired')) {
-        statusCode = STATUS_CODES.NOT_FOUND;
+        statusCode = STATUS_CODES as number.NOT_FOUND;
       } else if (error.message.includes('validation') || error.message.includes('Invalid')) {
-        statusCode = STATUS_CODES.BAD_REQUEST;
+        statusCode = STATUS_CODES as number.BAD_REQUEST;
       } else if (error.message.includes('API') || error.message.includes('Gemini')) {
-        statusCode = STATUS_CODES.BAD_GATEWAY;
+        statusCode = STATUS_CODES as number.BAD_GATEWAY;
       }
     }
 

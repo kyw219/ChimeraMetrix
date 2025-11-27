@@ -2,7 +2,7 @@ import { VercelRequest, VercelResponse } from '@vercel/node';
 import { GeminiClient } from '../lib/gemini';
 import { sessionManager } from '../lib/session';
 import { applyCorsAndSecurity } from '../lib/cors';
-import { formatErrorResponse, sanitizeError, STATUS_CODES, Logger } from '../lib/errors';
+import { formatErrorResponse, STATUS_CODES, logger } from '../lib/errors';
 import { validateRequestBody, validatePlatform, validateSessionId } from '../lib/validators';
 import { GenerateStrategyRequest, GenerateStrategyResponse } from '../types';
 
@@ -19,22 +19,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return;
     }
 
-    Logger.info('Strategy generation request received');
+    logger.info('Strategy generation request received');
 
     // Validate request body
-    const validation = validateRequestBody<GenerateStrategyRequest>(
+    const { sessionId, features, platform } = validateRequestBody<GenerateStrategyRequest>(
       req.body,
       ['sessionId', 'features', 'platform']
     );
-
-    if (!validation.valid) {
-      res.status(STATUS_CODES.BAD_REQUEST).json(
-        formatErrorResponse(new Error(validation.error))
-      );
-      return;
-    }
-
-    const { sessionId, features, platform } = validation.data!;
 
     // Validate session ID format
     if (!validateSessionId(sessionId)) {
@@ -54,7 +45,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     // Retrieve session data
     const sessionData = await sessionManager.getSessionData(sessionId);
-    Logger.info('Session retrieved', { sessionId });
+    logger.info('Session retrieved', { sessionId });
 
     // Generate strategy using Gemini
     const geminiClient = new GeminiClient();
@@ -70,7 +61,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       strategy,
     });
 
-    Logger.info('Strategy generated successfully', { sessionId });
+    logger.info('Strategy generated successfully', { sessionId });
 
     // Return response
     const response: GenerateStrategyResponse = {
@@ -82,20 +73,20 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       data: response,
     });
   } catch (error) {
-    Logger.error('Strategy generation failed', { error });
+    logger.error('Strategy generation failed', { error });
 
-    const isProduction = process.env.NODE_ENV === 'production';
-    const errorResponse = sanitizeError(error as Error, isProduction);
+    const isDev = process.env.NODE_ENV !== "production";
+    const errorResponse = formatErrorResponse(error as Error, isDev);
 
     // Determine status code
-    let statusCode = STATUS_CODES.INTERNAL_SERVER_ERROR;
+    let statusCode: number = STATUS_CODES.INTERNAL_SERVER_ERROR;
     if (error instanceof Error) {
       if (error.message.includes('not found') || error.message.includes('expired')) {
-        statusCode = STATUS_CODES.NOT_FOUND;
+        statusCode = STATUS_CODES as number.NOT_FOUND;
       } else if (error.message.includes('validation') || error.message.includes('Invalid')) {
-        statusCode = STATUS_CODES.BAD_REQUEST;
+        statusCode = STATUS_CODES as number.BAD_REQUEST;
       } else if (error.message.includes('API') || error.message.includes('Gemini')) {
-        statusCode = STATUS_CODES.BAD_GATEWAY;
+        statusCode = STATUS_CODES as number.BAD_GATEWAY;
       }
     }
 

@@ -45,3 +45,42 @@ export function validateRequestBody<T>(
 
   return body as T;
 }
+
+export function validatePlatform(platform: string): boolean {
+  const validPlatforms = ['youtube', 'tiktok', 'shorts'];
+  return validPlatforms.includes(platform.toLowerCase());
+}
+
+export function validateSessionId(sessionId: string): boolean {
+  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+  return uuidRegex.test(sessionId);
+}
+
+export function validateVideoFile(
+  filename: string,
+  size: number,
+  mimeType: string
+): { valid: boolean; error?: string } {
+  if (!validateFileFormat(filename)) {
+    return {
+      valid: false,
+      error: `Invalid file format. Allowed formats: ${ALLOWED_EXTENSIONS.join(', ')}`,
+    };
+  }
+
+  if (!validateFileSize(size)) {
+    return {
+      valid: false,
+      error: `File size must be between 1 byte and ${MAX_FILE_SIZE / 1024 / 1024}MB`,
+    };
+  }
+
+  if (!validateMimeType(mimeType)) {
+    return {
+      valid: false,
+      error: 'Invalid MIME type',
+    };
+  }
+
+  return { valid: true };
+}

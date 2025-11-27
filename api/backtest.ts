@@ -3,7 +3,7 @@ import { GeminiClient } from '../lib/gemini';
 import { csvDatabase } from '../lib/csv-db';
 import { sessionManager } from '../lib/session';
 import { applyCorsAndSecurity } from '../lib/cors';
-import { formatErrorResponse, sanitizeError, STATUS_CODES, Logger } from '../lib/errors';
+import { formatErrorResponse, STATUS_CODES, logger } from '../lib/errors';
 import { validateRequestBody, validatePlatform, validateSessionId } from '../lib/validators';
 import { BacktestRequest, BacktestResponse, SimilarityQuery } from '../types';
 
@@ -20,22 +20,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return;
     }
 
-    Logger.info('Backtest request received');
+    logger.info('Backtest request received');
 
     // Validate request body
-    const validation = validateRequestBody<BacktestRequest>(
+    const { sessionId, strategy, features, platform } = validateRequestBody<BacktestRequest>(
       req.body,
       ['sessionId', 'strategy', 'features', 'platform']
     );
-
-    if (!validation.valid) {
-      res.status(STATUS_CODES.BAD_REQUEST).json(
-        formatErrorResponse(new Error(validation.error))
-      );
-      return;
-    }
-
-    const { sessionId, strategy, features, platform } = validation.data!;
 
     // Validate session ID format
     if (!validateSessionId(sessionId)) {
@@ -55,7 +46,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     // Retrieve session data
     await sessionManager.getSessionData(sessionId);
-    Logger.info('Session retrieved for backtest', { sessionId });
+    logger.info('Session retrieved for backtest', { sessionId });
 
     // Initialize CSV database
     await csvDatabase.initialize();
@@ -67,9 +58,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     if (strategy.coverImageUrl) {
       try {
         coverDescription = await geminiClient.imageToText(strategy.coverImageUrl);
-        Logger.info('Cover image converted to text');
+        logger.info('Cover image converted to text');
       } catch (error) {
-        Logger.warn('Failed to convert cover image, using text description', { error });
+        logger.warn('Failed to convert cover image, using text description', { error });
       }
     }
 
@@ -89,7 +80,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       throw new Error(`Expected 5 similar videos, got ${similarVideos.length}`);
     }
 
-    Logger.info('Similar videos found', { count: similarVideos.length });
+    logger.info('Similar videos found', { count: similarVideos.length });
 
     // Step 3: Retrieve time-series data for matched videos
     const videoIds = similarVideos.map((v) => v.videoId);
@@ -98,7 +89,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     // Step 4: Aggregate time-series data (calculate averages)
     const aggregatedMetrics = csvDatabase.aggregateTimeSeries(timeSeriesData);
 
-    Logger.info('Time-series data aggregated');
+    logger.info('Time-series data aggregated');
 
     // Step 5: Enrich similar videos with CTR and views data
     const enrichedSimilarVideos = similarVideos.map((video, index) => {
@@ -127,7 +118,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       videoMetadata
     );
 
-    Logger.info('Performance drivers analyzed', { sessionId });
+    logger.info('Performance drivers analyzed', { sessionId });
 
     // Return response
     const response: BacktestResponse = {
@@ -141,20 +132,20 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       data: response,
     });
   } catch (error) {
-    Logger.error('Backtest failed', { error });
+    logger.error('Backtest failed', { error });
 
-    const isProduction = process.env.NODE_ENV === 'production';
-    const errorResponse = sanitizeError(error as Error, isProduction);
+    const isDev = process.env.NODE_ENV !== "production";
+    const errorResponse = formatErrorResponse(error as Error, isDev);
 
     // Determine status code
-    let statusCode = STATUS_CODES.INTERNAL_SERVER_ERROR;
+    let statusCode: number = STATUS_CODES.INTERNAL_SERVER_ERROR;
     if (error instanceof Error) {
       if (error.message.includes('not found') || error.message.includes('expired')) {
-        statusCode = STATUS_CODES.NOT_FOUND;
+        statusCode = STATUS_CODES as number.NOT_FOUND;
       } else if (error.message.includes('validation') || error.message.includes('Invalid')) {
-        statusCode = STATUS_CODES.BAD_REQUEST;
+        statusCode = STATUS_CODES as number.BAD_REQUEST;
       } else if (error.message.includes('API') || error.message.includes('Gemini')) {
-        statusCode = STATUS_CODES.BAD_GATEWAY;
+        statusCode = STATUS_CODES as number.BAD_GATEWAY;
       }
     }
 

@@ -3,7 +3,7 @@ import { IncomingMessage } from 'http';
 import { promises as fs } from 'fs';
 import path from 'path';
 import { validateVideoFile, sanitizeFileName } from './validators';
-import { ValidationError, Logger } from './errors';
+import { formatErrorResponse, STATUS_CODES, logger } from './errors';
 
 export interface ParsedFormData {
   video: Buffer;
@@ -34,7 +34,7 @@ export class FileUploadHandler {
 
       form.parse(req, async (err, fields, files) => {
         if (err) {
-          Logger.error('Form parsing error', { error: err.message });
+          logger.error('Form parsing error', { error: err.message });
           reject(new ValidationError('Failed to parse form data', { error: err.message }));
           return;
         }
@@ -98,10 +98,10 @@ export class FileUploadHandler {
 
     try {
       await fs.writeFile(filepath, buffer);
-      Logger.info('Video saved to temporary storage', { filepath });
+      logger.info('Video saved to temporary storage', { filepath });
       return filepath;
     } catch (error) {
-      Logger.error('Failed to save video', { error });
+      logger.error('Failed to save video', { error });
       throw new ValidationError('Failed to save video file');
     }
   }
@@ -112,10 +112,10 @@ export class FileUploadHandler {
   async cleanup(filepath: string): Promise<void> {
     try {
       await fs.unlink(filepath);
-      Logger.info('Temporary file cleaned up', { filepath });
+      logger.info('Temporary file cleaned up', { filepath });
     } catch (error) {
       // Log but don't throw - cleanup failures shouldn't break the flow
-      Logger.warn('Failed to cleanup temporary file', { filepath, error });
+      logger.warn('Failed to cleanup temporary file', { filepath, error });
     }
   }
 

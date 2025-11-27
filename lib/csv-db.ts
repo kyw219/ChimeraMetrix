@@ -1,12 +1,11 @@
 import { parse } from 'csv-parse/sync';
 import { promises as fs } from 'fs';
-import path from 'path';
 import {
   VideoMetadata,
   TimeSeriesData,
   AggregatedMetrics,
 } from '../types';
-import { NotFoundError, Logger } from './errors';
+import { formatErrorResponse, STATUS_CODES, logger } from './errors';
 
 interface CSVRow {
   video_id: string;
@@ -57,12 +56,12 @@ export class CSVDatabase {
         trim: true,
       });
 
-      Logger.info('CSV database initialized', {
+      logger.info('CSV database initialized', {
         path: this.csvPath,
         rows: this.data.length,
       });
     } catch (error) {
-      Logger.error('Failed to load CSV database', { error });
+      logger.error('Failed to load CSV database', { error });
       throw new Error('Failed to load CSV database');
     }
   }
@@ -109,7 +108,7 @@ export class CSVDatabase {
     const missingIds = videoIds.filter((id) => !foundIds.includes(id));
 
     if (missingIds.length > 0) {
-      Logger.warn('Some video IDs not found', { missingIds });
+      logger.warn('Some video IDs not found', { missingIds });
     }
 
     return videos;

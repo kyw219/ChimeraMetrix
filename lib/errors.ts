@@ -1,16 +1,16 @@
 import { ErrorResponse } from '../types';
 
 export const STATUS_CODES = {
-  OK: 200,
-  BAD_REQUEST: 400,
-  FORBIDDEN: 403,
-  NOT_FOUND: 404,
-  PAYLOAD_TOO_LARGE: 413,
-  INTERNAL_SERVER_ERROR: 500,
-  BAD_GATEWAY: 502,
-  SERVICE_UNAVAILABLE: 503,
-  GATEWAY_TIMEOUT: 504,
-} as const;
+  OK: 200 as number,
+  BAD_REQUEST: 400 as number,
+  FORBIDDEN: 403 as number,
+  NOT_FOUND: 404 as number,
+  PAYLOAD_TOO_LARGE: 413 as number,
+  INTERNAL_SERVER_ERROR: 500 as number,
+  BAD_GATEWAY: 502 as number,
+  SERVICE_UNAVAILABLE: 503 as number,
+  GATEWAY_TIMEOUT: 504 as number,
+};
 
 export class ValidationError extends Error {
   constructor(message: string) {
@@ -83,14 +83,12 @@ type LogLevel = 'ERROR' | 'WARN' | 'INFO' | 'DEBUG';
 interface LogEntry {
   timestamp: string;
   level: LogLevel;
-  endpoint?: string;
-  sessionId?: string;
   message: string;
-  details?: any;
+  [key: string]: any;
 }
 
 export const logger = {
-  log(level: LogLevel, message: string, meta: Partial<LogEntry> = {}) {
+  log(level: LogLevel, message: string, meta: Record<string, any> = {}) {
     const entry: LogEntry = {
       timestamp: new Date().toISOString(),
       level,
@@ -100,19 +98,19 @@ export const logger = {
     console.log(JSON.stringify(entry));
   },
 
-  error(message: string, meta?: Partial<LogEntry>) {
+  error(message: string, meta?: Record<string, any>) {
     this.log('ERROR', message, meta);
   },
 
-  warn(message: string, meta?: Partial<LogEntry>) {
+  warn(message: string, meta?: Record<string, any>) {
     this.log('WARN', message, meta);
   },
 
-  info(message: string, meta?: Partial<LogEntry>) {
+  info(message: string, meta?: Record<string, any>) {
     this.log('INFO', message, meta);
   },
 
-  debug(message: string, meta?: Partial<LogEntry>) {
+  debug(message: string, meta?: Record<string, any>) {
     if (process.env.NODE_ENV !== 'production') {
       this.log('DEBUG', message, meta);
     }

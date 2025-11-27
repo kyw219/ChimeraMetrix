@@ -1,5 +1,5 @@
 import { IncomingMessage, ServerResponse } from 'http';
-import { UnauthorizedError, Logger } from './errors';
+import { formatErrorResponse, STATUS_CODES, logger } from './errors';
 
 /**
  * Get allowed origins from environment
@@ -32,12 +32,12 @@ export function setCorsHeaders(
   const requestOrigin = origin || req.headers.origin;
 
   if (!requestOrigin) {
-    Logger.warn('Request without origin header');
+    logger.warn('Request without origin header');
     return;
   }
 
   if (!validateOrigin(requestOrigin)) {
-    Logger.warn('Unauthorized origin blocked', { origin: requestOrigin });
+    logger.warn('Unauthorized origin blocked', { origin: requestOrigin });
     throw new UnauthorizedError('Origin not allowed', { origin: requestOrigin });
   }
 
@@ -47,7 +47,7 @@ export function setCorsHeaders(
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
   res.setHeader('Access-Control-Max-Age', '86400'); // 24 hours
 
-  Logger.debug('CORS headers set', { origin: requestOrigin });
+  logger.debug('CORS headers set', { origin: requestOrigin });
 }
 
 /**
