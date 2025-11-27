@@ -28,6 +28,24 @@ export default function Upload() {
   const handleGenerateStrategy = async () => {
     if (!file) return;
     
+    // Check file size (Vercel free tier limit is 4.5MB)
+    const maxSize = 4.5 * 1024 * 1024; // 4.5MB in bytes
+    if (file.size > maxSize) {
+      const fileSizeMB = (file.size / (1024 * 1024)).toFixed(2);
+      toast({
+        title: "File Too Large",
+        description: `Your video is ${fileSizeMB}MB. Due to Vercel's free tier limits, please use a video smaller than 4.5MB for now. We're working on supporting larger files!`,
+        variant: "destructive",
+      });
+      console.log(`❌ File too large: ${fileSizeMB}MB (max 4.5MB on free tier)`);
+      
+      // Fallback to mock data for demo
+      console.log('⚠️ Using mock data for demo purposes');
+      setAnalysis(mockAnalysis);
+      setStrategy(mockStrategy);
+      return;
+    }
+    
     setIsGenerating(true);
     console.log('🚀 Starting video analysis...');
     console.log('📁 File:', file.name, file.size, 'bytes');
