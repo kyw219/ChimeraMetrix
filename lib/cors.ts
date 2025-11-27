@@ -14,10 +14,17 @@ function getAllowedOrigins(): string[] {
  */
 export function validateOrigin(origin: string | undefined): boolean {
   if (!origin) {
-    return false;
+    // Allow requests without origin (same-origin requests)
+    return true;
   }
 
   const allowedOrigins = getAllowedOrigins();
+  
+  // Allow same-origin requests (when frontend and backend are on same domain)
+  if (origin.includes('chimera-metrix.vercel.app')) {
+    return true;
+  }
+  
   return allowedOrigins.includes(origin);
 }
 
