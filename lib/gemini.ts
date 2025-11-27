@@ -51,8 +51,13 @@ export class GeminiClient {
    * Analyze video and extract features
    */
   async analyzeVideo(videoBuffer: Buffer, platform: string): Promise<VideoFeatures> {
+    console.log('🔍 analyzeVideo called');
+    console.log('   - Buffer size:', videoBuffer.length);
+    console.log('   - Platform:', platform);
+    
     return this.retryWithBackoff(async () => {
       try {
+        console.log('📝 Preparing Gemini prompt...');
         const prompt = `Analyze this ${platform} video and extract the following features in JSON format:
 {
   "category": "main content category (e.g., Food & Cooking, Tech, Gaming)",
@@ -65,6 +70,10 @@ export class GeminiClient {
 
 Provide only the JSON response, no additional text.`;
 
+        console.log('🚀 Calling Gemini API...');
+        console.log('   - Model:', process.env.GEMINI_MODEL || 'gemini-1.5-pro');
+        console.log('   - Video base64 length:', videoBuffer.toString('base64').length);
+        
         const result = await this.model.generateContent([
           prompt,
           {
@@ -75,13 +84,22 @@ Provide only the JSON response, no additional text.`;
           },
         ]);
 
+        console.log('✅ Gemini API call completed');
         const response = await result.response;
+        console.log('📄 Parsing response...');
         const text = response.text();
+        console.log('📝 Raw response text:', text.substring(0, 200) + '...');
+        
         const features = JSON.parse(text);
+        console.log('✅ Features parsed successfully:', features);
 
         logger.info('Video analyzed successfully', { platform });
         return features as VideoFeatures;
       } catch (error) {
+        console.error('❌ Gemini API error:', error);
+        console.error('   - Error type:', error?.constructor?.name);
+        console.error('   - Error message:', error instanceof Error ? error.message : String(error));
+        console.error('   - Error stack:', error instanceof Error ? error.stack : 'N/A');
         logger.error('Video analysis failed', { error });
         throw new APIError('Failed to analyze video', 502);
       }

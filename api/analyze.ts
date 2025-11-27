@@ -38,8 +38,16 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     logger.info('Video file validated', { filename, size, platform });
 
     // Analyze video using Gemini
+    console.log('🤖 Initializing Gemini client...');
     const geminiClient = new GeminiClient();
+    console.log('✅ Gemini client initialized');
+    
+    console.log('📹 Calling Gemini API to analyze video...');
+    console.log('   - Video size:', video.length, 'bytes');
+    console.log('   - Platform:', platform);
+    
     const features = await geminiClient.analyzeVideo(video, platform);
+    console.log('✅ Gemini API returned features:', features);
 
     // Create session and store features
     const sessionId = sessionManager.createSession();
