@@ -13,30 +13,38 @@ export const STATUS_CODES = {
 };
 
 export class ValidationError extends Error {
-  constructor(message: string) {
+  public details?: any;
+  constructor(message: string, details?: any) {
     super(message);
     this.name = 'ValidationError';
+    this.details = details;
   }
 }
 
 export class APIError extends Error {
-  constructor(message: string) {
+  public details?: any;
+  constructor(message: string, details?: any) {
     super(message);
     this.name = 'APIError';
+    this.details = details;
   }
 }
 
 export class NotFoundError extends Error {
-  constructor(message: string) {
+  public details?: any;
+  constructor(message: string, details?: any) {
     super(message);
     this.name = 'NotFoundError';
+    this.details = details;
   }
 }
 
 export class UnauthorizedError extends Error {
-  constructor(message: string) {
+  public details?: any;
+  constructor(message: string, details?: any) {
     super(message);
     this.name = 'UnauthorizedError';
+    this.details = details;
   }
 }
 

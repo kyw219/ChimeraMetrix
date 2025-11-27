@@ -3,7 +3,7 @@ import { FileUploadHandler } from '../lib/file-handler';
 import { GeminiClient } from '../lib/gemini';
 import { sessionManager } from '../lib/session';
 import { applyCorsAndSecurity } from '../lib/cors';
-import { formatErrorResponse, formatErrorResponse, STATUS_CODES, logger } from '../lib/errors';
+import { formatErrorResponse, STATUS_CODES, logger } from '../lib/errors';
 import { validatePlatform } from '../lib/validators';
 import { AnalyzeResponse } from '../types';
 

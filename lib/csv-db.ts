@@ -102,7 +102,11 @@ export class CSVDatabase {
   async getVideosByIds(videoIds: string[]): Promise<CSVRow[]> {
     await this.ensureInitialized();
 
-    const videos = this.data!.filter((row) => videoIds.includes(row.video_id));
+    if (!this.data) {
+      throw new Error('CSV data not initialized');
+    }
+
+    const videos = this.data.filter((row) => videoIds.includes(row.video_id));
 
     if (videos.length === 0) {
       throw new NotFoundError('No videos found with provided IDs', { videoIds });
