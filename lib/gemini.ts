@@ -87,8 +87,12 @@ Provide only the JSON response, no additional text.`;
         console.log('✅ Gemini API call completed');
         const response = await result.response;
         console.log('📄 Parsing response...');
-        const text = response.text();
+        let text = response.text();
         console.log('📝 Raw response text:', text.substring(0, 200) + '...');
+        
+        // Clean up markdown code blocks if present
+        text = text.replace(/```json\s*/g, '').replace(/```\s*/g, '').trim();
+        console.log('🧹 Cleaned text:', text.substring(0, 200) + '...');
         
         const features = JSON.parse(text);
         console.log('✅ Features parsed successfully:', features);
@@ -133,7 +137,9 @@ Provide only the JSON response, no additional text.`;
 
         const result = await this.model.generateContent(prompt);
         const response = await result.response;
-        const text = response.text();
+        let text = response.text();
+        // Clean up markdown code blocks if present
+        text = text.replace(/```json\s*/g, '').replace(/```\s*/g, '').trim();
         const strategy = JSON.parse(text);
 
         logger.info('Strategy generated successfully', { platform });
@@ -217,7 +223,9 @@ Provide only the JSON array, no additional text. MUST return exactly 5 results.`
 
         const result = await this.model.generateContent(prompt);
         const response = await result.response;
-        const text = response.text();
+        let text = response.text();
+        // Clean up markdown code blocks if present
+        text = text.replace(/```json\s*/g, '').replace(/```\s*/g, '').trim();
         const matches = JSON.parse(text);
 
         // Ensure exactly 5 results
@@ -288,7 +296,9 @@ Provide only the JSON response, no additional text.`;
 
         const result = await this.model.generateContent(prompt);
         const response = await result.response;
-        const text = response.text();
+        let text = response.text();
+        // Clean up markdown code blocks if present
+        text = text.replace(/```json\s*/g, '').replace(/```\s*/g, '').trim();
         const drivers = JSON.parse(text);
 
         logger.info('Performance drivers analyzed');
