@@ -97,6 +97,7 @@ export interface RegenerateStrategyRequest {
   features: VideoFeatures;
   platform: string;
   field?: 'cover' | 'title' | 'hashtags' | 'postingTime';
+  currentStrategy?: Strategy;
 }
 
 export interface BacktestRequest {

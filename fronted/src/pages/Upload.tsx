@@ -229,7 +229,7 @@ export default function Upload() {
   };
 
   const handleRegenerateField = async (field: string) => {
-    if (!sessionId || !analysis) {
+    if (!sessionId || !analysis || !strategy) {
       toast({
         title: "Error",
         description: "Please analyze a video first",
@@ -246,6 +246,7 @@ export default function Upload() {
         features: analysis,
         platform,
         field, // Specify which field to regenerate
+        currentStrategy: strategy, // Pass current strategy to preserve other fields
       };
 
       const response = await fetch(`${API_BASE_URL}/api/regenerate-strategy`, {
@@ -264,6 +265,7 @@ export default function Upload() {
 
       setStrategy(data.data.strategy);
       console.log(`✅ ${field} regenerated successfully`);
+      console.log('   - Updated strategy:', data.data.strategy);
       
       toast({
         title: "Success!",

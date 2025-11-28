@@ -22,7 +22,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     logger.info('Strategy regeneration request received');
 
     // Validate request body
-    const { sessionId, features, platform, field } = validateRequestBody<RegenerateStrategyRequest>(
+    const { sessionId, features, platform, field, currentStrategy } = validateRequestBody<RegenerateStrategyRequest>(
       req.body,
       ['sessionId', 'features', 'platform']
     );
@@ -51,22 +51,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return;
     }
 
-    // Try to retrieve existing strategy from session (optional in serverless)
-    let existingStrategy: Strategy | undefined;
-    try {
-      const sessionData = await sessionManager.getSessionData(sessionId);
-      existingStrategy = sessionData.strategy;
-    } catch (error) {
-      // Session not found - this is OK in serverless
-      logger.warn('Session not found, will generate new strategy', { sessionId });
-    }
+    // Use currentStrategy from request (for serverless compatibility)
+    const existingStrategy = currentStrategy;
 
     logger.info('Regenerating strategy', { sessionId, field: field || 'all' });
 
     const geminiClient = new GeminiClient();
     let updatedStrategy: Strategy;
 
-    if (field) {
+    if (field && existingStrategy) {
       // Regenerate only the specified field
       const newStrategy = await geminiClient.generateStrategy(features, platform);
 
