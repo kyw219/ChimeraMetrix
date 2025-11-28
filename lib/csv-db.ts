@@ -36,8 +36,12 @@ export class CSVDatabase {
   private data: CSVRow[] | null = null;
   private csvPath: string;
 
-  constructor(csvPath: string = 'backtest-data.csv') {
-    this.csvPath = csvPath;
+  constructor(csvPath?: string) {
+    // In Vercel, use absolute path from project root
+    const defaultPath = process.env.VERCEL 
+      ? '/var/task/backtest-data.csv'  // Vercel serverless path
+      : 'backtest-data.csv';            // Local development path
+    this.csvPath = csvPath || defaultPath;
   }
 
   /**
