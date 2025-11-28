@@ -100,8 +100,12 @@ Provide only the JSON response, no additional text.`;
         console.error('   - Error type:', error?.constructor?.name);
         console.error('   - Error message:', error instanceof Error ? error.message : String(error));
         console.error('   - Error stack:', error instanceof Error ? error.stack : 'N/A');
+        console.error('   - Full error:', JSON.stringify(error, Object.getOwnPropertyNames(error)));
         logger.error('Video analysis failed', { error });
-        throw new APIError('Failed to analyze video', 502);
+        
+        // Preserve original error message
+        const errorMessage = error instanceof Error ? error.message : 'Failed to analyze video';
+        throw new APIError(`Gemini API Error: ${errorMessage}`, 502);
       }
     });
   }
