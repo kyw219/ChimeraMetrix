@@ -51,15 +51,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return;
     }
 
-    // Retrieve session data
-    const sessionData = await sessionManager.getSessionData(sessionId);
-    const existingStrategy = sessionData.strategy;
-
-    if (!existingStrategy) {
-      res.status(STATUS_CODES.BAD_REQUEST).json(
-        formatErrorResponse(new Error('No existing strategy found. Generate a strategy first.'))
-      );
-      return;
+    // Try to retrieve existing strategy from session (optional in serverless)
+    let existingStrategy: Strategy | undefined;
+    try {
+      const sessionData = await sessionManager.getSessionData(sessionId);
+      existingStrategy = sessionData.strategy;
+    } catch (error) {
+      // Session not found - this is OK in serverless
+      logger.warn('Session not found, will generate new strategy', { sessionId });
     }
 
     logger.info('Regenerating strategy', { sessionId, field: field || 'all' });
@@ -92,11 +91,17 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       logger.info('Entire strategy regenerated', { sessionId });
     }
 
-    // Store updated strategy in session
-    await sessionManager.setSessionData(sessionId, {
-      ...sessionData,
-      strategy: updatedStrategy,
-    });
+    // Try to store updated strategy in session (optional in serverless)
+    try {
+      const sessionData = await sessionManager.getSessionData(sessionId);
+      await sessionManager.setSessionData(sessionId, {
+        ...sessionData,
+        strategy: updatedStrategy,
+      });
+      logger.info('Updated strategy stored in session', { sessionId });
+    } catch (error) {
+      logger.warn('Could not store strategy in session (serverless limitation)', { sessionId });
+    }
 
     // Return response
     const response: GenerateStrategyResponse = {

@@ -43,11 +43,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return;
     }
 
-    // Retrieve session data
-    const sessionData = await sessionManager.getSessionData(sessionId);
-    logger.info('Session retrieved', { sessionId });
-
-    // Generate strategy using Gemini
+    // Generate strategy using Gemini (use features from request body)
     const geminiClient = new GeminiClient();
     const strategy = await geminiClient.generateStrategy(features, platform);
 
@@ -55,11 +51,18 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const coverImageUrl = await geminiClient.generateCoverImage(strategy.cover);
     strategy.coverImageUrl = coverImageUrl;
 
-    // Store strategy in session
-    await sessionManager.setSessionData(sessionId, {
-      ...sessionData,
-      strategy,
-    });
+    // Try to store strategy in session (optional, may fail in serverless)
+    try {
+      const sessionData = await sessionManager.getSessionData(sessionId);
+      await sessionManager.setSessionData(sessionId, {
+        ...sessionData,
+        strategy,
+      });
+      logger.info('Strategy stored in session', { sessionId });
+    } catch (error) {
+      // Session not found or expired - this is OK in serverless environment
+      logger.warn('Could not store strategy in session (serverless limitation)', { sessionId });
+    }
 
     logger.info('Strategy generated successfully', { sessionId });
 

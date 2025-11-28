@@ -44,9 +44,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return;
     }
 
-    // Retrieve session data
-    await sessionManager.getSessionData(sessionId);
-    logger.info('Session retrieved for backtest', { sessionId });
+    // Session validation (optional in serverless)
+    try {
+      await sessionManager.getSessionData(sessionId);
+      logger.info('Session retrieved for backtest', { sessionId });
+    } catch (error) {
+      // Session not found - this is OK in serverless, we have all data in request
+      logger.warn('Session not found, using request data', { sessionId });
+    }
 
     // Initialize CSV database
     await csvDatabase.initialize();
