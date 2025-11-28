@@ -58,6 +58,10 @@ export class CSVDatabase {
         columns: true,
         skip_empty_lines: true,
         trim: true,
+        quote: '"',
+        escape: '"',
+        relax_column_count: true, // Allow inconsistent column counts
+        relax_quotes: true,        // Be lenient with quotes
       });
 
       logger.info('CSV database initialized', {
