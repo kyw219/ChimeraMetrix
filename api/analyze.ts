@@ -69,10 +69,25 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       data: response,
     });
   } catch (error) {
+    console.error('❌❌❌ ANALYZE ENDPOINT ERROR ❌❌❌');
+    console.error('Error type:', error?.constructor?.name);
+    console.error('Error message:', error instanceof Error ? error.message : String(error));
+    console.error('Error stack:', error instanceof Error ? error.stack : 'N/A');
+    console.error('Full error object:', JSON.stringify(error, Object.getOwnPropertyNames(error)));
+    
     logger.error('Video analysis failed', { error });
 
     const isDev = process.env.NODE_ENV !== 'production';
     const errorResponse = formatErrorResponse(error as Error, isDev);
+
+    // Add detailed error info for debugging
+    if (error instanceof Error) {
+      (errorResponse as any).details = {
+        message: error.message,
+        stack: isDev ? error.stack : undefined,
+        name: error.name,
+      };
+    }
 
     // Determine status code
     let statusCode: number = STATUS_CODES.INTERNAL_SERVER_ERROR;
