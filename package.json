@@ -20,7 +20,7 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "@google/generative-ai": "^0.2.0",
+    "@google/generative-ai": "^0.21.0",
     "csv-parse": "^5.5.0",
     "formidable": "^3.5.0",
     "uuid": "^9.0.0"
