@@ -213,12 +213,70 @@ export default function Upload() {
     }
   };
 
-  const handleStartBacktest = () => {
+  const handleStartBacktest = async () => {
+    if (!sessionId || !analysis || !strategy) {
+      toast({
+        title: "Error",
+        description: "Please generate a strategy first",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsRunningBacktest(true);
+    console.log('\n🔬 Starting backtest...');
+
+    try {
+      const payload = {
+        sessionId,
+        strategy,
+        features: analysis,
+        platform,
+      };
+
+      console.log('📤 Backtest request payload:', JSON.stringify(payload, null, 2));
+
+      const response = await fetch(`${API_BASE_URL}/api/backtest`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await response.json();
+      console.log('📥 Backtest response:', data);
+
+      if (!data.success) {
+        throw new Error(data.error?.message || 'Failed to run backtest');
+      }
+
+      console.log('✅ Backtest completed successfully');
+
+      // Navigate to backtest page with results
+      navigate("/backtest", {
+        state: {
+          predictions: data.data.predictions,
+          matchedVideos: data.data.matchedVideos,
+          performanceDrivers: data.data.performanceDrivers,
+          strategy,
+          features: analysis,
+        },
+      });
+    } catch (error) {
+      console.error('❌ Backtest failed:', error);
+      setIsRunningBacktest(false);
+      toast({
+        title: "Error",
+        description: error instanceof Error ? error.message : 'Failed to run backtest',
+        variant: "destructive",
+      });
+    }
   };
 
   const handleBacktestComplete = () => {
-    navigate("/backtest");
+    // This is called after the loading animation
+    // The actual navigation happens in handleStartBacktest
   };
 
   const handleReset = () => {

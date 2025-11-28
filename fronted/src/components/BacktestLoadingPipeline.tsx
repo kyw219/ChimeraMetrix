@@ -3,6 +3,7 @@ import { CheckCircle2, Loader2 } from "lucide-react";
 
 interface BacktestLoadingPipelineProps {
   onComplete: () => void;
+  onError?: (error: Error) => void;
 }
 
 interface Step {

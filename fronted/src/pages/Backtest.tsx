@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { MetricCard } from "@/components/MetricCard";
 import { PerformanceChart } from "@/components/PerformanceChart";
@@ -9,13 +10,39 @@ import { Button } from "@/components/ui/button";
 import { Eye, TrendingUp, Heart, Sparkles } from "lucide-react";
 import { mockBacktestData, mockMatchedVideos, mockInsights, mockStrategy } from "@/lib/mockData";
 
-const InsightsPanel = () => {
+const InsightsPanel = ({ strategy, performanceDrivers, matchedVideos }: any) => {
+  // Convert performanceDrivers to factors format
+  const factors = performanceDrivers ? [
+    {
+      name: "Cover Design",
+      impact: performanceDrivers.coverDesign.impact === "High" ? "High Impact" : performanceDrivers.coverDesign.impact === "Medium" ? "Medium Impact" : "Low Impact",
+      description: performanceDrivers.coverDesign.reason,
+    },
+    {
+      name: "Title Framing",
+      impact: performanceDrivers.titleFraming.impact === "High" ? "High Impact" : performanceDrivers.titleFraming.impact === "Medium" ? "Medium Impact" : "Low Impact",
+      description: performanceDrivers.titleFraming.reason,
+    },
+    {
+      name: "Hashtag Combination",
+      impact: performanceDrivers.hashtagCombination.impact === "High" ? "High Impact" : performanceDrivers.hashtagCombination.impact === "Medium" ? "Medium Impact" : "Low Impact",
+      description: performanceDrivers.hashtagCombination.reason,
+    },
+    {
+      name: "Posting Time",
+      impact: performanceDrivers.postingTime.impact === "High" ? "High Impact" : performanceDrivers.postingTime.impact === "Medium" ? "Medium Impact" : "Low Impact",
+      description: performanceDrivers.postingTime.reason,
+    },
+  ] : mockInsights.factors;
+
+  const videos = matchedVideos || mockMatchedVideos;
+
   return (
     <div className="space-y-6">
       {/* Strategy Preview Snapshot */}
       <div>
         <StrategyPreview 
-          strategy={mockStrategy}
+          strategy={strategy || mockStrategy}
           label="Strategy used for model prediction"
         />
       </div>
@@ -26,7 +53,7 @@ const InsightsPanel = () => {
           Performance Drivers
         </h3>
         <div className="space-y-2">
-          {mockInsights.factors.map((factor, index) => (
+          {factors.map((factor, index) => (
             <div key={index} className="subpanel rounded-xl p-3 hover:bg-[hsl(var(--module-bg))] transition-colors">
               <div className="flex items-start justify-between gap-2 mb-1">
                 <span className="text-xs font-semibold text-foreground">{factor.name}</span>
@@ -46,14 +73,14 @@ const InsightsPanel = () => {
       {/* Matched Videos */}
       <div>
         <h3 className="text-sm font-bold text-info mb-3 uppercase tracking-wide">
-          Reference Dataset (K={mockMatchedVideos.length})
+          Reference Dataset (K={videos.length})
         </h3>
         <div className="space-y-2">
-          {mockMatchedVideos.map((video, index) => (
+          {videos.map((video: any, index: number) => (
             <div key={index} className="subpanel rounded-xl p-3 hover:bg-[hsl(var(--module-bg))] transition-all">
               <div className="flex items-start gap-3">
                 <div className="w-10 h-10 bg-muted/30 rounded-lg flex items-center justify-center text-lg shrink-0">
-                  {video.thumbnail}
+                  {video.thumbnail || '🎬'}
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-[10px] font-medium text-foreground mb-1 line-clamp-2 leading-tight">
@@ -65,7 +92,7 @@ const InsightsPanel = () => {
                     <span>{video.views24h} views</span>
                   </div>
                   <Badge variant="outline" className="text-[9px] px-2 py-0.5 bg-info/10 text-info border-info/30">
-                    Similarity {video.similarity}
+                    Similarity {video.similarity || (video.similarity * 100).toFixed(0) + '%'}
                   </Badge>
                 </div>
               </div>
@@ -78,8 +105,21 @@ const InsightsPanel = () => {
 };
 
 export default function Backtest() {
+  const location = useLocation();
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("views");
   const [isSaved, setIsSaved] = useState(false);
+
+  // Get data from navigation state or use mock data
+  const { predictions, matchedVideos, performanceDrivers, strategy, features } = location.state || {};
+  const backtestData = predictions || mockBacktestData;
+
+  // Redirect to upload if no data
+  useEffect(() => {
+    if (!location.state) {
+      console.warn('No backtest data found, using mock data');
+    }
+  }, [location.state]);
 
   const handleSave = () => {
     setIsSaved(true);
@@ -92,11 +132,11 @@ export default function Backtest() {
   const getChartData = () => {
     switch (activeTab) {
       case "views":
-        return mockBacktestData.views;
+        return backtestData.views;
       case "ctr":
-        return mockBacktestData.ctr;
+        return backtestData.ctr;
       case "likes":
-        return mockBacktestData.likes;
+        return backtestData.likes;
       default:
         return mockBacktestData.views;
     }
@@ -116,7 +156,7 @@ export default function Backtest() {
   };
 
   return (
-    <DashboardLayout rightPanel={<InsightsPanel />}>
+    <DashboardLayout rightPanel={<InsightsPanel strategy={strategy} performanceDrivers={performanceDrivers} matchedVideos={matchedVideos} />}>
       <div className="max-w-5xl">
         {/* Page Header */}
         <div className="mb-8">
@@ -134,25 +174,25 @@ export default function Backtest() {
           <MetricCard
             icon={Eye}
             label="Predicted 24h Views"
-            value={mockBacktestData.metrics.views24h}
+            value={backtestData.metrics.views24h}
             note="Based on averaged performance of matched videos"
-            badge={`${mockMatchedVideos.length} matched videos`}
+            badge={`${matchedVideos?.length || mockMatchedVideos.length} matched videos`}
             iconColor="text-chart-1"
           />
           <MetricCard
             icon={TrendingUp}
             label="Predicted 24h CTR"
-            value={mockBacktestData.metrics.ctr24h}
+            value={backtestData.metrics.ctr24h}
             note="Based on averaged performance of matched videos"
-            badge={`${mockMatchedVideos.length} matched videos`}
+            badge={`${matchedVideos?.length || mockMatchedVideos.length} matched videos`}
             iconColor="text-chart-2"
           />
           <MetricCard
             icon={Heart}
             label="Predicted 24h Likes"
-            value={mockBacktestData.metrics.likes24h}
+            value={backtestData.metrics.likes24h}
             note="Based on averaged performance of matched videos"
-            badge={`${mockMatchedVideos.length} matched videos`}
+            badge={`${matchedVideos?.length || mockMatchedVideos.length} matched videos`}
             iconColor="text-chart-3"
           />
         </div>
