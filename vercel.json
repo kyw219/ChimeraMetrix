@@ -4,7 +4,8 @@
   "installCommand": "npm install",
   "functions": {
     "api/**/*.ts": {
-      "maxDuration": 60
+      "maxDuration": 60,
+      "includeFiles": "backtest-data.csv"
     }
   }
 }
