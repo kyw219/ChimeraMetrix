@@ -228,9 +228,55 @@ export default function Upload() {
     setIsRunningBacktest(false);
   };
 
-  const handleRegenerateField = (field: string) => {
-    console.log(`Regenerating ${field}...`);
-    // TODO: Implement regeneration logic
+  const handleRegenerateField = async (field: string) => {
+    if (!sessionId || !analysis) {
+      toast({
+        title: "Error",
+        description: "Please analyze a video first",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    console.log(`🔄 Regenerating ${field}...`);
+    
+    try {
+      const payload = {
+        sessionId,
+        features: analysis,
+        platform,
+        field, // Specify which field to regenerate
+      };
+
+      const response = await fetch(`${API_BASE_URL}/api/regenerate-strategy`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await response.json();
+
+      if (!data.success) {
+        throw new Error(data.error?.message || 'Failed to regenerate');
+      }
+
+      setStrategy(data.data.strategy);
+      console.log(`✅ ${field} regenerated successfully`);
+      
+      toast({
+        title: "Success!",
+        description: `${field.charAt(0).toUpperCase() + field.slice(1)} regenerated`,
+      });
+    } catch (error) {
+      console.error(`❌ Failed to regenerate ${field}:`, error);
+      toast({
+        title: "Error",
+        description: error instanceof Error ? error.message : 'Failed to regenerate',
+        variant: "destructive",
+      });
+    }
   };
 
   return (
