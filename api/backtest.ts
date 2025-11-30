@@ -5,7 +5,7 @@ import { sessionManager } from '../lib/session';
 import { applyCorsAndSecurity } from '../lib/cors';
 import { formatErrorResponse, STATUS_CODES, logger } from '../lib/errors';
 import { validateRequestBody, validatePlatform, validateSessionId } from '../lib/validators';
-import { BacktestRequest, BacktestResponse, SimilarityQuery } from '../types';
+import { BacktestRequest, BacktestResponse, SimilarityQuery, PerformanceDrivers } from '../types';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   try {
@@ -100,7 +100,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     });
 
     // Step 6: Analyze performance drivers (with timeout protection)
-    let performanceDrivers;
+    let performanceDrivers: PerformanceDrivers;
     try {
       const matchedVideoMetadata = await csvDatabase.getVideosByIds(videoIds);
       const videoMetadata = matchedVideoMetadata.map((row) => ({
