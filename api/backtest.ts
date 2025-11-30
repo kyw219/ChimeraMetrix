@@ -58,16 +58,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     const geminiClient = new GeminiClient();
 
-    // Step 1: Convert cover image to text description
-    let coverDescription = strategy.cover;
-    if (strategy.coverImageUrl) {
-      try {
-        coverDescription = await geminiClient.imageToText(strategy.coverImageUrl);
-        logger.info('Cover image converted to text');
-      } catch (error) {
-        logger.warn('Failed to convert cover image, using text description', { error });
-      }
-    }
+    // Step 1: Use cover text description (skip imageToText to save time)
+    const coverDescription = strategy.cover;
+    logger.info('Using cover text description for similarity matching');
 
     // Step 2: Find 5 similar videos using semantic matching
     const similarityQuery: SimilarityQuery = {
