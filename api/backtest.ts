@@ -121,7 +121,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       performanceDrivers = await Promise.race([
         geminiClient.analyzePerformanceDrivers(strategy, videoMetadata),
         timeoutPromise
-      ]);
+      ]) as PerformanceDrivers;
 
       logger.info('Performance drivers analyzed', { sessionId });
     } catch (error) {
