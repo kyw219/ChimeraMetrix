@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { MetricCard } from "@/components/MetricCard";
 import { PerformanceChart } from "@/components/PerformanceChart";
@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Eye, TrendingUp, Heart, Sparkles } from "lucide-react";
 import { mockBacktestData, mockMatchedVideos, mockInsights, mockStrategy } from "@/lib/mockData";
+import { useWorkflow } from "@/contexts/WorkflowContext";
 
 const InsightsPanel = ({ strategy, performanceDrivers, matchedVideos }: any) => {
   // Convert performanceDrivers to factors format
@@ -105,21 +106,24 @@ const InsightsPanel = ({ strategy, performanceDrivers, matchedVideos }: any) => 
 };
 
 export default function Backtest() {
-  const location = useLocation();
   const navigate = useNavigate();
+  const workflow = useWorkflow();
   const [activeTab, setActiveTab] = useState("views");
   const [isSaved, setIsSaved] = useState(false);
 
-  // Get data from navigation state or use mock data
-  const { predictions, matchedVideos, performanceDrivers, strategy, features } = location.state || {};
-  const backtestData = predictions || mockBacktestData;
+  // Get data from workflow context
+  const predictions = workflow.backtestResults?.predictions || mockBacktestData;
+  const matchedVideos = workflow.backtestResults?.matchedVideos || mockMatchedVideos;
+  const performanceDrivers = workflow.backtestResults?.performanceDrivers;
+  const strategy = workflow.strategy || mockStrategy;
+  const backtestData = predictions;
 
-  // Redirect to upload if no data
+  // Warn if no data
   useEffect(() => {
-    if (!location.state) {
+    if (!workflow.backtestResults) {
       console.warn('No backtest data found, using mock data');
     }
-  }, [location.state]);
+  }, [workflow.backtestResults]);
 
   const handleSave = () => {
     setIsSaved(true);
@@ -127,6 +131,8 @@ export default function Backtest() {
     localStorage.setItem("hasNewSavedReport", "true");
     // Dispatch event to notify sidebar
     window.dispatchEvent(new Event("reportSaved"));
+    // Clear workflow context after saving
+    workflow.clearAll();
   };
 
   const getChartData = () => {

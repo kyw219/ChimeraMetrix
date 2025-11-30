@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Image, FileText, Hash, Clock, Loader2, Zap, Sparkles } from "lucide-react";
 import { mockAnalysis, mockStrategy } from "@/lib/mockData";
 import { useToast } from "@/hooks/use-toast";
+import { useWorkflow } from "@/contexts/WorkflowContext";
 
 // API Base URL
 const API_BASE_URL = window.location.origin;
@@ -17,11 +18,14 @@ const API_BASE_URL = window.location.origin;
 export default function Upload() {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [file, setFile] = useState<File | null>(null);
-  const [platform, setPlatform] = useState("youtube");
-  const [strategy, setStrategy] = useState<any>(null);
-  const [analysis, setAnalysis] = useState<any>(null);
-  const [sessionId, setSessionId] = useState<string | null>(null);
+  const workflow = useWorkflow();
+  
+  // Use workflow context for persistent state
+  const [file, setFile] = useState<File | null>(workflow.file);
+  const [platform, setPlatform] = useState(workflow.platform);
+  const [strategy, setStrategy] = useState<any>(workflow.strategy);
+  const [analysis, setAnalysis] = useState<any>(workflow.analysis);
+  const [sessionId, setSessionId] = useState<string | null>(workflow.sessionId);
   const [isGenerating, setIsGenerating] = useState(false);
   const [isRunningBacktest, setIsRunningBacktest] = useState(false);
 
@@ -126,6 +130,9 @@ export default function Upload() {
       const { sessionId: newSessionId, features } = analyzeData.data;
       setSessionId(newSessionId);
       setAnalysis(features);
+      // Save to workflow context
+      workflow.setSessionId(newSessionId);
+      workflow.setAnalysis(features);
       console.log('\n✅ Video analyzed successfully!');
       console.log('🔑 Session ID:', newSessionId);
       console.log('🎬 Features extracted:');
@@ -166,6 +173,8 @@ export default function Upload() {
       }
 
       setStrategy(strategyData.data.strategy);
+      // Save to workflow context
+      workflow.setStrategy(strategyData.data.strategy);
       console.log('\n✅ Strategy generated successfully!');
       console.log('💡 Strategy details:');
       console.log('   - Cover:', strategyData.data.strategy.cover?.substring(0, 50) + '...');
@@ -253,16 +262,15 @@ export default function Upload() {
 
       console.log('✅ Backtest completed successfully');
 
-      // Navigate to backtest page with results
-      navigate("/backtest", {
-        state: {
-          predictions: data.data.predictions,
-          matchedVideos: data.data.matchedVideos,
-          performanceDrivers: data.data.performanceDrivers,
-          strategy,
-          features: analysis,
-        },
+      // Save backtest results to workflow context
+      workflow.setBacktestResults({
+        predictions: data.data.predictions,
+        matchedVideos: data.data.matchedVideos,
+        performanceDrivers: data.data.performanceDrivers,
       });
+      
+      // Navigate to backtest page
+      navigate("/backtest");
     } catch (error) {
       console.error('❌ Backtest failed:', error);
       setIsRunningBacktest(false);
@@ -282,8 +290,12 @@ export default function Upload() {
   const handleReset = () => {
     setFile(null);
     setStrategy(null);
+    setAnalysis(null);
+    setSessionId(null);
     setIsGenerating(false);
     setIsRunningBacktest(false);
+    // Clear workflow context
+    workflow.clearAll();
   };
 
   const handleRegenerateField = async (field: string) => {
