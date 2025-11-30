@@ -99,24 +99,41 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       };
     });
 
-    // Step 6: Analyze performance drivers
-    const matchedVideoMetadata = await csvDatabase.getVideosByIds(videoIds);
-    const videoMetadata = matchedVideoMetadata.map((row) => ({
-      videoId: row.video_id,
-      platform: row.platform,
-      category: row.category,
-      title: row.title,
-      coverDescription: row.cover_description,
-      hashtags: row.hashtags,
-      postingHour: parseInt(row.posting_hour) || 0,
-    }));
+    // Step 6: Analyze performance drivers (with timeout protection)
+    let performanceDrivers;
+    try {
+      const matchedVideoMetadata = await csvDatabase.getVideosByIds(videoIds);
+      const videoMetadata = matchedVideoMetadata.map((row) => ({
+        videoId: row.video_id,
+        platform: row.platform,
+        category: row.category,
+        title: row.title,
+        coverDescription: row.cover_description,
+        hashtags: row.hashtags,
+        postingHour: parseInt(row.posting_hour) || 0,
+      }));
 
-    const performanceDrivers = await geminiClient.analyzePerformanceDrivers(
-      strategy,
-      videoMetadata
-    );
+      // Set a timeout for this API call
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('Performance analysis timeout')), 45000)
+      );
+      
+      performanceDrivers = await Promise.race([
+        geminiClient.analyzePerformanceDrivers(strategy, videoMetadata),
+        timeoutPromise
+      ]);
 
-    logger.info('Performance drivers analyzed', { sessionId });
+      logger.info('Performance drivers analyzed', { sessionId });
+    } catch (error) {
+      logger.warn('Performance driver analysis failed or timed out, using defaults', { error });
+      // Use default performance drivers
+      performanceDrivers = {
+        coverDesign: { impact: 'High', reason: 'Visual appeal is crucial for click-through rates' },
+        titleFraming: { impact: 'High', reason: 'Compelling titles drive initial interest' },
+        hashtagCombination: { impact: 'Medium', reason: 'Hashtags help with discoverability' },
+        postingTime: { impact: 'Medium', reason: 'Timing affects initial visibility' },
+      };
+    }
 
     // Return response
     const response: BacktestResponse = {

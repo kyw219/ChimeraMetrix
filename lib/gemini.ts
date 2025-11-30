@@ -12,7 +12,7 @@ import { APIError, logger } from './errors';
 export class GeminiClient {
   private genAI: GoogleGenerativeAI;
   private model: any;
-  private maxRetries: number = 3;
+  private maxRetries: number = 2; // Reduced from 3 to 2 for faster response
 
   constructor(apiKey?: string) {
     const key = apiKey || process.env.GEMINI_API_KEY;
