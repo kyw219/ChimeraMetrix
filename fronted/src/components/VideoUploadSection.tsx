@@ -12,6 +12,7 @@ import { Upload, Video, X } from "lucide-react";
 
 interface VideoUploadSectionProps {
   onFileUpload: (file: File) => void;
+  onThumbnailGenerated?: (thumbnail: string) => void;
   platform: string;
   onPlatformChange: (value: string) => void;
   onRemove?: () => void;
@@ -21,6 +22,7 @@ interface VideoUploadSectionProps {
 
 export const VideoUploadSection = ({
   onFileUpload,
+  onThumbnailGenerated,
   platform,
   onPlatformChange,
   onRemove,
@@ -61,7 +63,9 @@ export const VideoUploadSection = ({
         canvas.width = video.videoWidth;
         canvas.height = video.videoHeight;
         canvas.getContext('2d')?.drawImage(video, 0, 0);
-        setVideoThumbnail(canvas.toDataURL());
+        const thumbnailUrl = canvas.toDataURL('image/jpeg', 0.7); // Use JPEG with compression
+        setVideoThumbnail(thumbnailUrl);
+        onThumbnailGenerated?.(thumbnailUrl);
       };
       video.src = URL.createObjectURL(selectedFile);
     }

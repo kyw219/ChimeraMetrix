@@ -131,7 +131,7 @@ export default function Backtest() {
   const handleSave = () => {
     try {
       // Save report to localStorage
-      const savedReport = saveReport({
+      saveReport({
         platform: workflow.platform,
         strategy,
         predictions,
@@ -148,16 +148,11 @@ export default function Backtest() {
       
       toast({
         title: "Report Saved!",
-        description: "Your backtest report has been saved successfully.",
+        description: "Check Saved Reports in the sidebar to view it.",
       });
       
       // Clear workflow context after saving
       workflow.clearAll();
-      
-      // Navigate to saved reports after a short delay
-      setTimeout(() => {
-        navigate("/saved-reports");
-      }, 1000);
     } catch (error) {
       console.error('Failed to save report:', error);
       toast({

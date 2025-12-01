@@ -379,11 +379,11 @@ export default function Upload() {
             <VideoUploadSection
               onFileUpload={(newFile) => {
                 setFile(newFile);
-                if (newFile) {
-                  const previewUrl = URL.createObjectURL(newFile);
-                  workflow.setFile(newFile, previewUrl, newFile.name);
-                } else {
-                  workflow.setFile(null, null, null);
+                workflow.setFile(newFile, null, newFile.name);
+              }}
+              onThumbnailGenerated={(thumbnail) => {
+                if (file) {
+                  workflow.setFile(file, thumbnail, file.name);
                 }
               }}
               platform={platform}
