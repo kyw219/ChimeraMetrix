@@ -15,6 +15,8 @@ interface VideoUploadSectionProps {
   platform: string;
   onPlatformChange: (value: string) => void;
   onRemove?: () => void;
+  initialThumbnail?: string | null;
+  initialFileName?: string | null;
 }
 
 export const VideoUploadSection = ({
@@ -22,10 +24,13 @@ export const VideoUploadSection = ({
   platform,
   onPlatformChange,
   onRemove,
+  initialThumbnail,
+  initialFileName,
 }: VideoUploadSectionProps) => {
   const [file, setFile] = useState<File | null>(null);
   const [isDragging, setIsDragging] = useState(false);
-  const [videoThumbnail, setVideoThumbnail] = useState<string | null>(null);
+  const [videoThumbnail, setVideoThumbnail] = useState<string | null>(initialThumbnail || null);
+  const [fileName, setFileName] = useState<string | null>(initialFileName || null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleDrop = (e: React.DragEvent) => {
@@ -42,6 +47,7 @@ export const VideoUploadSection = ({
     const selectedFile = e.target.files?.[0];
     if (selectedFile) {
       setFile(selectedFile);
+      setFileName(selectedFile.name);
       onFileUpload(selectedFile);
       
       // Generate thumbnail from video
@@ -64,6 +70,7 @@ export const VideoUploadSection = ({
   const handleRemove = () => {
     setFile(null);
     setVideoThumbnail(null);
+    setFileName(null);
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
@@ -94,7 +101,7 @@ export const VideoUploadSection = ({
           className="hidden"
         />
 
-        {file ? (
+        {(file || videoThumbnail) ? (
           <div className="space-y-4">
             {/* Video Thumbnail */}
             {videoThumbnail && (
@@ -114,11 +121,13 @@ export const VideoUploadSection = ({
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-semibold text-foreground truncate">
-                  {file.name}
+                  {fileName || file?.name || 'Video uploaded'}
                 </p>
-                <p className="text-xs text-muted-foreground">
-                  {(file.size / (1024 * 1024)).toFixed(2)} MB
-                </p>
+                {file && (
+                  <p className="text-xs text-muted-foreground">
+                    {(file.size / (1024 * 1024)).toFixed(2)} MB
+                  </p>
+                )}
               </div>
               <Button
                 variant="ghost"

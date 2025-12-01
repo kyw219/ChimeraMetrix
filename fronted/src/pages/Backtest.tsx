@@ -10,6 +10,8 @@ import { Button } from "@/components/ui/button";
 import { Eye, TrendingUp, Heart, Sparkles } from "lucide-react";
 import { mockBacktestData, mockMatchedVideos, mockInsights, mockStrategy } from "@/lib/mockData";
 import { useWorkflow } from "@/contexts/WorkflowContext";
+import { saveReport } from "@/lib/savedReports";
+import { useToast } from "@/hooks/use-toast";
 
 const InsightsPanel = ({ strategy, performanceDrivers, matchedVideos }: any) => {
   // Convert performanceDrivers to factors format
@@ -108,6 +110,7 @@ const InsightsPanel = ({ strategy, performanceDrivers, matchedVideos }: any) => 
 export default function Backtest() {
   const navigate = useNavigate();
   const workflow = useWorkflow();
+  const { toast } = useToast();
   const [activeTab, setActiveTab] = useState("views");
   const [isSaved, setIsSaved] = useState(false);
 
@@ -126,13 +129,43 @@ export default function Backtest() {
   }, [workflow.backtestResults]);
 
   const handleSave = () => {
-    setIsSaved(true);
-    // Save to localStorage to persist the saved state
-    localStorage.setItem("hasNewSavedReport", "true");
-    // Dispatch event to notify sidebar
-    window.dispatchEvent(new Event("reportSaved"));
-    // Clear workflow context after saving
-    workflow.clearAll();
+    try {
+      // Save report to localStorage
+      const savedReport = saveReport({
+        platform: workflow.platform,
+        strategy,
+        predictions,
+        matchedVideos,
+        performanceDrivers,
+        features: workflow.analysis,
+      });
+      
+      setIsSaved(true);
+      
+      // Notify sidebar
+      localStorage.setItem("hasNewSavedReport", "true");
+      window.dispatchEvent(new Event("reportSaved"));
+      
+      toast({
+        title: "Report Saved!",
+        description: "Your backtest report has been saved successfully.",
+      });
+      
+      // Clear workflow context after saving
+      workflow.clearAll();
+      
+      // Navigate to saved reports after a short delay
+      setTimeout(() => {
+        navigate("/saved-reports");
+      }, 1000);
+    } catch (error) {
+      console.error('Failed to save report:', error);
+      toast({
+        title: "Save Failed",
+        description: "Failed to save report. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   const getChartData = () => {

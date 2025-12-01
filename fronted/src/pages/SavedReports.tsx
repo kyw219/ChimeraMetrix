@@ -1,45 +1,36 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { SavedReportCard } from "@/components/SavedReportCard";
 import { SavedReportModal } from "@/components/SavedReportModal";
 import { Bookmark } from "lucide-react";
-
-// Mock saved reports data
-const mockSavedReports = [
-  {
-    id: "1",
-    timestamp: new Date(Date.now() - 5 * 60 * 1000), // 5 minutes ago
-    strategy: {
-      cover: "Close-up of hands working on vintage film camera with shallow depth of field",
-      title: "Why film photography is making a comeback in 2024",
-      hashtags: ["#FilmPhotography", "#VintageVibes", "#AnalogIsBack", "#Photography2024", "#FilmCommunity"],
-      postingTime: "7:00 PM EST",
-    },
-    metrics: {
-      views24h: "125K",
-      ctr24h: "8.2%",
-      likes24h: "12.4K",
-    },
-  },
-  {
-    id: "2",
-    timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000), // 2 hours ago
-    strategy: {
-      cover: "Neon-lit street scene at night with reflections on wet pavement",
-      title: "The secret to capturing cinematic night photography",
-      hashtags: ["#NightPhotography", "#CinematicVibes", "#StreetPhotography"],
-      postingTime: "9:00 PM EST",
-    },
-    metrics: {
-      views24h: "89K",
-      ctr24h: "7.1%",
-      likes24h: "8.9K",
-    },
-  },
-];
+import { getSavedReports, type SavedReport } from "@/lib/savedReports";
 
 export default function SavedReports() {
-  const [selectedReport, setSelectedReport] = useState<typeof mockSavedReports[0] | null>(null);
+  const [savedReports, setSavedReports] = useState<SavedReport[]>([]);
+  const [selectedReport, setSelectedReport] = useState<SavedReport | null>(null);
+
+  // Load saved reports from localStorage
+  useEffect(() => {
+    const reports = getSavedReports();
+    setSavedReports(reports);
+  }, []);
+
+  // Convert SavedReport to format expected by SavedReportCard
+  const formatReportForCard = (report: SavedReport) => ({
+    id: report.id,
+    timestamp: new Date(report.timestamp),
+    strategy: {
+      cover: report.strategy.cover,
+      title: report.strategy.title,
+      hashtags: report.strategy.hashtags.split(' ').filter((h: string) => h.startsWith('#')),
+      postingTime: report.strategy.postingTime,
+    },
+    metrics: {
+      views24h: report.predictions?.metrics?.views24h || 'N/A',
+      ctr24h: report.predictions?.metrics?.ctr24h || 'N/A',
+      likes24h: report.predictions?.metrics?.likes24h || 'N/A',
+    },
+  });
 
   return (
     <DashboardLayout>
@@ -56,24 +47,23 @@ export default function SavedReports() {
         </div>
 
         {/* Reports Grid */}
-        <div className="grid grid-cols-[repeat(auto-fill,minmax(320px,1fr))] gap-5">
-          {mockSavedReports.map((report) => (
-            <SavedReportCard
-              key={report.id}
-              report={report}
-              onClick={() => setSelectedReport(report)}
-            />
-          ))}
-        </div>
-
-        {/* Empty State */}
-        {mockSavedReports.length === 0 && (
+        {savedReports.length === 0 ? (
           <div className="panel-base rounded-2xl p-12 text-center">
             <Bookmark className="w-16 h-16 mx-auto mb-4 text-muted-foreground/30" />
             <h3 className="text-lg font-semibold text-foreground mb-2">No saved reports yet</h3>
             <p className="text-sm text-muted-foreground">
               Run a backtest and save your results to see them here
             </p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-[repeat(auto-fill,minmax(320px,1fr))] gap-5">
+            {savedReports.map((report) => (
+              <SavedReportCard
+                key={report.id}
+                {...formatReportForCard(report)}
+                onClick={() => setSelectedReport(report)}
+              />
+            ))}
           </div>
         )}
       </div>

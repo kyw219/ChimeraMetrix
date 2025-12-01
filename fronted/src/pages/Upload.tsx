@@ -381,9 +381,9 @@ export default function Upload() {
                 setFile(newFile);
                 if (newFile) {
                   const previewUrl = URL.createObjectURL(newFile);
-                  workflow.setFile(newFile, previewUrl);
+                  workflow.setFile(newFile, previewUrl, newFile.name);
                 } else {
-                  workflow.setFile(null, null);
+                  workflow.setFile(null, null, null);
                 }
               }}
               platform={platform}
@@ -392,6 +392,8 @@ export default function Upload() {
                 workflow.setPlatform(newPlatform);
               }}
               onRemove={handleReset}
+              initialThumbnail={workflow.videoPreviewUrl}
+              initialFileName={workflow.videoFileName}
             />
           </div>
 
