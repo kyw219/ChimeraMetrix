@@ -3,6 +3,7 @@ import { createContext, useContext, useState, useEffect, ReactNode } from 'react
 interface WorkflowState {
   // Upload page state
   file: File | null;
+  videoPreviewUrl: string | null; // For displaying video thumbnail
   platform: string;
   sessionId: string | null;
   analysis: any | null;
@@ -17,7 +18,7 @@ interface WorkflowState {
 }
 
 interface WorkflowContextType extends WorkflowState {
-  setFile: (file: File | null) => void;
+  setFile: (file: File | null, previewUrl?: string | null) => void;
   setPlatform: (platform: string) => void;
   setSessionId: (id: string | null) => void;
   setAnalysis: (analysis: any) => void;
@@ -32,6 +33,7 @@ const STORAGE_KEY = 'chimeramatrix_workflow_state';
 
 export function WorkflowProvider({ children }: { children: ReactNode }) {
   const [file, setFileState] = useState<File | null>(null);
+  const [videoPreviewUrl, setVideoPreviewUrlState] = useState<string | null>(null);
   const [platform, setPlatformState] = useState('youtube');
   const [sessionId, setSessionIdState] = useState<string | null>(null);
   const [analysis, setAnalysisState] = useState<any | null>(null);
@@ -49,7 +51,7 @@ export function WorkflowProvider({ children }: { children: ReactNode }) {
         setAnalysisState(state.analysis || null);
         setStrategyState(state.strategy || null);
         setBacktestResultsState(state.backtestResults || null);
-        // Note: File cannot be saved to localStorage
+        setVideoPreviewUrlState(state.videoPreviewUrl || null);
       }
     } catch (error) {
       console.error('Failed to load workflow state:', error);
@@ -65,15 +67,19 @@ export function WorkflowProvider({ children }: { children: ReactNode }) {
         analysis,
         strategy,
         backtestResults,
+        videoPreviewUrl,
       };
       localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
     } catch (error) {
       console.error('Failed to save workflow state:', error);
     }
-  }, [platform, sessionId, analysis, strategy, backtestResults]);
+  }, [platform, sessionId, analysis, strategy, backtestResults, videoPreviewUrl]);
 
-  const setFile = (newFile: File | null) => {
+  const setFile = (newFile: File | null, previewUrl?: string | null) => {
     setFileState(newFile);
+    if (previewUrl !== undefined) {
+      setVideoPreviewUrlState(previewUrl);
+    }
   };
 
   const setPlatform = (newPlatform: string) => {
@@ -98,6 +104,7 @@ export function WorkflowProvider({ children }: { children: ReactNode }) {
 
   const clearAll = () => {
     setFileState(null);
+    setVideoPreviewUrlState(null);
     setPlatformState('youtube');
     setSessionIdState(null);
     setAnalysisState(null);
@@ -110,6 +117,7 @@ export function WorkflowProvider({ children }: { children: ReactNode }) {
     <WorkflowContext.Provider
       value={{
         file,
+        videoPreviewUrl,
         platform,
         sessionId,
         analysis,

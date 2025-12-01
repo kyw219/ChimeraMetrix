@@ -377,9 +377,20 @@ export default function Upload() {
           {/* Upload & Platform Section */}
           <div className="mb-8">
             <VideoUploadSection
-              onFileUpload={setFile}
+              onFileUpload={(newFile) => {
+                setFile(newFile);
+                if (newFile) {
+                  const previewUrl = URL.createObjectURL(newFile);
+                  workflow.setFile(newFile, previewUrl);
+                } else {
+                  workflow.setFile(null, null);
+                }
+              }}
               platform={platform}
-              onPlatformChange={setPlatform}
+              onPlatformChange={(newPlatform) => {
+                setPlatform(newPlatform);
+                workflow.setPlatform(newPlatform);
+              }}
               onRemove={handleReset}
             />
           </div>
