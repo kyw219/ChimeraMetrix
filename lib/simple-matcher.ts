@@ -32,19 +32,19 @@ export function findSimilarVideosFast(
 function calculateSimilarity(query: SimilarityQuery, video: VideoMetadata): number {
   let score = 0;
 
-  // 1. Category match (40% weight)
+  // 1. Category match (30% weight - reduced from 40%)
   if (video.category.toLowerCase() === query.category.toLowerCase()) {
-    score += 0.4;
+    score += 0.3;
   } else if (
     video.category.toLowerCase().includes(query.category.toLowerCase().split(' ')[0]) ||
     query.category.toLowerCase().includes(video.category.toLowerCase())
   ) {
-    score += 0.2;
+    score += 0.15;
   }
 
-  // 2. Platform match (10% weight)
+  // 2. Platform match (15% weight - increased from 10%)
   if (video.platform === query.platform) {
-    score += 0.1;
+    score += 0.15;
   }
 
   // 3. Hashtag overlap (25% weight)
@@ -53,9 +53,9 @@ function calculateSimilarity(query: SimilarityQuery, video: VideoMetadata): numb
   const hashtagOverlap = calculateOverlap(queryHashtags, videoHashtags);
   score += hashtagOverlap * 0.25;
 
-  // 4. Title similarity (15% weight)
+  // 4. Title similarity (20% weight - increased from 15%)
   const titleSimilarity = calculateTextSimilarity(query.title, video.title);
-  score += titleSimilarity * 0.15;
+  score += titleSimilarity * 0.2;
 
   // 5. Cover description similarity (10% weight)
   const coverSimilarity = calculateTextSimilarity(

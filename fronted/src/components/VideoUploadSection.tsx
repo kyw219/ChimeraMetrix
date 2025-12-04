@@ -52,22 +52,10 @@ export const VideoUploadSection = ({
       setFileName(selectedFile.name);
       onFileUpload(selectedFile);
       
-      // Generate thumbnail from video
-      const video = document.createElement('video');
-      video.preload = 'metadata';
-      video.onloadeddata = () => {
-        video.currentTime = 1; // Capture at 1 second
-      };
-      video.onseeked = () => {
-        const canvas = document.createElement('canvas');
-        canvas.width = video.videoWidth;
-        canvas.height = video.videoHeight;
-        canvas.getContext('2d')?.drawImage(video, 0, 0);
-        const thumbnailUrl = canvas.toDataURL('image/jpeg', 0.7); // Use JPEG with compression
-        setVideoThumbnail(thumbnailUrl);
-        onThumbnailGenerated?.(thumbnailUrl);
-      };
-      video.src = URL.createObjectURL(selectedFile);
+      // Create video URL for preview playback
+      const videoUrl = URL.createObjectURL(selectedFile);
+      setVideoThumbnail(videoUrl);
+      onThumbnailGenerated?.(videoUrl);
     }
   };
 
@@ -107,14 +95,25 @@ export const VideoUploadSection = ({
 
         {(file || videoThumbnail) ? (
           <div className="space-y-4">
-            {/* Video Thumbnail */}
+            {/* Video Preview */}
             {videoThumbnail && (
               <div className="relative w-full aspect-video rounded-lg overflow-hidden bg-[hsl(var(--module-bg))]">
-                <img 
-                  src={videoThumbnail} 
-                  alt="Video preview" 
-                  className="w-full h-full object-cover"
-                />
+                {videoThumbnail.startsWith('blob:') ? (
+                  <video 
+                    src={videoThumbnail}
+                    className="w-full h-full object-cover"
+                    autoPlay
+                    loop
+                    muted
+                    playsInline
+                  />
+                ) : (
+                  <img 
+                    src={videoThumbnail} 
+                    alt="Video preview" 
+                    className="w-full h-full object-cover"
+                  />
+                )}
               </div>
             )}
             
