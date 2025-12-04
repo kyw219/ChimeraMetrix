@@ -3,17 +3,28 @@ import { DashboardLayout } from "@/components/DashboardLayout";
 import { SavedReportCard } from "@/components/SavedReportCard";
 import { SavedReportModal } from "@/components/SavedReportModal";
 import { Bookmark } from "lucide-react";
-import { getSavedReports, type SavedReport } from "@/lib/savedReports";
+import { getSavedReports, deleteReport, type SavedReport } from "@/lib/savedReports";
 
 export default function SavedReports() {
   const [savedReports, setSavedReports] = useState<SavedReport[]>([]);
   const [selectedReport, setSelectedReport] = useState<SavedReport | null>(null);
 
   // Load saved reports from localStorage
-  useEffect(() => {
+  const loadReports = () => {
     const reports = getSavedReports();
     setSavedReports(reports);
+  };
+
+  useEffect(() => {
+    loadReports();
   }, []);
+
+  // Handle report deletion
+  const handleDeleteReport = (reportId: string) => {
+    deleteReport(reportId);
+    loadReports(); // Reload reports after deletion
+    setSelectedReport(null); // Close modal
+  };
 
   // Convert SavedReport to format expected by SavedReportCard
   const formatReportForCard = (report: SavedReport) => ({
@@ -73,6 +84,7 @@ export default function SavedReports() {
         <SavedReportModal
           report={selectedReport}
           onClose={() => setSelectedReport(null)}
+          onDelete={handleDeleteReport}
         />
       )}
     </DashboardLayout>

@@ -18,9 +18,10 @@ import { useNavigate } from "react-router-dom";
 interface SavedReportModalProps {
   report: any; // Full SavedReport from savedReports.ts
   onClose: () => void;
+  onDelete: (reportId: string) => void;
 }
 
-export const SavedReportModal = ({ report, onClose }: SavedReportModalProps) => {
+export const SavedReportModal = ({ report, onClose, onDelete }: SavedReportModalProps) => {
   const [activeTab, setActiveTab] = useState("views");
   const navigate = useNavigate();
 
@@ -56,9 +57,9 @@ export const SavedReportModal = ({ report, onClose }: SavedReportModalProps) => 
   };
 
   const handleDelete = () => {
-    // TODO: Implement delete functionality
-    console.log("Delete report:", report.id);
-    onClose();
+    if (confirm("Are you sure you want to delete this report? This action cannot be undone.")) {
+      onDelete(report.id);
+    }
   };
 
   return (
