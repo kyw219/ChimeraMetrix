@@ -149,7 +149,7 @@ export const SavedReportModal = ({ report, onClose }: SavedReportModalProps) => 
           {/* Matched Videos */}
           <div>
             <h3 className="text-sm font-bold text-info mb-3 uppercase tracking-wide">
-              Reference Dataset (K={report.matchedVideos?.length || mockMatchedVideos.length})
+              Similar Videos ({report.matchedVideos?.length || mockMatchedVideos.length})
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               {(report.matchedVideos || mockMatchedVideos).slice(0, 4).map((video: any, index: number) => (

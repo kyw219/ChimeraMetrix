@@ -76,7 +76,7 @@ const InsightsPanel = ({ strategy, performanceDrivers, matchedVideos }: any) => 
       {/* Matched Videos */}
       <div>
         <h3 className="text-sm font-bold text-info mb-3 uppercase tracking-wide">
-          Reference Dataset (K={videos.length})
+          Similar Videos ({videos.length})
         </h3>
         <div className="space-y-2">
           {videos.map((video: any, index: number) => (
