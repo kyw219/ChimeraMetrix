@@ -239,33 +239,46 @@ Provide only the JSON response, no additional text.`;
         try {
           console.log('🎨 Generating cover image based on video content...');
           
-          const imagePrompt = `Create a ${platform === 'youtube' ? '16:9 horizontal' : '9:16 vertical'} thumbnail for this video titled "${strategyData.title}".
-
-Style: ${features.visualStyle}
-Theme: ${features.category}
-Mood: ${features.emotion}
-
-Requirements:
-- Eye-catching, high-contrast design
-- Bold text with the title
-- Relevant emoji
-- Vibrant colors
-- Optimized for ${platform}`;
-
-          console.log('📸 Image prompt:', imagePrompt.substring(0, 150) + '...');
-          
-          // 如果有视频 buffer，基于视频内容生成封面
-          const contents: any[] = [{ text: imagePrompt }];
+          let imagePrompt: string;
+          const contents: any[] = [];
           
           if (videoBuffer) {
-            console.log('📹 Including video content for image generation');
+            console.log('📹 Using video content for thumbnail generation');
+            
+            // 先添加视频
             contents.push({
               inlineData: {
                 data: videoBuffer.toString('base64'),
                 mimeType: 'video/mp4',
               },
             });
+            
+            // Image-to-image prompt: 保留视频内容，只添加文字和优化
+            imagePrompt = `Based on this video, create a ${platform === 'youtube' ? '16:9 horizontal' : '9:16 vertical'} thumbnail.
+
+IMPORTANT: Use a frame from the video as the base. Keep the original people, faces, and scene exactly as they appear in the video. DO NOT generate new faces or people.
+
+Add these enhancements:
+- Bold text overlay: "${strategyData.title}"
+- Text style: Large, yellow with black stroke, highly readable
+- Position: Top or center
+- Add 2-3 relevant emoji
+- Enhance colors and contrast for ${platform}
+- Keep the original video content and people unchanged`;
+            
+          } else {
+            // 纯文字生成（降级方案）
+            imagePrompt = `Create a ${platform === 'youtube' ? '16:9 horizontal' : '9:16 vertical'} thumbnail for "${strategyData.title}".
+
+Style: ${features.visualStyle}
+Theme: ${features.category}
+Mood: ${features.emotion}
+
+Eye-catching design with bold text, emoji, and vibrant colors for ${platform}.`;
           }
+          
+          contents.push({ text: imagePrompt });
+          console.log('📸 Image prompt:', imagePrompt.substring(0, 150) + '...');
           
           const response = await this.newGenAI.models.generateContent({
             model: 'gemini-2.5-flash-image',
