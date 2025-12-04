@@ -6,6 +6,7 @@ import { applyCorsAndSecurity } from '../lib/cors';
 import { formatErrorResponse, STATUS_CODES, logger } from '../lib/errors';
 import { validateRequestBody, validatePlatform, validateSessionId } from '../lib/validators';
 import { BacktestRequest, BacktestResponse, SimilarityQuery, PerformanceDrivers } from '../types';
+import { findSimilarVideosFast } from '../lib/simple-matcher';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   try {
@@ -71,31 +72,20 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       platform,
     };
 
-    // Pre-filter videos by category and platform to reduce Gemini processing time
+    // Use fast keyword-based matching instead of slow Gemini API
     const allVideos = await csvDatabase.getAllVideoMetadata();
-    const filteredVideos = allVideos.filter(v => 
-      v.platform === platform && 
-      v.category.toLowerCase().includes(features.category.toLowerCase().split(' ')[0])
-    );
     
-    // Limit to max 15 videos to ensure we stay under 60s timeout
-    // If we have too few filtered videos, use all videos but still limit to 15
-    let videosToMatch = filteredVideos.length >= 10 ? filteredVideos : allVideos;
-    if (videosToMatch.length > 15) {
-      // Randomly sample 15 videos to get diverse results
-      videosToMatch = videosToMatch
-        .sort(() => Math.random() - 0.5)
-        .slice(0, 15);
-    }
+    // Filter by platform first
+    const platformVideos = allVideos.filter(v => v.platform === platform);
     
-    logger.info('Videos to match', { 
+    logger.info('Finding similar videos', { 
       total: allVideos.length, 
-      filtered: filteredVideos.length,
-      sampled: videosToMatch.length,
+      platform: platformVideos.length,
       category: features.category 
     });
     
-    const similarVideos = await geminiClient.findSimilarVideos(similarityQuery, videosToMatch);
+    // Use fast similarity matching (completes in milliseconds)
+    const similarVideos = findSimilarVideosFast(similarityQuery, platformVideos);
 
     if (similarVideos.length !== 5) {
       throw new Error(`Expected 5 similar videos, got ${similarVideos.length}`);
