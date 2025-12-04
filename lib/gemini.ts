@@ -115,7 +115,7 @@ Provide only the JSON response, no additional text.`;
   }
 
   /**
-   * Generate complete strategy
+   * Generate complete strategy with detailed thumbnail description
    */
   async generateStrategy(features: VideoFeatures, platform: string): Promise<Strategy> {
     return this.retryWithBackoff(async () => {
@@ -125,13 +125,43 @@ Provide only the JSON response, no additional text.`;
 Features:
 ${JSON.stringify(features, null, 2)}
 
-Generate:
+Your task: Generate a complete content strategy with a detailed YouTube thumbnail description optimized for high CTR.
+
+Output the following JSON structure:
 {
-  "cover": "detailed description of an eye-catching cover image (describe visual elements, colors, composition)",
+  "cover": "brief text description for fallback display",
+  "thumbnailDescription": {
+    "main_subject": "Describe the primary person/object, pose, emotion, outfit, facial expression based on video content",
+    "extracted_objects": ["list", "important", "objects", "from", "video"],
+    "background_style": "Describe suitable background visual style and color theme (e.g., 'tech-modern with purple-blue gradient' or 'dramatic red-yellow MrBeast style')",
+    "composition": {
+      "subject_position": "left/right/center",
+      "text_position": "top-left/top-right/bottom-left/bottom-right",
+      "object_positioning": "describe where objects should be placed"
+    },
+    "lighting_effects": "Describe lighting style (e.g., 'rim light, dramatic shadows, neon glow')",
+    "emotion_mood": "Describe emotional tone (e.g., 'surprised', 'excited', 'mysterious', 'dramatic tension')",
+    "text_overlay": {
+      "title": "punchy main title (max 8 words)",
+      "subtitle": "short subtitle",
+      "font_style": "bold, high contrast"
+    },
+    "color_palette": {
+      "primary": "#HEX color",
+      "secondary": "#HEX color",
+      "accent": "#HEX color"
+    }
+  },
   "title": "engaging title optimized for ${platform}",
   "hashtags": "space-separated relevant hashtags",
   "postingTime": "optimal posting time (e.g., 7:00 PM EST)"
 }
+
+Requirements:
+- thumbnailDescription must be concise, visual, actionable
+- All fields must be filled based on video analysis
+- Colors should be hex codes
+- Output ONLY valid JSON, no explanations
 
 Provide only the JSON response, no additional text.`;
 

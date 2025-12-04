@@ -1,5 +1,6 @@
 import { VercelRequest, VercelResponse } from '@vercel/node';
 import { GeminiClient } from '../lib/gemini';
+import { BananaClient } from '../lib/banana';
 import { sessionManager } from '../lib/session';
 import { applyCorsAndSecurity } from '../lib/cors';
 import { formatErrorResponse, STATUS_CODES, logger } from '../lib/errors';
@@ -47,9 +48,18 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const geminiClient = new GeminiClient();
     const strategy = await geminiClient.generateStrategy(features, platform);
 
-    // Generate cover image
-    const coverImageUrl = await geminiClient.generateCoverImage(strategy.cover);
-    strategy.coverImageUrl = coverImageUrl;
+    // Generate cover image using Banana if thumbnail description is available
+    if (strategy.thumbnailDescription) {
+      try {
+        const bananaClient = new BananaClient();
+        const coverImageUrl = await bananaClient.generateThumbnail(strategy.thumbnailDescription);
+        strategy.coverImageUrl = coverImageUrl;
+        logger.info('Cover image generated with Banana', { sessionId });
+      } catch (error) {
+        logger.warn('Banana thumbnail generation failed, using text description', { error });
+        // Fallback to text description if Banana fails
+      }
+    }
 
     // Try to store strategy in session (optional, may fail in serverless)
     try {

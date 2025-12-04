@@ -55,22 +55,40 @@ export const StrategyCard = ({
       </div>
       
       {/* Special visual treatment for cover card */}
-      {isCoverCard && !isEmpty && content ? (
+      {isCoverCard && !isEmpty ? (
         <div className="space-y-3">
           {/* Visual preview box */}
           <div className="relative aspect-video rounded-lg overflow-hidden bg-gradient-to-br from-chart-1/10 to-chart-2/10 border border-border/30">
-            <div className="absolute inset-0 flex items-center justify-center p-4">
-              <p className="text-xs text-center text-muted-foreground/80 leading-relaxed line-clamp-4">
-                {content}
-              </p>
-            </div>
-            {/* Decorative corner badge */}
-            <div className="absolute top-2 right-2 px-2 py-1 rounded bg-primary/20 backdrop-blur-sm">
-              <span className="text-[9px] font-semibold text-primary uppercase tracking-wide">AI Design</span>
-            </div>
+            {content && typeof content === 'object' && (content as any).coverImageUrl ? (
+              // Show generated image if available
+              <>
+                <img 
+                  src={(content as any).coverImageUrl} 
+                  alt="AI Generated Thumbnail" 
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute top-2 right-2 px-2 py-1 rounded bg-primary/20 backdrop-blur-sm">
+                  <span className="text-[9px] font-semibold text-primary uppercase tracking-wide">AI Generated</span>
+                </div>
+              </>
+            ) : (
+              // Fallback to text description
+              <>
+                <div className="absolute inset-0 flex items-center justify-center p-4">
+                  <p className="text-xs text-center text-muted-foreground/80 leading-relaxed line-clamp-4">
+                    {typeof content === 'string' ? content : (content as any)?.cover || 'Generating...'}
+                  </p>
+                </div>
+                <div className="absolute top-2 right-2 px-2 py-1 rounded bg-primary/20 backdrop-blur-sm">
+                  <span className="text-[9px] font-semibold text-primary uppercase tracking-wide">AI Design</span>
+                </div>
+              </>
+            )}
           </div>
           <p className="text-[10px] text-muted-foreground/60 italic">
-            💡 Visual description for your thumbnail design
+            💡 {content && typeof content === 'object' && (content as any).coverImageUrl 
+              ? 'AI-generated thumbnail ready for use' 
+              : 'Visual description for your thumbnail design'}
           </p>
         </div>
       ) : (

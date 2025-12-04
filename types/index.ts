@@ -8,8 +8,32 @@ export interface VideoFeatures {
   hookType: string;
 }
 
+export interface ThumbnailDescription {
+  main_subject: string;
+  extracted_objects: string[];
+  background_style: string;
+  composition: {
+    subject_position: string;
+    text_position: string;
+    object_positioning: string;
+  };
+  lighting_effects: string;
+  emotion_mood: string;
+  text_overlay: {
+    title: string;
+    subtitle: string;
+    font_style: string;
+  };
+  color_palette: {
+    primary: string;
+    secondary: string;
+    accent: string;
+  };
+}
+
 export interface Strategy {
   cover: string;
+  thumbnailDescription?: ThumbnailDescription;
   coverImageUrl?: string;
   title: string;
   hashtags: string;
