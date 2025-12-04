@@ -269,8 +269,11 @@ export default function Upload() {
         performanceDrivers: data.data.performanceDrivers,
       });
       
-      // Navigate to backtest page
-      navigate("/backtest");
+      // Wait for loading animation to complete before navigating
+      setTimeout(() => {
+        setIsRunningBacktest(false);
+        navigate("/backtest");
+      }, 3000); // Wait 3 seconds for animation
     } catch (error) {
       console.error('❌ Backtest failed:', error);
       setIsRunningBacktest(false);
