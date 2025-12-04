@@ -252,7 +252,7 @@ The thumbnail should be eye-catching, high-contrast, and optimized for ${platfor
           
           // 使用新 SDK 的正确方法
           const response = await this.newGenAI.models.generateContent({
-            model: 'gemini-2.0-flash-exp',
+            model: 'gemini-2.5-flash-image',
             contents: simpleImagePrompt,
           });
 
@@ -329,7 +329,7 @@ The thumbnail should be eye-catching, high-contrast, and optimized for ${platfor
 
         try {
           const response = await this.newGenAI.models.generateContent({
-            model: 'gemini-2.0-flash-exp',
+            model: 'gemini-2.5-flash-image',
             contents: coverPrompt,
           });
 
