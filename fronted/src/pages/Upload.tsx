@@ -28,7 +28,6 @@ export default function Upload() {
   const [sessionId, setSessionId] = useState<string | null>(workflow.sessionId);
   const [isGenerating, setIsGenerating] = useState(false);
   const [isRunningBacktest, setIsRunningBacktest] = useState(false);
-  const [backtestCompleted, setBacktestCompleted] = useState(false);
 
   const handleGenerateStrategy = async () => {
     if (!file) return;
@@ -270,8 +269,7 @@ export default function Upload() {
         performanceDrivers: data.data.performanceDrivers,
       });
       
-      // Signal animation to complete
-      setBacktestCompleted(true);
+      // Animation will complete automatically after 15 seconds (3 steps × 5s each)
     } catch (error) {
       console.error('❌ Backtest failed:', error);
       setIsRunningBacktest(false);
@@ -284,9 +282,8 @@ export default function Upload() {
   };
 
   const handleBacktestComplete = () => {
-    // Called when animation finishes
+    // Called when animation finishes (after 15 seconds)
     setIsRunningBacktest(false);
-    setBacktestCompleted(false);
     navigate("/backtest");
   };
 
@@ -360,10 +357,7 @@ export default function Upload() {
         {/* Show loading pipeline when running backtest */}
         {isRunningBacktest ? (
           <div className="min-h-[600px] flex items-center justify-center">
-            <BacktestLoadingPipeline 
-              onComplete={handleBacktestComplete}
-              forceComplete={backtestCompleted}
-            />
+            <BacktestLoadingPipeline onComplete={handleBacktestComplete} />
           </div>
         ) : (
           <>

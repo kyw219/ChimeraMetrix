@@ -4,7 +4,6 @@ import { CheckCircle2, Loader2 } from "lucide-react";
 interface BacktestLoadingPipelineProps {
   onComplete: () => void;
   onError?: (error: Error) => void;
-  forceComplete?: boolean;
 }
 
 interface Step {
@@ -20,43 +19,28 @@ const steps: Step[] = [
     id: 1,
     title: "Matching Similar Videos",
     subtitle: "Finding most similar videos using semantic search…",
-    duration: 35000, // ~35 seconds (Gemini API is slow)
+    duration: 5000, // 5 seconds
     animationType: 'pulse'
   },
   {
     id: 2,
     title: "Analyzing Historical Performance",
     subtitle: "Aggregating metrics: views, CTR, impressions, likes…",
-    duration: 8000, // ~8 seconds
+    duration: 5000, // 5 seconds
     animationType: 'chart'
   },
   {
     id: 3,
     title: "Generating Predictions",
     subtitle: "Building 24-hour temporal curve and model outputs…",
-    duration: 12000, // ~12 seconds (includes performance analysis)
+    duration: 5000, // 5 seconds
     animationType: 'curve'
   }
 ];
 
-export const BacktestLoadingPipeline = ({ onComplete, forceComplete }: BacktestLoadingPipelineProps) => {
+export const BacktestLoadingPipeline = ({ onComplete }: BacktestLoadingPipelineProps) => {
   const [currentStep, setCurrentStep] = useState(0);
   const [completedSteps, setCompletedSteps] = useState<number[]>([]);
-
-  // When API completes, fast-forward through remaining steps
-  useEffect(() => {
-    if (forceComplete && currentStep < steps.length) {
-      // Complete all remaining steps quickly
-      const completeAll = async () => {
-        for (let i = currentStep; i < steps.length; i++) {
-          setCompletedSteps(prev => [...prev, i]);
-          setCurrentStep(i + 1);
-          await new Promise(resolve => setTimeout(resolve, 500)); // 0.5s per step
-        }
-      };
-      completeAll();
-    }
-  }, [forceComplete, currentStep]);
 
   useEffect(() => {
     if (currentStep >= steps.length) {
@@ -64,16 +48,13 @@ export const BacktestLoadingPipeline = ({ onComplete, forceComplete }: BacktestL
       return () => clearTimeout(timer);
     }
 
-    // Don't auto-advance if force completing
-    if (forceComplete) return;
-
     const timer = setTimeout(() => {
       setCompletedSteps(prev => [...prev, currentStep]);
       setCurrentStep(prev => prev + 1);
     }, steps[currentStep].duration);
 
     return () => clearTimeout(timer);
-  }, [currentStep, onComplete, forceComplete]);
+  }, [currentStep, onComplete]);
 
   return (
     <div className="panel-base rounded-2xl p-8 max-w-3xl mx-auto">
