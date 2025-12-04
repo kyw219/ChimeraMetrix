@@ -14,6 +14,8 @@ import { saveReport } from "@/lib/savedReports";
 import { useToast } from "@/hooks/use-toast";
 
 const InsightsPanel = ({ strategy, performanceDrivers, matchedVideos }: any) => {
+  const [expandedFactor, setExpandedFactor] = useState<number | null>(null);
+
   // Convert performanceDrivers to factors format
   const factors = performanceDrivers ? [
     {
@@ -57,20 +59,31 @@ const InsightsPanel = ({ strategy, performanceDrivers, matchedVideos }: any) => 
         </h3>
         <div className="space-y-2">
           {factors.map((factor, index) => (
-            <div key={index} className="subpanel rounded-xl p-3 hover:bg-[hsl(var(--module-bg))] transition-colors">
-              <div className="flex items-start justify-between gap-2 mb-1">
+            <div 
+              key={index} 
+              className="subpanel rounded-xl p-3 hover:bg-[hsl(var(--module-bg))] transition-all cursor-pointer"
+              onClick={() => setExpandedFactor(expandedFactor === index ? null : index)}
+            >
+              <div className="flex items-start justify-between gap-2">
                 <span className="text-xs font-semibold text-foreground">{factor.name}</span>
                 <Badge 
                   variant={factor.impact === "High Impact" ? "default" : "secondary"}
-                  className="text-[9px] px-2 py-0.5"
+                  className="text-[9px] px-2 py-0.5 flex-shrink-0"
                 >
                   {factor.impact}
                 </Badge>
               </div>
-              <p className="text-[10px] text-muted-foreground leading-relaxed">{factor.description}</p>
+              {expandedFactor === index && (
+                <p className="text-[10px] text-muted-foreground leading-relaxed mt-2 pt-2 border-t border-border/30">
+                  {factor.description}
+                </p>
+              )}
             </div>
           ))}
         </div>
+        <p className="text-[9px] text-muted-foreground/60 mt-2 italic">
+          💡 Click to view details
+        </p>
       </div>
 
       {/* Matched Videos */}
