@@ -9,7 +9,6 @@ import {
   SimilarityQuery,
 } from '../types';
 import { APIError, logger } from './errors';
-import { downloadFrame } from './fal-client';
 
 export class GeminiClient {
   private genAI: GoogleGenerativeAI;
@@ -195,7 +194,7 @@ IMPORTANT: Text must be LARGE, BOLD, and HIGHLY READABLE on mobile devices. Use 
   /**
    * Generate complete strategy with cover image
    */
-  async generateStrategy(features: VideoFeatures, platform: string, frameUrl?: string): Promise<Strategy> {
+  async generateStrategy(features: VideoFeatures, platform: string): Promise<Strategy> {
     return this.retryWithBackoff(async () => {
       try {
         console.log('📝 Step 1: Generating strategy text...');
@@ -238,115 +237,28 @@ Provide only the JSON response, no additional text.`;
         const coverDescription = 'AI-generated thumbnail optimized for ' + platform;
 
         try {
-          console.log('🎨 Generating cover image based on video content...');
+          console.log('🎨 Generating cover image with gemini-2.5-flash-image...');
           
-          const contents: any[] = [];
-          let imagePrompt: string;
-          
-          if (frameUrl) {
-            console.log('📸 Using pre-extracted frame:', frameUrl);
-            
-            try {
-              // Download frame
-              const frameBuffer = await downloadFrame(frameUrl);
-              console.log('✅ Frame downloaded:', frameBuffer.length, 'bytes');
-              
-              // Verify frame is valid
-              if (frameBuffer.length < 1000) {
-                throw new Error('Frame too small, likely invalid');
-              }
-              
-              // Add frame as base image
-              contents.push({
-                inlineData: {
-                  data: frameBuffer.toString('base64'),
-                  mimeType: 'image/jpeg',
-                },
-              });
-              
-              console.log('✅ Frame added to Gemini request as base image');
-              
-              // Image-to-image prompt: 严格保留人物
-              imagePrompt = `Edit this image to create a ${platform} thumbnail.
-
-CRITICAL - DO NOT CHANGE:
-- The person's face, skin tone, ethnicity, age, gender - MUST stay IDENTICAL
-- Their facial expression and pose - MUST stay IDENTICAL  
-- What they're holding or doing - MUST stay IDENTICAL
-- Only edit the background and add text/emoji
-
-BACKGROUND:
-- Replace background with vibrant, eye-catching scene related to ${features.category}
-- Keep person in sharp focus, blur background slightly
-- High contrast, dramatic lighting
-
-TEXT OVERLAY:
-- Add: "${strategyData.title}"
-- Style: Extra large, bold, yellow (#FFD700) with 4px black stroke
-- Position: Top or sides (don't cover person's face)
-- Add 2-3 emoji related to ${features.keywords.slice(0, 3).join(', ')}
-
-IMPORTANT: This is image editing, NOT image generation. Keep the original person unchanged.`;
-              
-            } catch (frameError) {
-              console.error('❌ Frame download failed, using text-only generation:', frameError);
-              // 降级：纯文字生成
-              imagePrompt = `Create a ${platform === 'youtube' ? '16:9 horizontal' : '9:16 vertical'} thumbnail for "${strategyData.title}".
-
-Style: ${features.visualStyle}
-Theme: ${features.category}
-
-Eye-catching design with bold text and vibrant colors.`;
-            }
-            
-          } else {
-            // 纯文字生成（降级方案）
-            imagePrompt = `Create a ${platform === 'youtube' ? '16:9 horizontal' : '9:16 vertical'} thumbnail for "${strategyData.title}".
-
-Style: ${features.visualStyle}
-Theme: ${features.category}
-
-Eye-catching design with bold text and vibrant colors.`;
-          }
-          
-          contents.push({ text: imagePrompt });
-          console.log('📸 Image prompt:', imagePrompt.substring(0, 150) + '...');
+          // 使用详细的提示词生成高质量封面
+          console.log('📸 Using detailed cover prompt...');
           
           const response = await this.newGenAI.models.generateContent({
             model: 'gemini-2.5-flash-image',
-            contents,
+            contents: coverPrompt,
           });
 
-          console.log('🔍 Checking image response from new SDK...');
-          console.log('Response keys:', Object.keys(response));
-          
-          // 新 SDK 的响应结构
           const parts = response.candidates?.[0]?.content?.parts || [];
-          console.log('Parts count:', parts.length);
+          console.log('Parts received:', parts.length);
           
-          for (let i = 0; i < parts.length; i++) {
-            const part = parts[i];
-            console.log(`Part ${i} keys:`, Object.keys(part));
-            
-            if (part.inlineData && part.inlineData.data) {
-              console.log('✅ Found inline image data in new SDK response');
+          for (const part of parts) {
+            if (part.inlineData?.data) {
+              console.log('✅ Cover image generated successfully!');
               const base64Data = part.inlineData.data;
               const mimeType = part.inlineData.mimeType || 'image/png';
               coverImageUrl = `data:${mimeType};base64,${base64Data}`;
               console.log('✅ Cover image generated, size:', base64Data.length, 'bytes');
               break;
             }
-            
-            if (part.text) {
-              console.log('Part text preview:', part.text.substring(0, 100));
-            }
-          }
-
-          if (!coverImageUrl) {
-            console.warn('⚠️ No image data found in new SDK response');
-            console.warn('Response text:', response.text?.substring(0, 200));
-            console.warn('⚠️ Gemini 2.0 Flash may not support image generation yet');
-            console.warn('⚠️ Falling back to text description');
           }
         } catch (imageError) {
           console.error('❌ Image generation failed:', imageError);
@@ -382,21 +294,25 @@ Eye-catching design with bold text and vibrant colors.`;
   async regenerateCover(features: VideoFeatures, platform: string, title: string): Promise<{ cover: string; coverImageUrl?: string }> {
     return this.retryWithBackoff(async () => {
       try {
-        console.log('🎨 Regenerating cover image...');
-        
-        const coverPrompt = this.generateCoverPromptFromFeatures(features, platform, title);
         let coverImageUrl: string | undefined;
         const coverDescription = 'AI-generated thumbnail optimized for ' + platform;
 
         try {
+          const imagePrompt = `Create a ${platform === 'youtube' ? '16:9 horizontal' : '9:16 vertical'} thumbnail for "${title}".
+
+Style: ${features.visualStyle}
+Theme: ${features.category}
+
+Eye-catching design with bold text and vibrant colors.`;
+          
           const response = await this.newGenAI.models.generateContent({
             model: 'gemini-2.5-flash-image',
-            contents: coverPrompt,
+            contents: imagePrompt,
           });
 
           const parts = response.candidates?.[0]?.content?.parts || [];
           for (const part of parts) {
-            if (part.inlineData) {
+            if (part.inlineData?.data) {
               const base64Data = part.inlineData.data;
               const mimeType = part.inlineData.mimeType || 'image/png';
               coverImageUrl = `data:${mimeType};base64,${base64Data}`;

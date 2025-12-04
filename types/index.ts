@@ -171,7 +171,7 @@ export interface SimilarVideo {
 export interface SessionData {
   features?: VideoFeatures;
   strategy?: Strategy;
-  frameUrl?: string; // URL of extracted video frame
+  videoBase64?: string;
   createdAt: number;
   lastAccessedAt: number;
 }
