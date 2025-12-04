@@ -145,12 +145,25 @@ export default function Upload() {
 
       // Step 2: Generate strategy
       console.log('\n🎨 Step 2: Generating strategy...');
+      
+      // Read video as base64 for cover generation
+      const videoBase64 = await new Promise<string>((resolve) => {
+        const reader = new FileReader();
+        reader.onload = () => {
+          const base64 = (reader.result as string).split(',')[1];
+          resolve(base64);
+        };
+        reader.readAsDataURL(file);
+      });
+      console.log('📹 Video converted to base64:', videoBase64.length, 'chars');
+      
       const strategyPayload = {
         sessionId: newSessionId,
         features,
         platform,
+        videoBase64, // Include video for cover generation
       };
-      console.log('📤 Strategy request payload:', JSON.stringify(strategyPayload, null, 2));
+      console.log('📤 Strategy request payload (without video):', JSON.stringify({...strategyPayload, videoBase64: `[${videoBase64.length} chars]`}, null, 2));
       
       const strategyResponse = await fetch(`${API_BASE_URL}/api/generate-strategy`, {
         method: 'POST',

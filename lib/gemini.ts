@@ -284,6 +284,12 @@ Respond with ONLY a number (the timestamp in seconds). Video duration is approxi
                 // Download frame
                 const frameBuffer = await downloadFrame(bestFrame.url);
                 console.log('✅ Frame downloaded:', frameBuffer.length, 'bytes');
+                console.log('📸 Frame URL:', bestFrame.url);
+                
+                // Verify frame is valid
+                if (frameBuffer.length < 1000) {
+                  throw new Error('Frame too small, likely invalid');
+                }
                 
                 // Add frame as base image
                 contents.push({
@@ -292,6 +298,8 @@ Respond with ONLY a number (the timestamp in seconds). Video duration is approxi
                     mimeType: 'image/jpeg',
                   },
                 });
+                
+                console.log('✅ Frame added to Gemini request as base image');
                 
                 // Image-to-image prompt: 严格保留人物
                 imagePrompt = `Edit this image to create a ${platform} thumbnail.

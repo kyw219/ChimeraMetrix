@@ -1,7 +1,6 @@
 import * as fc from 'fast-check';
 import { sanitizeFileName } from '../../lib/validators';
 
-// Feature: backend, Property 16: File name sanitization prevents path traversal
 describe('Property-Based Tests: File Name Sanitization', () => {
   test('Property 16: sanitized filenames should never contain path traversal sequences', () => {
     fc.assert(
@@ -108,44 +107,6 @@ describe('Property-Based Tests: File Name Sanitization', () => {
             const path = `/tmp/${sanitized}`;
             expect(path).toBeDefined();
           }).not.toThrow();
-        }
-      ),
-      { numRuns: 100 }
-    );
-  });
-});
-import * as fc from 'fast-check';
-import { sanitizeFileName } from '../../lib/validators';
-
-describe('Property-Based Tests for Validators', () => {
-  // Feature: backend, Property 16: File name sanitization prevents path traversal
-  test('Property 16: sanitized filenames never contain path traversal sequences', () => {
-    fc.assert(
-      fc.property(
-        fc.string({ minLength: 1, maxLength: 100 }),
-        (filename) => {
-          const sanitized = sanitizeFileName(filename);
-          // Verify no path traversal sequences remain
-          expect(sanitized).not.toContain('../');
-          expect(sanitized).not.toContain('..\\');
-          // Verify result is a string
-          expect(typeof sanitized).toBe('string');
-        }
-      ),
-      { numRuns: 100 }
-    );
-  });
-
-  test('Property 16: sanitization handles filenames with multiple path traversal attempts', () => {
-    fc.assert(
-      fc.property(
-        fc.array(fc.constantFrom('../', '..\\', '/', '\\'), { minLength: 1, maxLength: 10 }),
-        fc.string({ minLength: 1, maxLength: 50 }),
-        (traversals, basename) => {
-          const maliciousFilename = traversals.join('') + basename;
-          const sanitized = sanitizeFileName(maliciousFilename);
-          expect(sanitized).not.toContain('../');
-          expect(sanitized).not.toContain('..\\');
         }
       ),
       { numRuns: 100 }

@@ -108,6 +108,7 @@ export interface GenerateStrategyRequest {
   sessionId: string;
   features: VideoFeatures;
   platform: string;
+  videoBase64?: string; // Optional: video for cover generation
 }
 
 export interface RegenerateStrategyRequest {

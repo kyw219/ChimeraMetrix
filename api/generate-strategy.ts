@@ -43,16 +43,24 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return;
     }
 
-    // Get video buffer from session (if available)
+    // Get video buffer from request body or session
     let videoBuffer: Buffer | undefined;
-    try {
-      const sessionData = await sessionManager.getSessionData(sessionId);
-      if (sessionData.videoBuffer) {
-        videoBuffer = Buffer.from(sessionData.videoBuffer, 'base64');
-        console.log('📹 Retrieved video buffer from session:', videoBuffer.length, 'bytes');
+    
+    const requestBody = req.body as GenerateStrategyRequest;
+    if (requestBody.videoBase64) {
+      videoBuffer = Buffer.from(requestBody.videoBase64, 'base64');
+      console.log('📹 Using video buffer from request:', videoBuffer.length, 'bytes');
+    } else {
+      // Fallback: try session (may not work in serverless)
+      try {
+        const sessionData = await sessionManager.getSessionData(sessionId);
+        if (sessionData.videoBuffer) {
+          videoBuffer = Buffer.from(sessionData.videoBuffer, 'base64');
+          console.log('📹 Retrieved video buffer from session:', videoBuffer.length, 'bytes');
+        }
+      } catch (error) {
+        console.log('⚠️ Could not retrieve video buffer from session');
       }
-    } catch (error) {
-      console.log('⚠️ Could not retrieve video buffer from session');
     }
 
     // Generate strategy using Gemini (with video buffer for image generation)
