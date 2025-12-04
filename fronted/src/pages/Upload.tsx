@@ -26,6 +26,7 @@ export default function Upload() {
   const [strategy, setStrategy] = useState<any>(workflow.strategy);
   const [analysis, setAnalysis] = useState<any>(workflow.analysis);
   const [sessionId, setSessionId] = useState<string | null>(workflow.sessionId);
+  const [frameUrl, setFrameUrl] = useState<string | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [isRunningBacktest, setIsRunningBacktest] = useState(false);
 
@@ -127,14 +128,16 @@ export default function Upload() {
         throw new Error(analyzeData.error?.message || 'Failed to analyze video');
       }
 
-      const { sessionId: newSessionId, features } = analyzeData.data;
+      const { sessionId: newSessionId, features, frameUrl } = analyzeData.data;
       setSessionId(newSessionId);
       setAnalysis(features);
+      setFrameUrl(frameUrl || null);
       // Save to workflow context
       workflow.setSessionId(newSessionId);
       workflow.setAnalysis(features);
       console.log('\n✅ Video analyzed successfully!');
       console.log('🔑 Session ID:', newSessionId);
+      console.log('🖼️  Frame URL:', frameUrl || 'N/A');
       console.log('🎬 Features extracted:');
       console.log('   - Category:', features.category);
       console.log('   - Emotion:', features.emotion);
@@ -150,6 +153,7 @@ export default function Upload() {
         sessionId: newSessionId,
         features,
         platform,
+        frameUrl, // Pass frame URL for cover generation
       };
       console.log('📤 Strategy request payload:', JSON.stringify(strategyPayload, null, 2));
       
@@ -293,6 +297,7 @@ export default function Upload() {
     setStrategy(null);
     setAnalysis(null);
     setSessionId(null);
+    setFrameUrl(null);
     setIsGenerating(false);
     setIsRunningBacktest(false);
     // Clear workflow context
@@ -318,6 +323,7 @@ export default function Upload() {
         platform,
         field, // Specify which field to regenerate
         currentStrategy: strategy, // Pass current strategy to preserve other fields
+        frameUrl, // Pass frame URL for cover regeneration
       };
 
       const response = await fetch(`${API_BASE_URL}/api/regenerate-strategy`, {
