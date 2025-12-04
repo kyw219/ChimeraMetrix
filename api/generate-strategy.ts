@@ -43,29 +43,21 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return;
     }
 
-    // Get video buffer from request body or session
-    let videoBuffer: Buffer | undefined;
-    
-    const requestBody = req.body as GenerateStrategyRequest;
-    if (requestBody.videoBase64) {
-      videoBuffer = Buffer.from(requestBody.videoBase64, 'base64');
-      console.log('📹 Using video buffer from request:', videoBuffer.length, 'bytes');
-    } else {
-      // Fallback: try session (may not work in serverless)
-      try {
-        const sessionData = await sessionManager.getSessionData(sessionId);
-        if (sessionData.videoBuffer) {
-          videoBuffer = Buffer.from(sessionData.videoBuffer, 'base64');
-          console.log('📹 Retrieved video buffer from session:', videoBuffer.length, 'bytes');
-        }
-      } catch (error) {
-        console.log('⚠️ Could not retrieve video buffer from session');
+    // Get frame URL from session
+    let frameUrl: string | undefined;
+    try {
+      const sessionData = await sessionManager.getSessionData(sessionId);
+      frameUrl = sessionData.frameUrl;
+      if (frameUrl) {
+        console.log('📸 Retrieved frame URL from session:', frameUrl);
       }
+    } catch (error) {
+      console.log('⚠️ Could not retrieve frame URL from session');
     }
 
-    // Generate strategy using Gemini (with video buffer for image generation)
+    // Generate strategy using Gemini (with frame URL for image generation)
     const geminiClient = new GeminiClient();
-    const strategy = await geminiClient.generateStrategy(features, platform, videoBuffer);
+    const strategy = await geminiClient.generateStrategy(features, platform, frameUrl);
 
     // Try to store strategy in session (optional, may fail in serverless)
     try {

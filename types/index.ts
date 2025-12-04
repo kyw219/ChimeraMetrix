@@ -108,7 +108,6 @@ export interface GenerateStrategyRequest {
   sessionId: string;
   features: VideoFeatures;
   platform: string;
-  videoBase64?: string; // Optional: video for cover generation
 }
 
 export interface RegenerateStrategyRequest {
@@ -172,7 +171,7 @@ export interface SimilarVideo {
 export interface SessionData {
   features?: VideoFeatures;
   strategy?: Strategy;
-  videoBuffer?: string; // base64 encoded video
+  frameUrl?: string; // URL of extracted video frame
   createdAt: number;
   lastAccessedAt: number;
 }

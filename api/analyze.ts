@@ -49,11 +49,27 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const features = await geminiClient.analyzeVideo(video, platform);
     console.log('✅ Gemini API returned features:', features);
 
-    // Create session and store features + video buffer
+    // Extract video frame for cover generation
+    console.log('🎬 Extracting key frame for cover generation...');
+    let frameUrl: string | undefined;
+    try {
+      const { extractVideoFrames } = await import('../lib/fal-client');
+      const frames = await extractVideoFrames(video);
+      if (frames.length > 0) {
+        // Use middle frame
+        const bestFrame = frames[Math.floor(frames.length / 2)];
+        frameUrl = bestFrame.url;
+        console.log('✅ Frame extracted:', frameUrl);
+      }
+    } catch (error) {
+      console.log('⚠️ Frame extraction failed, will use text-only generation:', error);
+    }
+
+    // Create session and store features + frame URL
     const sessionId = sessionManager.createSession();
     await sessionManager.setSessionData(sessionId, { 
       features,
-      videoBuffer: video.toString('base64'), // Store as base64 string
+      frameUrl, // Store frame URL instead of video buffer
     });
 
     // Clean up temporary file

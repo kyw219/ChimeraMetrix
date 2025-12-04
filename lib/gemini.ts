@@ -9,7 +9,7 @@ import {
   SimilarityQuery,
 } from '../types';
 import { APIError, logger } from './errors';
-import { extractVideoFrames, downloadFrame } from './fal-client';
+import { downloadFrame } from './fal-client';
 
 export class GeminiClient {
   private genAI: GoogleGenerativeAI;
@@ -195,7 +195,7 @@ IMPORTANT: Text must be LARGE, BOLD, and HIGHLY READABLE on mobile devices. Use 
   /**
    * Generate complete strategy with cover image
    */
-  async generateStrategy(features: VideoFeatures, platform: string, videoBuffer?: Buffer): Promise<Strategy> {
+  async generateStrategy(features: VideoFeatures, platform: string, frameUrl?: string): Promise<Strategy> {
     return this.retryWithBackoff(async () => {
       try {
         console.log('📝 Step 1: Generating strategy text...');
@@ -235,74 +235,39 @@ Provide only the JSON response, no additional text.`;
 
         // Step 3: 使用图片生成模型创建封面
         let coverImageUrl: string | undefined;
-        let coverDescription = 'AI-generated thumbnail optimized for ' + platform;
+        const coverDescription = 'AI-generated thumbnail optimized for ' + platform;
 
         try {
           console.log('🎨 Generating cover image based on video content...');
           
-          let imagePrompt: string;
           const contents: any[] = [];
+          let imagePrompt: string;
           
-          if (videoBuffer) {
-            console.log('📹 Extracting key frame from video using fal.ai...');
+          if (frameUrl) {
+            console.log('📸 Using pre-extracted frame:', frameUrl);
             
             try {
-              // Extract frames using fal.ai
-              const frames = await extractVideoFrames(videoBuffer);
+              // Download frame
+              const frameBuffer = await downloadFrame(frameUrl);
+              console.log('✅ Frame downloaded:', frameBuffer.length, 'bytes');
               
-              if (frames.length > 0) {
-                console.log(`📸 Extracted ${frames.length} frames`);
-                
-                // Ask Gemini to analyze the video and find best timestamp for thumbnail
-                const timestampPrompt = `Analyze this video and tell me the best timestamp (in seconds) for a thumbnail that shows:
-1. A clear view of the person's face
-2. An interesting expression or action
-3. Good for a ${platform} thumbnail
-
-Respond with ONLY a number (the timestamp in seconds). Video duration is approximately ${frames[frames.length - 1].timestamp} seconds.`;
-
-                const timestampResult = await this.model.generateContent([
-                  timestampPrompt,
-                  {
-                    inlineData: {
-                      data: videoBuffer.toString('base64'),
-                      mimeType: 'video/mp4',
-                    },
-                  },
-                ]);
-                
-                const timestampText = timestampResult.response.text().trim();
-                const bestTimestamp = parseFloat(timestampText) || frames[Math.floor(frames.length / 2)].timestamp;
-                
-                // Find closest frame to that timestamp
-                const bestFrame = frames.reduce((prev, curr) => 
-                  Math.abs(curr.timestamp - bestTimestamp) < Math.abs(prev.timestamp - bestTimestamp) ? curr : prev
-                );
-                
-                console.log('✅ Gemini suggested timestamp:', bestTimestamp, 's, using frame at', bestFrame.timestamp, 's');
-                
-                // Download frame
-                const frameBuffer = await downloadFrame(bestFrame.url);
-                console.log('✅ Frame downloaded:', frameBuffer.length, 'bytes');
-                console.log('📸 Frame URL:', bestFrame.url);
-                
-                // Verify frame is valid
-                if (frameBuffer.length < 1000) {
-                  throw new Error('Frame too small, likely invalid');
-                }
-                
-                // Add frame as base image
-                contents.push({
-                  inlineData: {
-                    data: frameBuffer.toString('base64'),
-                    mimeType: 'image/jpeg',
-                  },
-                });
-                
-                console.log('✅ Frame added to Gemini request as base image');
-                
-                // Image-to-image prompt: 严格保留人物
-                imagePrompt = `Edit this image to create a ${platform} thumbnail.
+              // Verify frame is valid
+              if (frameBuffer.length < 1000) {
+                throw new Error('Frame too small, likely invalid');
+              }
+              
+              // Add frame as base image
+              contents.push({
+                inlineData: {
+                  data: frameBuffer.toString('base64'),
+                  mimeType: 'image/jpeg',
+                },
+              });
+              
+              console.log('✅ Frame added to Gemini request as base image');
+              
+              // Image-to-image prompt: 严格保留人物
+              imagePrompt = `Edit this image to create a ${platform} thumbnail.
 
 CRITICAL - DO NOT CHANGE:
 - The person's face, skin tone, ethnicity, age, gender - MUST stay IDENTICAL
@@ -322,12 +287,9 @@ TEXT OVERLAY:
 - Add 2-3 emoji related to ${features.keywords.slice(0, 3).join(', ')}
 
 IMPORTANT: This is image editing, NOT image generation. Keep the original person unchanged.`;
-                
-              } else {
-                throw new Error('No frames extracted');
-              }
-            } catch (falError) {
-              console.error('❌ fal.ai extraction failed, using text-only generation:', falError);
+              
+            } catch (frameError) {
+              console.error('❌ Frame download failed, using text-only generation:', frameError);
               // 降级：纯文字生成
               imagePrompt = `Create a ${platform === 'youtube' ? '16:9 horizontal' : '9:16 vertical'} thumbnail for "${strategyData.title}".
 
