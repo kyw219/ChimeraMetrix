@@ -330,7 +330,7 @@ Provide only the JSON response, no additional text.`;
   /**
    * Regenerate only the cover field with image
    */
-  async regenerateCover(features: VideoFeatures, platform: string, title: string): Promise<{ cover: string; coverImageUrl?: string }> {
+  async regenerateCover(features: VideoFeatures, platform: string, title: string, frameUrl?: string): Promise<{ cover: string; coverImageUrl?: string }> {
     return this.retryWithBackoff(async () => {
       try {
         let coverImageUrl: string | undefined;
@@ -344,19 +344,51 @@ Theme: ${features.category}
 
 Eye-catching design with bold text and vibrant colors.`;
           
-          const response = await this.newGenAI.models.generateContent({
-            model: 'gemini-2.5-flash-image',
-            contents: imagePrompt,
-          });
+          if (frameUrl) {
+            // Use frame as reference
+            const frameResponse = await fetch(frameUrl);
+            const frameBuffer = await frameResponse.arrayBuffer();
+            const frameBase64 = Buffer.from(frameBuffer).toString('base64');
+            
+            const response = await this.newGenAI.models.generateContent({
+              model: 'gemini-2.5-flash-image',
+              contents: [
+                imagePrompt + '\n\nIMPORTANT: Keep the person/face from the original frame.',
+                {
+                  inlineData: {
+                    data: frameBase64,
+                    mimeType: 'image/jpeg',
+                  },
+                },
+              ],
+            });
 
-          const parts = response.candidates?.[0]?.content?.parts || [];
-          for (const part of parts) {
-            if (part.inlineData?.data) {
-              const base64Data = part.inlineData.data;
-              const mimeType = part.inlineData.mimeType || 'image/png';
-              coverImageUrl = `data:${mimeType};base64,${base64Data}`;
-              console.log('✅ Cover image regenerated');
-              break;
+            const parts = response.candidates?.[0]?.content?.parts || [];
+            for (const part of parts) {
+              if (part.inlineData?.data) {
+                const base64Data = part.inlineData.data;
+                const mimeType = part.inlineData.mimeType || 'image/png';
+                coverImageUrl = `data:${mimeType};base64,${base64Data}`;
+                console.log('✅ Cover regenerated with frame reference');
+                break;
+              }
+            }
+          } else {
+            // Text-only generation
+            const response = await this.newGenAI.models.generateContent({
+              model: 'gemini-2.5-flash-image',
+              contents: imagePrompt,
+            });
+
+            const parts = response.candidates?.[0]?.content?.parts || [];
+            for (const part of parts) {
+              if (part.inlineData?.data) {
+                const base64Data = part.inlineData.data;
+                const mimeType = part.inlineData.mimeType || 'image/png';
+                coverImageUrl = `data:${mimeType};base64,${base64Data}`;
+                console.log('✅ Cover regenerated from text');
+                break;
+              }
             }
           }
         } catch (imageError) {
