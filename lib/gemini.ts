@@ -251,9 +251,35 @@ Provide only the JSON response, no additional text.`;
               const frames = await extractVideoFrames(videoBuffer);
               
               if (frames.length > 0) {
-                // Use the middle frame (usually has good content)
-                const bestFrame = frames[Math.floor(frames.length / 2)];
-                console.log('✅ Using frame at', bestFrame.timestamp, 'seconds');
+                console.log(`📸 Extracted ${frames.length} frames`);
+                
+                // Ask Gemini to analyze the video and find best timestamp for thumbnail
+                const timestampPrompt = `Analyze this video and tell me the best timestamp (in seconds) for a thumbnail that shows:
+1. A clear view of the person's face
+2. An interesting expression or action
+3. Good for a ${platform} thumbnail
+
+Respond with ONLY a number (the timestamp in seconds). Video duration is approximately ${frames[frames.length - 1].timestamp} seconds.`;
+
+                const timestampResult = await this.model.generateContent([
+                  timestampPrompt,
+                  {
+                    inlineData: {
+                      data: videoBuffer.toString('base64'),
+                      mimeType: 'video/mp4',
+                    },
+                  },
+                ]);
+                
+                const timestampText = timestampResult.response.text().trim();
+                const bestTimestamp = parseFloat(timestampText) || frames[Math.floor(frames.length / 2)].timestamp;
+                
+                // Find closest frame to that timestamp
+                const bestFrame = frames.reduce((prev, curr) => 
+                  Math.abs(curr.timestamp - bestTimestamp) < Math.abs(prev.timestamp - bestTimestamp) ? curr : prev
+                );
+                
+                console.log('✅ Gemini suggested timestamp:', bestTimestamp, 's, using frame at', bestFrame.timestamp, 's');
                 
                 // Download frame
                 const frameBuffer = await downloadFrame(bestFrame.url);
