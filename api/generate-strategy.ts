@@ -44,12 +44,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     // Generate strategy using Gemini (use features from request body)
+    // Note: generateStrategy now automatically generates cover image
     const geminiClient = new GeminiClient();
     const strategy = await geminiClient.generateStrategy(features, platform);
-
-    // Generate cover image
-    const coverImageUrl = await geminiClient.generateCoverImage(strategy.cover);
-    strategy.coverImageUrl = coverImageUrl;
 
     // Try to store strategy in session (optional, may fail in serverless)
     try {
