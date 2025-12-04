@@ -140,14 +140,6 @@ Provide only the JSON response, no additional text.`;
       shorts: 'vibrant, energetic, attention-grabbing, vertical format',
     };
 
-    const emotionColors: Record<string, string> = {
-      'Excitement': 'vibrant orange and yellow',
-      'Calm': 'soft blue and green',
-      'Curiosity': 'purple and teal',
-      'Energy': 'red and orange gradient',
-      'Professional': 'navy blue and white',
-    };
-
     // 生成更有冲击力的封面文字（不直接使用标题）
     const hookTexts: Record<string, string[]> = {
       'Visual Hook': ['WATCH THIS!', 'YOU WON\'T BELIEVE', 'SHOCKING!', 'MUST SEE'],
