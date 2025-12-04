@@ -31,7 +31,7 @@ export class GeminiClient {
    */
   private getImageModel() {
     return this.genAI.getGenerativeModel({
-      model: 'imagen-3.0-generate-001', // Imagen 3 for image generation
+      model: 'gemini-2.0-flash-exp', // Gemini 2.0 Flash with image generation (Nano Banana)
     });
   }
 
