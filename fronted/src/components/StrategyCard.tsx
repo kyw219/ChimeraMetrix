@@ -21,6 +21,7 @@ export const StrategyCard = ({
   onRegenerate,
 }: StrategyCardProps) => {
   const colorName = iconColor.replace('text-', '');
+  const isCoverCard = title === "Recommended Cover";
   
   return (
     <div className={`subpanel rounded-xl p-5 transition-all h-full ${
@@ -52,11 +53,33 @@ export const StrategyCard = ({
           </Button>
         )}
       </div>
-      <p className={`text-sm leading-relaxed ${
-        isEmpty ? 'text-muted-foreground/50 italic' : 'text-muted-foreground'
-      }`}>
-        {isEmpty ? placeholder : content}
-      </p>
+      
+      {/* Special visual treatment for cover card */}
+      {isCoverCard && !isEmpty && content ? (
+        <div className="space-y-3">
+          {/* Visual preview box */}
+          <div className="relative aspect-video rounded-lg overflow-hidden bg-gradient-to-br from-chart-1/10 to-chart-2/10 border border-border/30">
+            <div className="absolute inset-0 flex items-center justify-center p-4">
+              <p className="text-xs text-center text-muted-foreground/80 leading-relaxed line-clamp-4">
+                {content}
+              </p>
+            </div>
+            {/* Decorative corner badge */}
+            <div className="absolute top-2 right-2 px-2 py-1 rounded bg-primary/20 backdrop-blur-sm">
+              <span className="text-[9px] font-semibold text-primary uppercase tracking-wide">AI Design</span>
+            </div>
+          </div>
+          <p className="text-[10px] text-muted-foreground/60 italic">
+            💡 Visual description for your thumbnail design
+          </p>
+        </div>
+      ) : (
+        <p className={`text-sm leading-relaxed ${
+          isEmpty ? 'text-muted-foreground/50 italic' : 'text-muted-foreground'
+        }`}>
+          {isEmpty ? placeholder : content}
+        </p>
+      )}
     </div>
   );
 };
