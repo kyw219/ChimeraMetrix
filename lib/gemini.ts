@@ -9,6 +9,7 @@ import {
   SimilarityQuery,
 } from '../types';
 import { APIError, logger } from './errors';
+import { extractVideoFrames, downloadFrame } from './fal-client';
 
 export class GeminiClient {
   private genAI: GoogleGenerativeAI;
@@ -243,28 +244,56 @@ Provide only the JSON response, no additional text.`;
           const contents: any[] = [];
           
           if (videoBuffer) {
-            console.log('📹 Using video content for thumbnail generation');
+            console.log('📹 Extracting key frame from video using fal.ai...');
             
-            // 先添加视频
-            contents.push({
-              inlineData: {
-                data: videoBuffer.toString('base64'),
-                mimeType: 'video/mp4',
-              },
-            });
-            
-            // Image-to-image prompt: 保留视频内容，只添加文字和优化
-            imagePrompt = `Based on this video, create a ${platform === 'youtube' ? '16:9 horizontal' : '9:16 vertical'} thumbnail.
+            try {
+              // Extract frames using fal.ai
+              const frames = await extractVideoFrames(videoBuffer);
+              
+              if (frames.length > 0) {
+                // Use the middle frame (usually has good content)
+                const bestFrame = frames[Math.floor(frames.length / 2)];
+                console.log('✅ Using frame at', bestFrame.timestamp, 'seconds');
+                
+                // Download frame
+                const frameBuffer = await downloadFrame(bestFrame.url);
+                console.log('✅ Frame downloaded:', frameBuffer.length, 'bytes');
+                
+                // Add frame as base image
+                contents.push({
+                  inlineData: {
+                    data: frameBuffer.toString('base64'),
+                    mimeType: 'image/jpeg',
+                  },
+                });
+                
+                // Image-to-image prompt: 只添加文字，保持原图
+                imagePrompt = `Edit this image to create a ${platform} thumbnail. 
 
-IMPORTANT: Use a frame from the video as the base. Keep the original people, faces, and scene exactly as they appear in the video. DO NOT generate new faces or people.
+CRITICAL: Keep the original image, people, and faces EXACTLY as they are. Only add text overlay.
 
-Add these enhancements:
-- Bold text overlay: "${strategyData.title}"
-- Text style: Large, yellow with black stroke, highly readable
-- Position: Top or center
-- Add 2-3 relevant emoji
-- Enhance colors and contrast for ${platform}
-- Keep the original video content and people unchanged`;
+Add:
+- Text: "${strategyData.title}"
+- Style: Large, bold, yellow with black stroke
+- Position: Top center
+- Add 2-3 emoji: ${features.keywords.slice(0, 3).join(', ')}
+- Slightly enhance contrast and saturation
+
+DO NOT change the people, faces, or scene.`;
+                
+              } else {
+                throw new Error('No frames extracted');
+              }
+            } catch (falError) {
+              console.error('❌ fal.ai extraction failed, using text-only generation:', falError);
+              // 降级：纯文字生成
+              imagePrompt = `Create a ${platform === 'youtube' ? '16:9 horizontal' : '9:16 vertical'} thumbnail for "${strategyData.title}".
+
+Style: ${features.visualStyle}
+Theme: ${features.category}
+
+Eye-catching design with bold text and vibrant colors.`;
+            }
             
           } else {
             // 纯文字生成（降级方案）
@@ -272,9 +301,8 @@ Add these enhancements:
 
 Style: ${features.visualStyle}
 Theme: ${features.category}
-Mood: ${features.emotion}
 
-Eye-catching design with bold text, emoji, and vibrant colors for ${platform}.`;
+Eye-catching design with bold text and vibrant colors.`;
           }
           
           contents.push({ text: imagePrompt });
