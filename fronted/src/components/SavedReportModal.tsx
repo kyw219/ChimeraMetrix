@@ -16,21 +16,7 @@ import { mockBacktestData, mockMatchedVideos } from "@/lib/mockData";
 import { useNavigate } from "react-router-dom";
 
 interface SavedReportModalProps {
-  report: {
-    id: string;
-    timestamp: Date;
-    strategy: {
-      cover: string;
-      title: string;
-      hashtags: string[];
-      postingTime: string;
-    };
-    metrics: {
-      views24h: string;
-      ctr24h: string;
-      likes24h: string;
-    };
-  };
+  report: any; // Full SavedReport from savedReports.ts
   onClose: () => void;
 }
 
@@ -89,10 +75,7 @@ export const SavedReportModal = ({ report, onClose }: SavedReportModalProps) => 
               Strategy Preview
             </h3>
             <StrategyPreview 
-              strategy={{
-                ...report.strategy,
-                hashtags: report.strategy.hashtags.join(", ")
-              }} 
+              strategy={report.strategy} 
             />
           </div>
 
@@ -101,7 +84,7 @@ export const SavedReportModal = ({ report, onClose }: SavedReportModalProps) => 
             <MetricCard
               icon={Eye}
               label="Predicted 24h Views"
-              value={report.metrics.views24h}
+              value={report.predictions?.metrics?.views24h || 'N/A'}
               note="Based on averaged performance"
               badge="Read-only"
               iconColor="text-chart-1"
@@ -109,7 +92,7 @@ export const SavedReportModal = ({ report, onClose }: SavedReportModalProps) => 
             <MetricCard
               icon={TrendingUp}
               label="Predicted 24h CTR"
-              value={report.metrics.ctr24h}
+              value={report.predictions?.metrics?.ctr24h || 'N/A'}
               note="Based on averaged performance"
               badge="Read-only"
               iconColor="text-chart-2"
@@ -117,7 +100,7 @@ export const SavedReportModal = ({ report, onClose }: SavedReportModalProps) => 
             <MetricCard
               icon={Heart}
               label="Predicted 24h Likes"
-              value={report.metrics.likes24h}
+              value={report.predictions?.metrics?.likes24h || 'N/A'}
               note="Based on averaged performance"
               badge="Read-only"
               iconColor="text-chart-3"
@@ -166,10 +149,10 @@ export const SavedReportModal = ({ report, onClose }: SavedReportModalProps) => 
           {/* Matched Videos */}
           <div>
             <h3 className="text-sm font-bold text-info mb-3 uppercase tracking-wide">
-              Reference Dataset (K={mockMatchedVideos.length})
+              Reference Dataset (K={report.matchedVideos?.length || mockMatchedVideos.length})
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              {mockMatchedVideos.slice(0, 4).map((video, index) => (
+              {(report.matchedVideos || mockMatchedVideos).slice(0, 4).map((video: any, index: number) => (
                 <div key={index} className="subpanel rounded-xl p-3">
                   <div className="flex items-start gap-3">
                     <div className="w-10 h-10 bg-muted/30 rounded-lg flex items-center justify-center text-lg shrink-0">
@@ -177,15 +160,15 @@ export const SavedReportModal = ({ report, onClose }: SavedReportModalProps) => 
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-[10px] font-medium text-foreground mb-1 line-clamp-2">
-                        {video.title}
+                        {video.title || 'Untitled'}
                       </p>
                       <div className="flex items-center gap-2 text-[9px] text-muted-foreground mb-1">
-                        <span>CTR: {video.ctr}</span>
+                        <span>CTR: {video.ctr || 'N/A'}</span>
                         <span>•</span>
-                        <span>{video.views24h} views</span>
+                        <span>{video.views24h || 'N/A'} views</span>
                       </div>
                       <Badge variant="outline" className="text-[9px] px-2 py-0.5">
-                        Similarity {video.similarity}
+                        Similarity {video.similarity || 'N/A'}
                       </Badge>
                     </div>
                   </div>
