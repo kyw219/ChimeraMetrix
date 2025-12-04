@@ -148,8 +148,32 @@ Provide only the JSON response, no additional text.`;
       'Professional': 'navy blue and white',
     };
 
-    // 提取标题关键词（前3-5个词）
-    const titleWords = title.split(' ').slice(0, isVertical ? 3 : 5).join(' ');
+    // 生成更有冲击力的封面文字（不直接使用标题）
+    const hookTexts: Record<string, string[]> = {
+      'Visual Hook': ['WATCH THIS!', 'YOU WON\'T BELIEVE', 'SHOCKING!', 'MUST SEE'],
+      'Question Hook': ['IS IT WORTH IT?', 'DOES IT WORK?', 'GOOD OR BAD?', 'WORTH THE HYPE?'],
+      'Shock Hook': ['INSANE!', 'NO WAY!', 'UNBELIEVABLE!', 'MIND BLOWN'],
+      'default': ['AMAZING!', 'CHECK THIS OUT!', 'WOW!', 'INCREDIBLE']
+    };
+    
+    // 根据类别生成主题词
+    const categoryKeywords: Record<string, string> = {
+      'Food & Drink': 'TASTE TEST',
+      'Product Review': 'HONEST REVIEW',
+      'Tech': 'TECH REVIEW',
+      'Gaming': 'GAMEPLAY',
+      'Lifestyle': 'LIFE HACK',
+      'default': 'REVIEW'
+    };
+    
+    const hookType = features.hookType || 'default';
+    const hookOptions = hookTexts[hookType] || hookTexts['default'];
+    const mainHook = hookOptions[Math.floor(Math.random() * hookOptions.length)];
+    
+    const categoryWord = categoryKeywords[features.category] || categoryKeywords['default'];
+    
+    // 从标题中提取产品/主题名（通常是第一个词或emoji后的词）
+    const productName = title.replace(/[🔥💥✨⚡️]/g, '').trim().split(/[:\-]/)[0].trim().split(' ').slice(0, 2).join(' ');
     
     return `Create a ${aspectRatio} ${platform} video thumbnail with the following specifications:
 
@@ -158,37 +182,60 @@ LAYOUT & COMPOSITION:
 - Composition: Dynamic ${isVertical ? 'vertical' : 'rule-of-thirds'} layout
 - Visual focus: ${features.visualStyle}
 
-MAIN TEXT:
-- Content: "${titleWords}"
-- Position: ${isVertical ? 'Top third, centered' : 'Center or top-center'}
-- Font: Bold, modern sans-serif, highly legible
-- Color: Bright yellow (#FFD700) with thick black stroke (4px)
-- Size: ${isVertical ? 'Extra large (占屏幕宽度 80%)' : 'Large (占宽度 60%)'}
-- Effects: Strong drop shadow, slight 3D effect for depth
+MAIN TEXT (3 lines for maximum impact):
+Line 1 (Top): "${productName}" 
+  - Font: Bold, modern sans-serif
+  - Color: White with thick black stroke (5px)
+  - Size: Large
+  
+Line 2 (Middle - BIGGEST): "${mainHook}"
+  - Font: Extra bold, impact style
+  - Color: Bright yellow (#FFD700) with thick black stroke (6px)
+  - Size: EXTRA LARGE (占宽度 70%)
+  - Effects: Strong drop shadow, 3D effect, slight tilt for energy
+  
+Line 3 (Bottom): "${categoryWord}"
+  - Font: Bold, modern sans-serif
+  - Color: White with red background box
+  - Size: Medium
+  - Style: Badge/label style
+
+TEXT POSITIONING:
+- ${isVertical ? 'Vertical stack in top 60%' : 'Centered with slight offset to avoid face'}
+- Ensure text doesn't cover the person's face
+- Leave breathing room around text
 
 EMOJI & DECORATIONS:
-- Add 2-3 relevant emoji based on category: ${features.category}
-- Position: Around the text (sides or corners)
-- Size: Medium-large, clearly visible
+- Add 3-4 relevant emoji: 🔥💥✨⚡️ (based on emotion and category)
+- Position: Around the main hook text for emphasis
+- Size: Large, clearly visible
+- Style: Explosive, energetic placement
 
-BACKGROUND:
-- Theme: ${features.category} related scene
-- Style: ${features.visualStyle}
-- Treatment: Slightly blurred or darkened to make text pop
-- Colors: ${emotionColors[features.emotion.split('&')[0].trim()] || 'vibrant and contrasting'}
+BACKGROUND TREATMENT:
+- Keep the original video frame as base
+- Add subtle vignette to darken edges
+- Slightly enhance saturation and contrast
+- Add subtle glow effect behind text for readability
 
 COLOR SCHEME:
-- Primary: High contrast, attention-grabbing
+- Primary text: Bright yellow (#FFD700) for main hook
+- Secondary: White for product name and category
+- Accent: Red for category badge
 - Mood: ${features.emotion}
-- Style: ${platformStyles[platform] || platformStyles.tiktok}
+- Style: ${platformStyles[platform] || platformStyles.youtube}
 
 OVERALL STYLE:
 - Target audience: ${features.audience}
 - Hook type: ${features.hookType}
-- Platform optimization: ${platform}
-- Must be: Eye-catching, clickable, mobile-friendly, high contrast
+- Platform: ${platform} optimized
+- Must be: EXTREMELY eye-catching, clickable, high-energy, mobile-friendly
 
-IMPORTANT: Text must be LARGE, BOLD, and HIGHLY READABLE on mobile devices. Use maximum contrast.`;
+CRITICAL REQUIREMENTS:
+1. Text must be MASSIVE and BOLD - readable from thumbnail size
+2. Use maximum contrast - text must pop from background
+3. Keep person's face visible and prominent
+4. Create urgency and curiosity with text placement
+5. Professional but energetic YouTube thumbnail style`;
   }
 
   /**
