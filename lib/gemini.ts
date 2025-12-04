@@ -174,34 +174,41 @@ LAYOUT & COMPOSITION:
 - Composition: Dynamic ${isVertical ? 'vertical' : 'rule-of-thirds'} layout
 - Visual focus: ${features.visualStyle}
 
-MAIN TEXT (3 lines for maximum impact):
-Line 1 (Top): "${productName}" 
+MAIN TEXT (2-3 lines for maximum impact):
+Line 1 (Top-Left or Top-Right corner): "${productName}" 
   - Font: Bold, modern sans-serif
   - Color: White with thick black stroke (5px)
-  - Size: Large
+  - Size: Medium-Large
+  - Position: Corner placement, away from center
   
-Line 2 (Middle - BIGGEST): "${mainHook}"
+Line 2 (Bottom area - BIGGEST): "${mainHook}"
   - Font: Extra bold, impact style
   - Color: Bright yellow (#FFD700) with thick black stroke (6px)
-  - Size: EXTRA LARGE (占宽度 70%)
-  - Effects: Strong drop shadow, 3D effect, slight tilt for energy
+  - Size: EXTRA LARGE (占宽度 60-70%)
+  - Position: Bottom third of image, horizontally centered
+  - Effects: Strong drop shadow, 3D effect
   
-Line 3 (Bottom): "${categoryWord}"
+Line 3 (Bottom corner): "${categoryWord}"
   - Font: Bold, modern sans-serif
   - Color: White with red background box
-  - Size: Medium
+  - Size: Small-Medium
+  - Position: Bottom-left or bottom-right corner
   - Style: Badge/label style
 
-TEXT POSITIONING:
-- ${isVertical ? 'Vertical stack in top 60%' : 'Centered with slight offset to avoid face'}
-- Ensure text doesn't cover the person's face
-- Leave breathing room around text
+TEXT POSITIONING RULES (CRITICAL):
+- **NEVER place text in the center** - center is reserved for face/subject
+- Product name: Top corner (left or right)
+- Main hook: Bottom third, below the face
+- Category badge: Bottom corner
+- ${isVertical ? 'Keep all text in top 20% and bottom 30%' : 'Keep text in corners and bottom area'}
+- **Face and product must remain clearly visible in center**
+- Text should frame the subject, not cover it
 
 EMOJI & DECORATIONS:
-- Add 3-4 relevant emoji: 🔥💥✨⚡️ (based on emotion and category)
-- Position: Around the main hook text for emphasis
-- Size: Large, clearly visible
-- Style: Explosive, energetic placement
+- Add 2-3 relevant emoji: 🔥💥✨⚡️ (based on emotion and category)
+- Position: Near text in corners, NOT in center
+- Size: Medium-large, clearly visible
+- Style: Accent the text, don't distract from face/subject
 
 BACKGROUND TREATMENT:
 - Keep the original video frame as base
@@ -223,11 +230,13 @@ OVERALL STYLE:
 - Must be: EXTREMELY eye-catching, clickable, high-energy, mobile-friendly
 
 CRITICAL REQUIREMENTS:
-1. Text must be MASSIVE and BOLD - readable from thumbnail size
-2. Use maximum contrast - text must pop from background
-3. Keep person's face visible and prominent
-4. Create urgency and curiosity with text placement
-5. Professional but energetic YouTube thumbnail style`;
+1. **FACE AND SUBJECT MUST BE IN CENTER AND FULLY VISIBLE** - this is the most important rule
+2. Text placement: corners and bottom area ONLY - never center
+3. Text must be LARGE and BOLD - readable from thumbnail size
+4. Use maximum contrast - text must pop from background
+5. Create urgency and curiosity with strategic text framing
+6. Professional but energetic YouTube thumbnail style
+7. The person's face and any product they're holding must be the visual focal point`;
   }
 
   /**
