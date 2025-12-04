@@ -4,6 +4,7 @@ import { CheckCircle2, Loader2 } from "lucide-react";
 interface BacktestLoadingPipelineProps {
   onComplete: () => void;
   onError?: (error: Error) => void;
+  forceComplete?: boolean;
 }
 
 interface Step {
@@ -38,9 +39,24 @@ const steps: Step[] = [
   }
 ];
 
-export const BacktestLoadingPipeline = ({ onComplete }: BacktestLoadingPipelineProps) => {
+export const BacktestLoadingPipeline = ({ onComplete, forceComplete }: BacktestLoadingPipelineProps) => {
   const [currentStep, setCurrentStep] = useState(0);
   const [completedSteps, setCompletedSteps] = useState<number[]>([]);
+
+  // When API completes, fast-forward through remaining steps
+  useEffect(() => {
+    if (forceComplete && currentStep < steps.length) {
+      // Complete all remaining steps quickly
+      const completeAll = async () => {
+        for (let i = currentStep; i < steps.length; i++) {
+          setCompletedSteps(prev => [...prev, i]);
+          setCurrentStep(i + 1);
+          await new Promise(resolve => setTimeout(resolve, 500)); // 0.5s per step
+        }
+      };
+      completeAll();
+    }
+  }, [forceComplete, currentStep]);
 
   useEffect(() => {
     if (currentStep >= steps.length) {
@@ -48,13 +64,16 @@ export const BacktestLoadingPipeline = ({ onComplete }: BacktestLoadingPipelineP
       return () => clearTimeout(timer);
     }
 
+    // Don't auto-advance if force completing
+    if (forceComplete) return;
+
     const timer = setTimeout(() => {
       setCompletedSteps(prev => [...prev, currentStep]);
       setCurrentStep(prev => prev + 1);
     }, steps[currentStep].duration);
 
     return () => clearTimeout(timer);
-  }, [currentStep, onComplete]);
+  }, [currentStep, onComplete, forceComplete]);
 
   return (
     <div className="panel-base rounded-2xl p-8 max-w-3xl mx-auto">
