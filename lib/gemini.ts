@@ -267,19 +267,23 @@ Provide only the JSON response, no additional text.`;
                   },
                 });
                 
-                // Image-to-image prompt: 只添加文字，保持原图
-                imagePrompt = `Edit this image to create a ${platform} thumbnail. 
+                // Image-to-image prompt: 保留人物，优化背景和添加文字
+                imagePrompt = `Create a ${platform} thumbnail based on this image.
 
-CRITICAL: Keep the original image, people, and faces EXACTLY as they are. Only add text overlay.
+REQUIREMENTS:
+1. KEEP the person/people and their faces EXACTLY as shown in the image
+2. KEEP their pose, expression, and what they're holding
+3. REPLACE the background with an eye-catching, relevant background for ${features.category}
+4. Make the background vibrant and attention-grabbing but keep focus on the person
 
-Add:
-- Text: "${strategyData.title}"
-- Style: Large, bold, yellow with black stroke
-- Position: Top center
-- Add 2-3 emoji: ${features.keywords.slice(0, 3).join(', ')}
-- Slightly enhance contrast and saturation
+ADD:
+- Bold text: "${strategyData.title}"
+- Style: Extra large, yellow with thick black stroke (4px)
+- Position: Top center or around the person
+- Emoji: 2-3 relevant ones (${features.keywords.slice(0, 3).join(', ')})
+- Enhance person's contrast and saturation to pop
 
-DO NOT change the people, faces, or scene.`;
+STYLE: YouTube thumbnail style - dramatic, high contrast, person in focus with exciting background.`;
                 
               } else {
                 throw new Error('No frames extracted');
