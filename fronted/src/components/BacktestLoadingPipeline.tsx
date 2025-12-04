@@ -19,21 +19,21 @@ const steps: Step[] = [
     id: 1,
     title: "Matching Similar Videos",
     subtitle: "Finding most similar videos using semantic search…",
-    duration: 800,
+    duration: 35000, // ~35 seconds (Gemini API is slow)
     animationType: 'pulse'
   },
   {
     id: 2,
     title: "Analyzing Historical Performance",
     subtitle: "Aggregating metrics: views, CTR, impressions, likes…",
-    duration: 900,
+    duration: 8000, // ~8 seconds
     animationType: 'chart'
   },
   {
     id: 3,
     title: "Generating Predictions",
     subtitle: "Building 24-hour temporal curve and model outputs…",
-    duration: 800,
+    duration: 12000, // ~12 seconds (includes performance analysis)
     animationType: 'curve'
   }
 ];
