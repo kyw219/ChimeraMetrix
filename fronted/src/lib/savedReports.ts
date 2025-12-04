@@ -32,7 +32,9 @@ export function saveReport(report: Omit<SavedReport, 'id' | 'timestamp'>): Saved
 export function getSavedReports(): SavedReport[] {
   try {
     const saved = localStorage.getItem(SAVED_REPORTS_KEY);
-    return saved ? JSON.parse(saved) : [];
+    const reports = saved ? JSON.parse(saved) : [];
+    // Sort by timestamp descending (newest first)
+    return reports.sort((a: SavedReport, b: SavedReport) => b.timestamp - a.timestamp);
   } catch (error) {
     console.error('Failed to load saved reports:', error);
     return [];
