@@ -43,9 +43,19 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return;
     }
 
+    // Get frame URL from session if available
+    let frameUrl: string | undefined;
+    try {
+      const sessionData = await sessionManager.getSessionData(sessionId);
+      frameUrl = sessionData.frameUrl;
+      logger.info('Frame URL retrieved from session', { sessionId, hasFrame: !!frameUrl });
+    } catch (error) {
+      logger.warn('Could not retrieve frame URL from session', { sessionId });
+    }
+
     // Generate strategy using Gemini
     const geminiClient = new GeminiClient();
-    const strategy = await geminiClient.generateStrategy(features, platform);
+    const strategy = await geminiClient.generateStrategy(features, platform, frameUrl);
 
     // Try to store strategy in session (optional, may fail in serverless)
     try {

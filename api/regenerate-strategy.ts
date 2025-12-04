@@ -54,6 +54,16 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     // Use currentStrategy from request (for serverless compatibility)
     const existingStrategy = currentStrategy;
 
+    // Get frame URL from session if available
+    let frameUrl: string | undefined;
+    try {
+      const sessionData = await sessionManager.getSessionData(sessionId);
+      frameUrl = sessionData.frameUrl;
+      logger.info('Frame URL retrieved from session', { sessionId, hasFrame: !!frameUrl });
+    } catch (error) {
+      logger.warn('Could not retrieve frame URL from session', { sessionId });
+    }
+
     logger.info('Regenerating strategy', { sessionId, field: field || 'all' });
 
     const geminiClient = new GeminiClient();
@@ -66,7 +76,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         const coverData = await geminiClient.regenerateCover(
           features, 
           platform, 
-          existingStrategy.title
+          existingStrategy.title,
+          frameUrl
         );
         updatedStrategy = {
           ...existingStrategy,
@@ -75,7 +86,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         };
       } else {
         // For other fields, generate new strategy and pick the field
-        const newStrategy = await geminiClient.generateStrategy(features, platform);
+        const newStrategy = await geminiClient.generateStrategy(features, platform, frameUrl);
         updatedStrategy = {
           ...existingStrategy,
           [field]: newStrategy[field as keyof Strategy],
@@ -85,7 +96,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       logger.info('Field regenerated', { sessionId, field });
     } else {
       // Regenerate entire strategy (already includes image generation)
-      updatedStrategy = await geminiClient.generateStrategy(features, platform);
+      updatedStrategy = await geminiClient.generateStrategy(features, platform, frameUrl);
 
       logger.info('Entire strategy regenerated', { sessionId });
     }

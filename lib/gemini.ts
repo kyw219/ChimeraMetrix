@@ -192,9 +192,13 @@ IMPORTANT: Text must be LARGE, BOLD, and HIGHLY READABLE on mobile devices. Use 
   }
 
   /**
-   * Generate complete strategy with cover image
+   * Generate complete strategy with cover image based on video frame
    */
-  async generateStrategy(features: VideoFeatures, platform: string): Promise<Strategy> {
+  async generateStrategy(
+    features: VideoFeatures, 
+    platform: string, 
+    frameUrl?: string
+  ): Promise<Strategy> {
     return this.retryWithBackoff(async () => {
       try {
         console.log('📝 Step 1: Generating strategy text...');
@@ -239,32 +243,67 @@ Provide only the JSON response, no additional text.`;
         try {
           console.log('🎨 Generating cover image with gemini-2.5-flash-image...');
           
-          // 使用详细的提示词生成高质量封面
-          console.log('📸 Using detailed cover prompt...');
-          
-          const response = await this.newGenAI.models.generateContent({
-            model: 'gemini-2.5-flash-image',
-            contents: coverPrompt,
-          });
+          // 如果有视频帧，基于帧生成封面（保留人脸等元素）
+          if (frameUrl) {
+            console.log('📸 Using video frame as reference:', frameUrl);
+            
+            // 下载帧
+            const frameResponse = await fetch(frameUrl);
+            const frameBuffer = await frameResponse.arrayBuffer();
+            const frameBase64 = Buffer.from(frameBuffer).toString('base64');
+            
+            // 基于帧生成封面
+            const response = await this.newGenAI.models.generateContent({
+              model: 'gemini-2.5-flash-image',
+              contents: [
+                coverPrompt + '\n\nIMPORTANT: Keep the person/face from the original frame.',
+                {
+                  inlineData: {
+                    data: frameBase64,
+                    mimeType: 'image/jpeg',
+                  },
+                },
+              ],
+            });
 
-          const parts = response.candidates?.[0]?.content?.parts || [];
-          console.log('Parts received:', parts.length);
-          
-          for (const part of parts) {
-            if (part.inlineData?.data) {
-              console.log('✅ Cover image generated successfully!');
-              const base64Data = part.inlineData.data;
-              const mimeType = part.inlineData.mimeType || 'image/png';
-              coverImageUrl = `data:${mimeType};base64,${base64Data}`;
-              console.log('✅ Cover image generated, size:', base64Data.length, 'bytes');
-              break;
+            const parts = response.candidates?.[0]?.content?.parts || [];
+            console.log('Parts received:', parts.length);
+            
+            for (const part of parts) {
+              if (part.inlineData?.data) {
+                console.log('✅ Cover generated with video frame reference!');
+                const base64Data = part.inlineData.data;
+                const mimeType = part.inlineData.mimeType || 'image/png';
+                coverImageUrl = `data:${mimeType};base64,${base64Data}`;
+                console.log('   Size:', base64Data.length, 'bytes');
+                break;
+              }
+            }
+          } else {
+            // 没有帧时，纯文字生成
+            console.log('📸 Generating cover from text prompt only...');
+            
+            const response = await this.newGenAI.models.generateContent({
+              model: 'gemini-2.5-flash-image',
+              contents: coverPrompt,
+            });
+
+            const parts = response.candidates?.[0]?.content?.parts || [];
+            
+            for (const part of parts) {
+              if (part.inlineData?.data) {
+                console.log('✅ Cover generated from text!');
+                const base64Data = part.inlineData.data;
+                const mimeType = part.inlineData.mimeType || 'image/png';
+                coverImageUrl = `data:${mimeType};base64,${base64Data}`;
+                break;
+              }
             }
           }
         } catch (imageError) {
           console.error('❌ Image generation failed:', imageError);
           console.error('Error details:', imageError instanceof Error ? imageError.message : String(imageError));
           logger.warn('Cover image generation failed, using text description', { imageError });
-          // 降级：如果图片生成失败，继续使用文字描述
         }
 
         const strategy: Strategy = {

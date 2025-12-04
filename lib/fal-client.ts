@@ -7,13 +7,15 @@ fal.config({
 
 export interface VideoFrame {
   url: string;
-  timestamp: number;
+  width: number;
+  height: number;
+  file_size: number;
 }
 
 /**
- * Extract key frames from video using fal.ai
+ * Extract middle frame from video using fal.ai
  */
-export async function extractVideoFrames(videoBuffer: Buffer): Promise<VideoFrame[]> {
+export async function extractVideoFrame(videoBuffer: Buffer): Promise<VideoFrame> {
   try {
     console.log('🎬 Uploading video to fal.ai for frame extraction...');
     
@@ -22,19 +24,32 @@ export async function extractVideoFrames(videoBuffer: Buffer): Promise<VideoFram
     
     // Upload video to fal.ai
     const videoUrl = await fal.storage.upload(blob);
-    console.log('✅ Video uploaded:', videoUrl);
+    console.log('✅ Video uploaded to fal.ai:', videoUrl);
 
-    // Extract frames
-    const result: any = await fal.subscribe('fal-ai/video-to-frames', {
+    // Extract middle frame (most likely to contain main subject/face)
+    console.log('📸 Extracting middle frame...');
+    const result: any = await fal.subscribe('fal-ai/ffmpeg-api/extract-frame', {
       input: {
         video_url: videoUrl,
-        num_frames: 5, // Extract 5 key frames
+        frame_type: 'middle',
       },
     });
 
-    console.log('✅ Frames extracted:', result.data?.frames?.length || 0);
+    const frame = result.images?.[0];
+    if (!frame) {
+      throw new Error('No frame extracted from video');
+    }
+
+    console.log('✅ Frame extracted:', frame.url);
+    console.log('   Dimensions:', `${frame.width}x${frame.height}`);
+    console.log('   Size:', frame.file_size, 'bytes');
     
-    return result.data?.frames || [];
+    return {
+      url: frame.url,
+      width: frame.width,
+      height: frame.height,
+      file_size: frame.file_size,
+    };
   } catch (error) {
     console.error('❌ Frame extraction failed:', error);
     logger.error('fal.ai frame extraction failed', { error });

@@ -172,6 +172,8 @@ export interface SessionData {
   features?: VideoFeatures;
   strategy?: Strategy;
   videoBase64?: string;
+  frameUrl?: string; // URL of extracted video frame for cover generation
+  platform?: string;
   createdAt: number;
   lastAccessedAt: number;
 }

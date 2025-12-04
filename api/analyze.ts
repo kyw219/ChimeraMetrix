@@ -37,23 +37,25 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     logger.info('Video file validated', { filename, size, platform });
 
-    // Analyze video using Gemini
-    console.log('🤖 Initializing Gemini client...');
+    // Step 1: Extract frame from video using fal.ai
+    console.log('📸 Step 1: Extracting frame from video...');
+    const { extractVideoFrame } = await import('../lib/fal-client');
+    const frame = await extractVideoFrame(video);
+    console.log('✅ Frame extracted:', frame.url);
+
+    // Step 2: Analyze video using Gemini
+    console.log('🤖 Step 2: Analyzing video with Gemini...');
     const geminiClient = new GeminiClient();
-    console.log('✅ Gemini client initialized');
-    
-    console.log('📹 Calling Gemini API to analyze video...');
-    console.log('   - Video size:', video.length, 'bytes');
-    console.log('   - Platform:', platform);
     
     const features = await geminiClient.analyzeVideo(video, platform);
-    console.log('✅ Gemini API returned features:', features);
+    console.log('✅ Video features extracted:', features);
 
-    // Store video buffer in session for cover generation
+    // Store frame URL in session for cover generation
     const sessionId = sessionManager.createSession();
     await sessionManager.setSessionData(sessionId, { 
       features,
-      videoBase64: video.toString('base64').substring(0, 100000), // Store first 100KB for cover generation
+      frameUrl: frame.url, // Store frame URL for cover generation
+      platform,
     });
 
     // Clean up temporary file
