@@ -20,8 +20,13 @@ export function validateOrigin(origin: string | undefined): boolean {
 
   const allowedOrigins = getAllowedOrigins();
   
-  // Allow same-origin requests (when frontend and backend are on same domain)
-  if (origin.includes('chimera-metrix.vercel.app')) {
+  // Allow all Vercel preview deployments for chimera-metrix
+  if (origin.includes('chimera-metrix') && origin.includes('vercel.app')) {
+    return true;
+  }
+  
+  // Allow localhost for development
+  if (origin.includes('localhost')) {
     return true;
   }
   
