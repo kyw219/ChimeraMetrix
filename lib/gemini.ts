@@ -1,4 +1,5 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
+import { GoogleGenAI } from '@google/genai';
 import {
   VideoFeatures,
   Strategy,
@@ -11,6 +12,7 @@ import { APIError, logger } from './errors';
 
 export class GeminiClient {
   private genAI: GoogleGenerativeAI;
+  private newGenAI: GoogleGenAI; // New SDK for image generation
   private model: any;
   private maxRetries: number = 2; // Reduced from 3 to 2 for faster response
 
@@ -20,20 +22,17 @@ export class GeminiClient {
       throw new Error('GEMINI_API_KEY is required');
     }
 
+    // Old SDK for text/video analysis
     this.genAI = new GoogleGenerativeAI(key);
     this.model = this.genAI.getGenerativeModel({
       model: process.env.GEMINI_MODEL || 'gemini-1.5-pro',
     });
+
+    // New SDK for image generation
+    this.newGenAI = new GoogleGenAI({ apiKey: key });
   }
 
-  /**
-   * Get image generation model
-   */
-  private getImageModel() {
-    return this.genAI.getGenerativeModel({
-      model: 'gemini-2.0-flash-exp', // Gemini 2.0 Flash with image generation (Nano Banana)
-    });
-  }
+
 
   /**
    * Retry logic with exponential backoff
@@ -238,43 +237,55 @@ Provide only the JSON response, no additional text.`;
         let coverDescription = 'AI-generated thumbnail optimized for ' + platform;
 
         try {
-          const imageModel = this.getImageModel();
-          const imageResult = await imageModel.generateContent([coverPrompt]);
-          const imageResponse = await imageResult.response;
-
-          console.log('🔍 Checking image response...');
-          console.log('Response structure:', JSON.stringify({
-            hasCandidates: !!imageResponse.candidates,
-            candidatesLength: imageResponse.candidates?.length,
-            firstCandidate: imageResponse.candidates?.[0] ? 'exists' : 'missing',
-          }));
+          console.log('🎨 Attempting image generation with new Google Gen AI SDK...');
           
-          // 尝试不同的响应结构
-          const parts = imageResponse.candidates?.[0]?.content?.parts || [];
+          // 简化 prompt，专注于图片生成
+          const simpleImagePrompt = `Create a ${platform === 'youtube' ? '16:9 horizontal' : '9:16 vertical'} thumbnail image for a video titled "${strategyData.title}". 
+          
+Style: ${features.visualStyle}
+Theme: ${features.category}
+Mood: ${features.emotion}
+
+The thumbnail should be eye-catching, high-contrast, and optimized for ${platform}. Include bold text with the title, relevant emoji, and vibrant colors.`;
+
+          console.log('📸 Image prompt:', simpleImagePrompt.substring(0, 150) + '...');
+          
+          // 使用新 SDK 的正确方法
+          const response = await this.newGenAI.models.generateContent({
+            model: 'gemini-2.0-flash-exp',
+            contents: simpleImagePrompt,
+          });
+
+          console.log('🔍 Checking image response from new SDK...');
+          console.log('Response keys:', Object.keys(response));
+          
+          // 新 SDK 的响应结构
+          const parts = response.candidates?.[0]?.content?.parts || [];
           console.log('Parts count:', parts.length);
           
-          // 查找图片数据
           for (let i = 0; i < parts.length; i++) {
             const part = parts[i];
-            console.log(`Part ${i}:`, {
-              hasInlineData: !!part.inlineData,
-              hasText: !!part.text,
-              keys: Object.keys(part),
-            });
+            console.log(`Part ${i} keys:`, Object.keys(part));
             
-            if (part.inlineData) {
-              console.log('✅ Found inline image data');
+            if (part.inlineData && part.inlineData.data) {
+              console.log('✅ Found inline image data in new SDK response');
               const base64Data = part.inlineData.data;
               const mimeType = part.inlineData.mimeType || 'image/png';
               coverImageUrl = `data:${mimeType};base64,${base64Data}`;
               console.log('✅ Cover image generated, size:', base64Data.length, 'bytes');
               break;
             }
+            
+            if (part.text) {
+              console.log('Part text preview:', part.text.substring(0, 100));
+            }
           }
 
           if (!coverImageUrl) {
-            console.warn('⚠️ No image data found in response, using text description');
-            console.warn('Full response:', JSON.stringify(imageResponse, null, 2).substring(0, 500));
+            console.warn('⚠️ No image data found in new SDK response');
+            console.warn('Response text:', response.text?.substring(0, 200));
+            console.warn('⚠️ Gemini 2.0 Flash may not support image generation yet');
+            console.warn('⚠️ Falling back to text description');
           }
         } catch (imageError) {
           console.error('❌ Image generation failed:', imageError);
@@ -317,11 +328,13 @@ Provide only the JSON response, no additional text.`;
         const coverDescription = 'AI-generated thumbnail optimized for ' + platform;
 
         try {
-          const imageModel = this.getImageModel();
-          const imageResult = await imageModel.generateContent([coverPrompt]);
-          const imageResponse = await imageResult.response;
+          const response = await this.newGenAI.models.generateContent({
+            model: 'gemini-2.0-flash-exp',
+            contents: coverPrompt,
+          });
 
-          for (const part of imageResponse.candidates?.[0]?.content?.parts || []) {
+          const parts = response.candidates?.[0]?.content?.parts || [];
+          for (const part of parts) {
             if (part.inlineData) {
               const base64Data = part.inlineData.data;
               const mimeType = part.inlineData.mimeType || 'image/png';
