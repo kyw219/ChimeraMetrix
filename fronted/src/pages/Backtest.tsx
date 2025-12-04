@@ -151,8 +151,8 @@ export default function Backtest() {
         description: "Check Saved Reports in the sidebar to view it.",
       });
       
-      // Clear workflow context after saving
-      workflow.clearAll();
+      // Don't clear workflow data - keep it visible on the page
+      // User can start a new workflow by going back to Upload page
     } catch (error) {
       console.error('Failed to save report:', error);
       toast({
