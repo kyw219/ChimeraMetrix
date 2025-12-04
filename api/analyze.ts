@@ -49,9 +49,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const features = await geminiClient.analyzeVideo(video, platform);
     console.log('✅ Gemini API returned features:', features);
 
-    // Create session and store features
+    // Create session and store features + video buffer
     const sessionId = sessionManager.createSession();
-    await sessionManager.setSessionData(sessionId, { features });
+    await sessionManager.setSessionData(sessionId, { 
+      features,
+      videoBuffer: video.toString('base64'), // Store as base64 string
+    });
 
     // Clean up temporary file
     await fileHandler.cleanup(videoPath);

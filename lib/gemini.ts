@@ -194,7 +194,7 @@ IMPORTANT: Text must be LARGE, BOLD, and HIGHLY READABLE on mobile devices. Use 
   /**
    * Generate complete strategy with cover image
    */
-  async generateStrategy(features: VideoFeatures, platform: string): Promise<Strategy> {
+  async generateStrategy(features: VideoFeatures, platform: string, videoBuffer?: Buffer): Promise<Strategy> {
     return this.retryWithBackoff(async () => {
       try {
         console.log('📝 Step 1: Generating strategy text...');
@@ -237,23 +237,39 @@ Provide only the JSON response, no additional text.`;
         let coverDescription = 'AI-generated thumbnail optimized for ' + platform;
 
         try {
-          console.log('🎨 Attempting image generation with new Google Gen AI SDK...');
+          console.log('🎨 Generating cover image based on video content...');
           
-          // 简化 prompt，专注于图片生成
-          const simpleImagePrompt = `Create a ${platform === 'youtube' ? '16:9 horizontal' : '9:16 vertical'} thumbnail image for a video titled "${strategyData.title}". 
-          
+          const imagePrompt = `Create a ${platform === 'youtube' ? '16:9 horizontal' : '9:16 vertical'} thumbnail for this video titled "${strategyData.title}".
+
 Style: ${features.visualStyle}
 Theme: ${features.category}
 Mood: ${features.emotion}
 
-The thumbnail should be eye-catching, high-contrast, and optimized for ${platform}. Include bold text with the title, relevant emoji, and vibrant colors.`;
+Requirements:
+- Eye-catching, high-contrast design
+- Bold text with the title
+- Relevant emoji
+- Vibrant colors
+- Optimized for ${platform}`;
 
-          console.log('📸 Image prompt:', simpleImagePrompt.substring(0, 150) + '...');
+          console.log('📸 Image prompt:', imagePrompt.substring(0, 150) + '...');
           
-          // 使用新 SDK 的正确方法
+          // 如果有视频 buffer，基于视频内容生成封面
+          const contents: any[] = [{ text: imagePrompt }];
+          
+          if (videoBuffer) {
+            console.log('📹 Including video content for image generation');
+            contents.push({
+              inlineData: {
+                data: videoBuffer.toString('base64'),
+                mimeType: 'video/mp4',
+              },
+            });
+          }
+          
           const response = await this.newGenAI.models.generateContent({
             model: 'gemini-2.5-flash-image',
-            contents: simpleImagePrompt,
+            contents,
           });
 
           console.log('🔍 Checking image response from new SDK...');

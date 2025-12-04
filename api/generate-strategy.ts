@@ -43,10 +43,21 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return;
     }
 
-    // Generate strategy using Gemini (use features from request body)
-    // Note: generateStrategy now automatically generates cover image
+    // Get video buffer from session (if available)
+    let videoBuffer: Buffer | undefined;
+    try {
+      const sessionData = await sessionManager.getSessionData(sessionId);
+      if (sessionData.videoBuffer) {
+        videoBuffer = Buffer.from(sessionData.videoBuffer, 'base64');
+        console.log('📹 Retrieved video buffer from session:', videoBuffer.length, 'bytes');
+      }
+    } catch (error) {
+      console.log('⚠️ Could not retrieve video buffer from session');
+    }
+
+    // Generate strategy using Gemini (with video buffer for image generation)
     const geminiClient = new GeminiClient();
-    const strategy = await geminiClient.generateStrategy(features, platform);
+    const strategy = await geminiClient.generateStrategy(features, platform, videoBuffer);
 
     // Try to store strategy in session (optional, may fail in serverless)
     try {

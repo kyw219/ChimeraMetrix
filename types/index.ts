@@ -171,6 +171,7 @@ export interface SimilarVideo {
 export interface SessionData {
   features?: VideoFeatures;
   strategy?: Strategy;
+  videoBuffer?: string; // base64 encoded video
   createdAt: number;
   lastAccessedAt: number;
 }
