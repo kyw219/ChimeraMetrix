@@ -31,7 +31,7 @@ export class GeminiClient {
    */
   private getImageModel() {
     return this.genAI.getGenerativeModel({
-      model: 'gemini-2.0-flash-exp',
+      model: 'imagen-3.0-generate-001', // Imagen 3 for image generation
     });
   }
 
@@ -242,10 +242,26 @@ Provide only the JSON response, no additional text.`;
           const imageResult = await imageModel.generateContent([coverPrompt]);
           const imageResponse = await imageResult.response;
 
-          console.log('🔍 Checking image response parts...');
+          console.log('🔍 Checking image response...');
+          console.log('Response structure:', JSON.stringify({
+            hasCandidates: !!imageResponse.candidates,
+            candidatesLength: imageResponse.candidates?.length,
+            firstCandidate: imageResponse.candidates?.[0] ? 'exists' : 'missing',
+          }));
+          
+          // 尝试不同的响应结构
+          const parts = imageResponse.candidates?.[0]?.content?.parts || [];
+          console.log('Parts count:', parts.length);
           
           // 查找图片数据
-          for (const part of imageResponse.candidates?.[0]?.content?.parts || []) {
+          for (let i = 0; i < parts.length; i++) {
+            const part = parts[i];
+            console.log(`Part ${i}:`, {
+              hasInlineData: !!part.inlineData,
+              hasText: !!part.text,
+              keys: Object.keys(part),
+            });
+            
             if (part.inlineData) {
               console.log('✅ Found inline image data');
               const base64Data = part.inlineData.data;
@@ -258,9 +274,11 @@ Provide only the JSON response, no additional text.`;
 
           if (!coverImageUrl) {
             console.warn('⚠️ No image data found in response, using text description');
+            console.warn('Full response:', JSON.stringify(imageResponse, null, 2).substring(0, 500));
           }
         } catch (imageError) {
           console.error('❌ Image generation failed:', imageError);
+          console.error('Error details:', imageError instanceof Error ? imageError.message : String(imageError));
           logger.warn('Cover image generation failed, using text description', { imageError });
           // 降级：如果图片生成失败，继续使用文字描述
         }
