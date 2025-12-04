@@ -22,7 +22,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     logger.info('Strategy regeneration request received');
 
     // Validate request body
-    const { sessionId, features, platform, field, currentStrategy } = validateRequestBody<RegenerateStrategyRequest>(
+    const { sessionId, features, platform, field, currentStrategy, frameUrl } = validateRequestBody<RegenerateStrategyRequest>(
       req.body,
       ['sessionId', 'features', 'platform']
     );
@@ -54,14 +54,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     // Use currentStrategy from request (for serverless compatibility)
     const existingStrategy = currentStrategy;
 
-    // Get frame URL from session if available
-    let frameUrl: string | undefined;
-    try {
-      const sessionData = await sessionManager.getSessionData(sessionId);
-      frameUrl = sessionData.frameUrl;
-      logger.info('Frame URL retrieved from session', { sessionId, hasFrame: !!frameUrl });
-    } catch (error) {
-      logger.warn('Could not retrieve frame URL from session', { sessionId });
+    // Use frameUrl from request body (passed from frontend)
+    if (frameUrl) {
+      logger.info('Using frame URL from request', { sessionId, frameUrl });
+    } else {
+      logger.warn('No frame URL provided', { sessionId });
     }
 
     logger.info('Regenerating strategy', { sessionId, field: field || 'all' });

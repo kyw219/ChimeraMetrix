@@ -102,12 +102,14 @@ export interface AnalyzeRequest {
 export interface AnalyzeResponse {
   sessionId: string;
   features: VideoFeatures;
+  frameUrl?: string; // URL of extracted video frame
 }
 
 export interface GenerateStrategyRequest {
   sessionId: string;
   features: VideoFeatures;
   platform: string;
+  frameUrl?: string; // URL of extracted video frame for cover generation
 }
 
 export interface RegenerateStrategyRequest {
@@ -116,6 +118,7 @@ export interface RegenerateStrategyRequest {
   platform: string;
   field?: 'cover' | 'title' | 'hashtags' | 'postingTime';
   currentStrategy?: Strategy;
+  frameUrl?: string; // URL of extracted video frame for cover generation
 }
 
 export interface BacktestRequest {

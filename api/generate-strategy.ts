@@ -22,7 +22,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     logger.info('Strategy generation request received');
 
     // Validate request body
-    const { sessionId, features, platform } = validateRequestBody<GenerateStrategyRequest>(
+    const { sessionId, features, platform, frameUrl } = validateRequestBody<GenerateStrategyRequest>(
       req.body,
       ['sessionId', 'features', 'platform']
     );
@@ -43,17 +43,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return;
     }
 
-    // Get frame URL from session if available
-    let frameUrl: string | undefined;
-    try {
-      const sessionData = await sessionManager.getSessionData(sessionId);
-      frameUrl = sessionData.frameUrl;
-      logger.info('Frame URL retrieved from session', { sessionId, hasFrame: !!frameUrl });
-    } catch (error) {
-      logger.warn('Could not retrieve frame URL from session', { sessionId });
+    // Use frameUrl from request body (passed from frontend)
+    if (frameUrl) {
+      logger.info('Using frame URL from request', { sessionId, frameUrl });
+    } else {
+      logger.warn('No frame URL provided', { sessionId });
     }
 
-    // Generate strategy using Gemini
+    // Generate strategy using Gemini (with frame if available)
     const geminiClient = new GeminiClient();
     const strategy = await geminiClient.generateStrategy(features, platform, frameUrl);
 

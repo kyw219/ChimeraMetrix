@@ -67,6 +67,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const response: AnalyzeResponse = {
       sessionId,
       features,
+      frameUrl: frame.url, // Return frame URL to frontend
     };
 
     res.status(STATUS_CODES.OK).json({
