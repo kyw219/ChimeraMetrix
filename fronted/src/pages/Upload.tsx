@@ -445,6 +445,7 @@ export default function Upload() {
                 icon={Image}
                 title="Recommended Cover"
                 content={strategy?.cover}
+                coverImageUrl={strategy?.coverImageUrl}
                 placeholder="AI will recommend the perfect thumbnail design based on viral patterns"
                 iconColor="text-chart-1"
                 isEmpty={!strategy}

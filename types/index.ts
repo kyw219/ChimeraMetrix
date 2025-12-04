@@ -8,36 +8,30 @@ export interface VideoFeatures {
   hookType: string;
 }
 
-export interface ThumbnailDescription {
-  main_subject: string;
-  extracted_objects: string[];
-  background_style: string;
-  composition: {
-    subject_position: string;
-    text_position: string;
-    object_positioning: string;
-  };
-  lighting_effects: string;
-  emotion_mood: string;
-  text_overlay: {
-    title: string;
-    subtitle: string;
-    font_style: string;
-  };
-  color_palette: {
-    primary: string;
-    secondary: string;
-    accent: string;
-  };
-}
-
 export interface Strategy {
-  cover: string;
-  thumbnailDescription?: ThumbnailDescription;
-  coverImageUrl?: string;
+  cover: string; // 文字描述（降级方案）
+  coverImageUrl?: string; // base64 图片数据或 URL
+  coverPrompt?: CoverPrompt; // 详细的封面生成描述
   title: string;
   hashtags: string;
   postingTime: string;
+}
+
+export interface CoverPrompt {
+  layout: string; // 构图方式
+  mainText: {
+    content: string; // 文字内容
+    position: string; // 位置
+    style: string; // 字体风格
+    color: string; // 颜色
+    effects: string; // 特效
+  };
+  emoji?: string[]; // emoji 列表
+  emojiPosition?: string; // emoji 位置
+  background: string; // 背景描述
+  colorScheme: string; // 色彩方案
+  platform: string; // 平台
+  aspectRatio: string; // 宽高比
 }
 
 export interface VideoMetadata {

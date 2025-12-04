@@ -61,25 +61,31 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     if (field && existingStrategy) {
       // Regenerate only the specified field
-      const newStrategy = await geminiClient.generateStrategy(features, platform);
-
-      updatedStrategy = {
-        ...existingStrategy,
-        [field]: newStrategy[field as keyof Strategy],
-      };
-
-      // If regenerating cover, also regenerate cover image
       if (field === 'cover') {
-        const coverImageUrl = await geminiClient.generateCoverImage(updatedStrategy.cover);
-        updatedStrategy.coverImageUrl = coverImageUrl;
+        // Special handling for cover - regenerate with image
+        const coverData = await geminiClient.regenerateCover(
+          features, 
+          platform, 
+          existingStrategy.title
+        );
+        updatedStrategy = {
+          ...existingStrategy,
+          cover: coverData.cover,
+          coverImageUrl: coverData.coverImageUrl,
+        };
+      } else {
+        // For other fields, generate new strategy and pick the field
+        const newStrategy = await geminiClient.generateStrategy(features, platform);
+        updatedStrategy = {
+          ...existingStrategy,
+          [field]: newStrategy[field as keyof Strategy],
+        };
       }
 
       logger.info('Field regenerated', { sessionId, field });
     } else {
-      // Regenerate entire strategy
+      // Regenerate entire strategy (already includes image generation)
       updatedStrategy = await geminiClient.generateStrategy(features, platform);
-      const coverImageUrl = await geminiClient.generateCoverImage(updatedStrategy.cover);
-      updatedStrategy.coverImageUrl = coverImageUrl;
 
       logger.info('Entire strategy regenerated', { sessionId });
     }

@@ -27,6 +27,15 @@ export class GeminiClient {
   }
 
   /**
+   * Get image generation model
+   */
+  private getImageModel() {
+    return this.genAI.getGenerativeModel({
+      model: 'gemini-2.0-flash-exp',
+    });
+  }
+
+  /**
    * Retry logic with exponential backoff
    */
   private async retryWithBackoff<T>(
@@ -115,65 +124,161 @@ Provide only the JSON response, no additional text.`;
   }
 
   /**
-   * Generate complete strategy with detailed thumbnail description
+   * Generate detailed cover prompt based on features
+   */
+  private generateCoverPromptFromFeatures(
+    features: VideoFeatures,
+    platform: string,
+    title: string
+  ): string {
+    const aspectRatio = platform === 'youtube' ? '16:9' : '9:16';
+    const isVertical = platform !== 'youtube';
+
+    // 根据平台和内容类型优化提示词
+    const platformStyles: Record<string, string> = {
+      youtube: 'cinematic, professional, detailed composition',
+      tiktok: 'bold, high-contrast, eye-catching, mobile-optimized',
+      shorts: 'vibrant, energetic, attention-grabbing, vertical format',
+    };
+
+    const emotionColors: Record<string, string> = {
+      'Excitement': 'vibrant orange and yellow',
+      'Calm': 'soft blue and green',
+      'Curiosity': 'purple and teal',
+      'Energy': 'red and orange gradient',
+      'Professional': 'navy blue and white',
+    };
+
+    // 提取标题关键词（前3-5个词）
+    const titleWords = title.split(' ').slice(0, isVertical ? 3 : 5).join(' ');
+    
+    return `Create a ${aspectRatio} ${platform} video thumbnail with the following specifications:
+
+LAYOUT & COMPOSITION:
+- Aspect ratio: ${aspectRatio} (${isVertical ? 'vertical' : 'horizontal'})
+- Composition: Dynamic ${isVertical ? 'vertical' : 'rule-of-thirds'} layout
+- Visual focus: ${features.visualStyle}
+
+MAIN TEXT:
+- Content: "${titleWords}"
+- Position: ${isVertical ? 'Top third, centered' : 'Center or top-center'}
+- Font: Bold, modern sans-serif, highly legible
+- Color: Bright yellow (#FFD700) with thick black stroke (4px)
+- Size: ${isVertical ? 'Extra large (占屏幕宽度 80%)' : 'Large (占宽度 60%)'}
+- Effects: Strong drop shadow, slight 3D effect for depth
+
+EMOJI & DECORATIONS:
+- Add 2-3 relevant emoji based on category: ${features.category}
+- Position: Around the text (sides or corners)
+- Size: Medium-large, clearly visible
+
+BACKGROUND:
+- Theme: ${features.category} related scene
+- Style: ${features.visualStyle}
+- Treatment: Slightly blurred or darkened to make text pop
+- Colors: ${emotionColors[features.emotion.split('&')[0].trim()] || 'vibrant and contrasting'}
+
+COLOR SCHEME:
+- Primary: High contrast, attention-grabbing
+- Mood: ${features.emotion}
+- Style: ${platformStyles[platform] || platformStyles.tiktok}
+
+OVERALL STYLE:
+- Target audience: ${features.audience}
+- Hook type: ${features.hookType}
+- Platform optimization: ${platform}
+- Must be: Eye-catching, clickable, mobile-friendly, high contrast
+
+IMPORTANT: Text must be LARGE, BOLD, and HIGHLY READABLE on mobile devices. Use maximum contrast.`;
+  }
+
+  /**
+   * Generate complete strategy with cover image
    */
   async generateStrategy(features: VideoFeatures, platform: string): Promise<Strategy> {
     return this.retryWithBackoff(async () => {
       try {
-        const prompt = `Based on these video features for ${platform}, generate a content strategy in JSON format:
+        console.log('📝 Step 1: Generating strategy text...');
+        
+        // Step 1: 生成策略文字（title, hashtags, postingTime）
+        const strategyPrompt = `Based on these video features for ${platform}, generate a content strategy in JSON format:
 
 Features:
 ${JSON.stringify(features, null, 2)}
 
-Your task: Generate a complete content strategy with a detailed YouTube thumbnail description optimized for high CTR.
-
-Output the following JSON structure:
+Generate:
 {
-  "cover": "brief text description for fallback display",
-  "thumbnailDescription": {
-    "main_subject": "Describe the primary person/object, pose, emotion, outfit, facial expression based on video content",
-    "extracted_objects": ["list", "important", "objects", "from", "video"],
-    "background_style": "Describe suitable background visual style and color theme (e.g., 'tech-modern with purple-blue gradient' or 'dramatic red-yellow MrBeast style')",
-    "composition": {
-      "subject_position": "left/right/center",
-      "text_position": "top-left/top-right/bottom-left/bottom-right",
-      "object_positioning": "describe where objects should be placed"
-    },
-    "lighting_effects": "Describe lighting style (e.g., 'rim light, dramatic shadows, neon glow')",
-    "emotion_mood": "Describe emotional tone (e.g., 'surprised', 'excited', 'mysterious', 'dramatic tension')",
-    "text_overlay": {
-      "title": "punchy main title (max 8 words)",
-      "subtitle": "short subtitle",
-      "font_style": "bold, high contrast"
-    },
-    "color_palette": {
-      "primary": "#HEX color",
-      "secondary": "#HEX color",
-      "accent": "#HEX color"
-    }
-  },
-  "title": "engaging title optimized for ${platform}",
+  "title": "engaging title optimized for ${platform} (concise, under 60 characters)",
   "hashtags": "space-separated relevant hashtags",
   "postingTime": "optimal posting time (e.g., 7:00 PM EST)"
 }
 
-Requirements:
-- thumbnailDescription must be concise, visual, actionable
-- All fields must be filled based on video analysis
-- Colors should be hex codes
-- Output ONLY valid JSON, no explanations
-
 Provide only the JSON response, no additional text.`;
 
-        const result = await this.model.generateContent(prompt);
-        const response = await result.response;
-        let text = response.text();
-        // Clean up markdown code blocks if present
-        text = text.replace(/```json\s*/g, '').replace(/```\s*/g, '').trim();
-        const strategy = JSON.parse(text);
+        const strategyResult = await this.model.generateContent(strategyPrompt);
+        const strategyResponse = await strategyResult.response;
+        let strategyText = strategyResponse.text();
+        strategyText = strategyText.replace(/```json\s*/g, '').replace(/```\s*/g, '').trim();
+        const strategyData = JSON.parse(strategyText);
 
-        logger.info('Strategy generated successfully', { platform });
-        return strategy as Strategy;
+        console.log('✅ Strategy text generated:', strategyData);
+
+        // Step 2: 生成详细的封面描述
+        console.log('🎨 Step 2: Generating cover image...');
+        const coverPrompt = this.generateCoverPromptFromFeatures(
+          features,
+          platform,
+          strategyData.title
+        );
+
+        console.log('📸 Cover prompt:', coverPrompt.substring(0, 200) + '...');
+
+        // Step 3: 使用图片生成模型创建封面
+        let coverImageUrl: string | undefined;
+        let coverDescription = 'AI-generated thumbnail optimized for ' + platform;
+
+        try {
+          const imageModel = this.getImageModel();
+          const imageResult = await imageModel.generateContent([coverPrompt]);
+          const imageResponse = await imageResult.response;
+
+          console.log('🔍 Checking image response parts...');
+          
+          // 查找图片数据
+          for (const part of imageResponse.candidates?.[0]?.content?.parts || []) {
+            if (part.inlineData) {
+              console.log('✅ Found inline image data');
+              const base64Data = part.inlineData.data;
+              const mimeType = part.inlineData.mimeType || 'image/png';
+              coverImageUrl = `data:${mimeType};base64,${base64Data}`;
+              console.log('✅ Cover image generated, size:', base64Data.length, 'bytes');
+              break;
+            }
+          }
+
+          if (!coverImageUrl) {
+            console.warn('⚠️ No image data found in response, using text description');
+          }
+        } catch (imageError) {
+          console.error('❌ Image generation failed:', imageError);
+          logger.warn('Cover image generation failed, using text description', { imageError });
+          // 降级：如果图片生成失败，继续使用文字描述
+        }
+
+        const strategy: Strategy = {
+          cover: coverDescription,
+          coverImageUrl,
+          title: strategyData.title,
+          hashtags: strategyData.hashtags,
+          postingTime: strategyData.postingTime,
+        };
+
+        logger.info('Strategy generated successfully', { 
+          platform, 
+          hasImage: !!coverImageUrl 
+        });
+        
+        return strategy;
       } catch (error) {
         logger.error('Strategy generation failed', { error });
         throw new APIError('Failed to generate strategy', 502);
@@ -182,14 +287,45 @@ Provide only the JSON response, no additional text.`;
   }
 
   /**
-   * Generate cover image (placeholder - returns description)
+   * Regenerate only the cover field with image
    */
-  async generateCoverImage(description: string): Promise<string> {
-    // Note: Gemini API doesn't support image generation yet
-    // This is a placeholder that returns a URL format
-    // In production, integrate with an image generation API
-    logger.info('Cover image generation requested', { description });
-    return `https://placeholder.com/cover?desc=${encodeURIComponent(description)}`;
+  async regenerateCover(features: VideoFeatures, platform: string, title: string): Promise<{ cover: string; coverImageUrl?: string }> {
+    return this.retryWithBackoff(async () => {
+      try {
+        console.log('🎨 Regenerating cover image...');
+        
+        const coverPrompt = this.generateCoverPromptFromFeatures(features, platform, title);
+        let coverImageUrl: string | undefined;
+        const coverDescription = 'AI-generated thumbnail optimized for ' + platform;
+
+        try {
+          const imageModel = this.getImageModel();
+          const imageResult = await imageModel.generateContent([coverPrompt]);
+          const imageResponse = await imageResult.response;
+
+          for (const part of imageResponse.candidates?.[0]?.content?.parts || []) {
+            if (part.inlineData) {
+              const base64Data = part.inlineData.data;
+              const mimeType = part.inlineData.mimeType || 'image/png';
+              coverImageUrl = `data:${mimeType};base64,${base64Data}`;
+              console.log('✅ Cover image regenerated');
+              break;
+            }
+          }
+        } catch (imageError) {
+          console.error('❌ Image regeneration failed:', imageError);
+          logger.warn('Cover image regeneration failed', { imageError });
+        }
+
+        return {
+          cover: coverDescription,
+          coverImageUrl,
+        };
+      } catch (error) {
+        logger.error('Cover regeneration failed', { error });
+        throw new APIError('Failed to regenerate cover', 502);
+      }
+    });
   }
 
   /**
