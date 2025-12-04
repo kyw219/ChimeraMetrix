@@ -71,8 +71,23 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       platform,
     };
 
+    // Pre-filter videos by category and platform to reduce Gemini processing time
     const allVideos = await csvDatabase.getAllVideoMetadata();
-    const similarVideos = await geminiClient.findSimilarVideos(similarityQuery, allVideos);
+    const filteredVideos = allVideos.filter(v => 
+      v.platform === platform && 
+      v.category.toLowerCase().includes(features.category.toLowerCase().split(' ')[0])
+    );
+    
+    // If we have too few filtered videos, use all videos
+    const videosToMatch = filteredVideos.length >= 10 ? filteredVideos : allVideos;
+    
+    logger.info('Videos to match', { 
+      total: allVideos.length, 
+      filtered: videosToMatch.length,
+      category: features.category 
+    });
+    
+    const similarVideos = await geminiClient.findSimilarVideos(similarityQuery, videosToMatch);
 
     if (similarVideos.length !== 5) {
       throw new Error(`Expected 5 similar videos, got ${similarVideos.length}`);
