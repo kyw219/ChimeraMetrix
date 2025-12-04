@@ -78,12 +78,20 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       v.category.toLowerCase().includes(features.category.toLowerCase().split(' ')[0])
     );
     
-    // If we have too few filtered videos, use all videos
-    const videosToMatch = filteredVideos.length >= 10 ? filteredVideos : allVideos;
+    // Limit to max 15 videos to ensure we stay under 60s timeout
+    // If we have too few filtered videos, use all videos but still limit to 15
+    let videosToMatch = filteredVideos.length >= 10 ? filteredVideos : allVideos;
+    if (videosToMatch.length > 15) {
+      // Randomly sample 15 videos to get diverse results
+      videosToMatch = videosToMatch
+        .sort(() => Math.random() - 0.5)
+        .slice(0, 15);
+    }
     
     logger.info('Videos to match', { 
       total: allVideos.length, 
-      filtered: videosToMatch.length,
+      filtered: filteredVideos.length,
+      sampled: videosToMatch.length,
       category: features.category 
     });
     
