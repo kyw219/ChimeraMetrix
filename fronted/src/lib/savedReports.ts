@@ -18,13 +18,44 @@ export function saveReport(report: Omit<SavedReport, 'id' | 'timestamp'>): Saved
     timestamp: Date.now(),
   };
 
+  // Remove large base64 image data to avoid localStorage quota issues
+  const reportToSave = {
+    ...newReport,
+    strategy: {
+      ...newReport.strategy,
+      // Keep coverImageUrl as null or empty to save space
+      coverImageUrl: newReport.strategy.coverImageUrl ? '[Image data removed to save space]' : null,
+    },
+    matchedVideos: newReport.matchedVideos.map((video: any) => ({
+      ...video,
+      // Remove thumbnail data from matched videos
+      thumbnail: video.thumbnail ? '[Thumbnail removed]' : null,
+    })),
+  };
+
   const reports = getSavedReports();
-  reports.unshift(newReport); // Add to beginning
+  reports.unshift(reportToSave); // Add to beginning
   
   // Keep only last 50 reports
   const trimmedReports = reports.slice(0, 50);
   
-  localStorage.setItem(SAVED_REPORTS_KEY, JSON.stringify(trimmedReports));
+  try {
+    localStorage.setItem(SAVED_REPORTS_KEY, JSON.stringify(trimmedReports));
+  } catch (error) {
+    if (error instanceof DOMException && error.name === 'QuotaExceededError') {
+      // If still exceeding quota, reduce to last 20 reports
+      const reducedReports = reports.slice(0, 20);
+      try {
+        localStorage.setItem(SAVED_REPORTS_KEY, JSON.stringify(reducedReports));
+      } catch (retryError) {
+        // If still failing, keep only last 10
+        const minimalReports = reports.slice(0, 10);
+        localStorage.setItem(SAVED_REPORTS_KEY, JSON.stringify(minimalReports));
+      }
+    } else {
+      throw error;
+    }
+  }
   
   return newReport;
 }
