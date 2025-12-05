@@ -111,7 +111,7 @@ export const VideoAnalysisCard = ({ data, isLoading }: VideoAnalysisCardProps) =
             <p className="text-xs font-semibold text-muted-foreground mb-1">
               Category
             </p>
-            <p className="text-sm text-foreground leading-relaxed">{data.category}</p>
+            <p className="text-sm text-foreground/90 leading-relaxed">{data.category}</p>
           </div>
         </div>
 

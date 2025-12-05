@@ -466,7 +466,7 @@ export default function Upload() {
           <div className="space-y-6">
             {/* Recommended Strategy */}
             <div className="panel-base rounded-2xl p-6" id="recommended-strategy">
-              <h2 className="text-lg font-bold text-accent mb-6">
+              <h2 className="text-lg font-bold text-primary mb-6">
                 Recommended Strategy
               </h2>
 

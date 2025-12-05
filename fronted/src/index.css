@@ -64,9 +64,9 @@ All colors MUST be HSL.
     --chart-5: 38 92% 58%;
     
     /* Layered backgrounds for depth */
-    --panel-bg: 220 18% 10%;
-    --subpanel-bg: 220 16% 13%;
-    --module-bg: 220 15% 16%;
+    --panel-bg: 220 18% 12%;
+    --subpanel-bg: 220 16% 15%;
+    --module-bg: 220 15% 18%;
   }
 }
 

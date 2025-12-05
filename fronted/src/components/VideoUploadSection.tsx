@@ -168,7 +168,7 @@ export const VideoUploadSection = ({
 
       {/* Platform Selection */}
       <div className="space-y-3">
-        <Label htmlFor="platform" className="text-sm font-bold text-foreground uppercase tracking-wide">
+        <Label htmlFor="platform" className="text-sm font-bold text-primary">
           Target Platform
         </Label>
         <Select value={platform} onValueChange={onPlatformChange}>
