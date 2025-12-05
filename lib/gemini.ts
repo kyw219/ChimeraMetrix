@@ -133,110 +133,74 @@ Provide only the JSON response, no additional text.`;
     const aspectRatio = platform === 'youtube' ? '16:9' : '9:16';
     const isVertical = platform !== 'youtube';
 
-    // 根据平台和内容类型优化提示词
-    const platformStyles: Record<string, string> = {
-      youtube: 'cinematic, professional, detailed composition',
-      tiktok: 'bold, high-contrast, eye-catching, mobile-optimized',
-      shorts: 'vibrant, energetic, attention-grabbing, vertical format',
-    };
+    // Extract key phrase from title (2-4 words max)
+    const headline = title
+      .replace(/[🔥💥✨⚡️]/g, '')
+      .trim()
+      .split(/[:\-]/)[0]
+      .trim()
+      .split(' ')
+      .slice(0, 4)
+      .join(' ')
+      .toUpperCase();
 
-    // 生成更有冲击力的封面文字（不直接使用标题）
-    const hookTexts: Record<string, string[]> = {
-      'Visual Hook': ['WATCH THIS!', 'YOU WON\'T BELIEVE', 'SHOCKING!', 'MUST SEE'],
-      'Question Hook': ['IS IT WORTH IT?', 'DOES IT WORK?', 'GOOD OR BAD?', 'WORTH THE HYPE?'],
-      'Shock Hook': ['INSANE!', 'NO WAY!', 'UNBELIEVABLE!', 'MIND BLOWN'],
-      'default': ['AMAZING!', 'CHECK THIS OUT!', 'WOW!', 'INCREDIBLE']
-    };
-    
-    // 根据类别生成主题词
-    const categoryKeywords: Record<string, string> = {
-      'Food & Drink': 'TASTE TEST',
-      'Product Review': 'HONEST REVIEW',
-      'Tech': 'TECH REVIEW',
-      'Gaming': 'GAMEPLAY',
-      'Lifestyle': 'LIFE HACK',
-      'default': 'REVIEW'
-    };
-    
-    const hookType = features.hookType || 'default';
-    const hookOptions = hookTexts[hookType] || hookTexts['default'];
-    const mainHook = hookOptions[Math.floor(Math.random() * hookOptions.length)];
-    
-    const categoryWord = categoryKeywords[features.category] || categoryKeywords['default'];
-    
-    // 从标题中提取产品/主题名（通常是第一个词或emoji后的词）
-    const productName = title.replace(/[🔥💥✨⚡️]/g, '').trim().split(/[:\-]/)[0].trim().split(' ').slice(0, 2).join(' ');
-    
-    return `Create a ${aspectRatio} ${platform} video thumbnail with the following specifications:
+    return `Create a high-CTR ${platform} thumbnail in modern YouTube style.
 
-LAYOUT & COMPOSITION:
-- Aspect ratio: ${aspectRatio} (${isVertical ? 'vertical' : 'horizontal'})
-- Composition: Dynamic ${isVertical ? 'vertical' : 'rule-of-thirds'} layout
-- Visual focus: ${features.visualStyle}
+ASPECT RATIO: ${aspectRatio} (${isVertical ? 'vertical mobile-optimized' : 'horizontal YouTube-optimized'})
 
-MAIN TEXT (2-3 lines for maximum impact):
-Line 1 (Top-Left or Top-Right corner): "${productName}" 
-  - Font: Bold, modern sans-serif
-  - Color: White with thick black stroke (5px)
-  - Size: Medium-Large
-  - Position: Corner placement, away from center
-  
-Line 2 (Bottom area - BIGGEST): "${mainHook}"
-  - Font: Extra bold, impact style
-  - Color: Bright yellow (#FFD700) with thick black stroke (6px)
-  - Size: EXTRA LARGE (占宽度 60-70%)
-  - Position: Bottom third of image, horizontally centered
-  - Effects: Strong drop shadow, 3D effect
-  
-Line 3 (Bottom corner): "${categoryWord}"
-  - Font: Bold, modern sans-serif
-  - Color: White with red background box
-  - Size: Small-Medium
-  - Position: Bottom-left or bottom-right corner
-  - Style: Badge/label style
+CONTENT & SUBJECT:
+- Main subject: ${features.category} content
+- Show the primary subject prominently (person, object, or scene from the video frame)
+- Emphasize the main action or message clearly and visually
+- Strong focal point with depth - subject should be close to camera
+- Emotion: ${features.emotion}
+- Target audience: ${features.audience}
 
-TEXT POSITIONING RULES (CRITICAL):
-- **NEVER place text in the center** - center is reserved for face/subject
-- Product name: Top corner (left or right)
-- Main hook: Bottom third, below the face
-- Category badge: Bottom corner
-- ${isVertical ? 'Keep all text in top 20% and bottom 30%' : 'Keep text in corners and bottom area'}
-- **Face and product must remain clearly visible in center**
-- Text should frame the subject, not cover it
+VISUAL STYLE:
+- Bright, bold, clean ${platform} thumbnail aesthetic
+- High contrast and high saturation with visually striking colors
+- Cinematic or studio-quality lighting that highlights the subject
+- Sharp details with smooth background blur to separate subject from background
+- Style reference: ${features.visualStyle}
+- Add minimal energetic accent elements (subtle spark lines, glow, motion cues) only if they enhance clarity
 
-EMOJI & DECORATIONS:
-- Add 2-3 relevant emoji: 🔥💥✨⚡️ (based on emotion and category)
-- Position: Near text in corners, NOT in center
-- Size: Medium-large, clearly visible
-- Style: Accent the text, don't distract from face/subject
+TEXT OVERLAY:
+- Headline: "${headline}"
+- Large, short, bold font at the top or side (NOT center)
+- Use highly readable colors: yellow, white, or neon tones with thick black outline (5-6px stroke)
+- Keep text AWAY from edges - maintain safe margins (at least 10% from all edges)
+- Text must NOT cover the main subject's face or key object
+- Maximum 2-4 words for instant readability
+- Position text using rule-of-thirds - never dead center
+
+COMPOSITION RULES:
+- Strong rule-of-thirds composition with face or key object as focal point
+- Maintain emotion-focused expressions when humans are present (surprised, excited, confident, curious)
+- Keep layout uncluttered and easy to understand instantly
+- Clear visual hierarchy: subject first, text second, background third
+- Ensure all important elements are within safe zone (avoid edge cropping)
 
 BACKGROUND TREATMENT:
-- Keep the original video frame as base
-- Add subtle vignette to darken edges
-- Slightly enhance saturation and contrast
-- Add subtle glow effect behind text for readability
+- Use the original video frame as base
+- Enhance saturation and contrast for thumbnail visibility
+- Add subtle vignette to darken edges and draw focus to center
+- Subtle glow or shadow behind text for readability
+- Background should support, not compete with subject
 
-COLOR SCHEME:
-- Primary text: Bright yellow (#FFD700) for main hook
-- Secondary: White for product name and category
-- Accent: Red for category badge
-- Mood: ${features.emotion}
-- Style: ${platformStyles[platform] || platformStyles.youtube}
-
-OVERALL STYLE:
-- Target audience: ${features.audience}
+TONE & ENERGY:
+- ${isVertical ? 'Energetic, mobile-first, scroll-stopping' : 'Eye-catching, engaging, professional'}
+- Should instantly communicate video topic without reading title
 - Hook type: ${features.hookType}
-- Platform: ${platform} optimized
-- Must be: EXTREMELY eye-catching, clickable, high-energy, mobile-friendly
+- Create curiosity and urgency through visual composition
 
-CRITICAL REQUIREMENTS:
-1. **FACE AND SUBJECT MUST BE IN CENTER AND FULLY VISIBLE** - this is the most important rule
-2. Text placement: corners and bottom area ONLY - never center
-3. Text must be LARGE and BOLD - readable from thumbnail size
-4. Use maximum contrast - text must pop from background
-5. Create urgency and curiosity with strategic text framing
-6. Professional but energetic YouTube thumbnail style
-7. The person's face and any product they're holding must be the visual focal point`;
+OUTPUT REQUIREMENTS:
+- Ultra sharp, high resolution
+- Optimized for ${platform} thumbnail display
+- All text must be readable even at small thumbnail size
+- Face and subject must be clearly visible and not obscured
+- Professional quality with strong CTR potential
+
+CRITICAL: Maintain proper spacing from edges. Text and key elements should never be cut off or too close to borders.`;
   }
 
   /**
@@ -385,12 +349,8 @@ Provide only the JSON response, no additional text.`;
         const coverDescription = 'AI-generated thumbnail optimized for ' + platform;
 
         try {
-          const imagePrompt = `Create a ${platform === 'youtube' ? '16:9 horizontal' : '9:16 vertical'} thumbnail for "${title}".
-
-Style: ${features.visualStyle}
-Theme: ${features.category}
-
-Eye-catching design with bold text and vibrant colors.`;
+          // Use the same high-quality prompt as generateStrategy
+          const imagePrompt = this.generateCoverPromptFromFeatures(features, platform, title);
           
           if (frameUrl) {
             // Use frame as reference
@@ -401,7 +361,7 @@ Eye-catching design with bold text and vibrant colors.`;
             const response = await this.newGenAI.models.generateContent({
               model: 'gemini-2.5-flash-image',
               contents: [
-                imagePrompt + '\n\nIMPORTANT: Keep the person/face from the original frame.',
+                imagePrompt + '\n\nIMPORTANT: Use the provided video frame as the base. Keep the person/face and main subject from the original frame.',
                 {
                   inlineData: {
                     data: frameBase64,
