@@ -383,10 +383,14 @@ export default function Upload() {
               </p>
             </div>
 
-        {/* Main Content Panel */}
-        <div className="panel-base rounded-2xl p-8 mb-8">
-          {/* Upload & Platform Section */}
-          <div className="mb-8">
+        {/* Two-Column Layout */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+          {/* LEFT COLUMN: User Input */}
+          <div className="panel-base rounded-2xl p-6">
+            <h2 className="text-sm font-bold text-primary mb-4 uppercase tracking-wide">
+              Video Upload
+            </h2>
+            
             <VideoUploadSection
               onFileUpload={(newFile) => {
                 setFile(newFile);
@@ -406,74 +410,75 @@ export default function Upload() {
               initialThumbnail={workflow.videoPreviewUrl}
               initialFileName={workflow.videoFileName}
             />
+
+            {/* Generate Button */}
+            {file && !strategy && (
+              <div className="mt-6 flex justify-center">
+                <Button
+                  onClick={handleGenerateStrategy}
+                  disabled={isGenerating}
+                  size="lg"
+                  className="w-full px-10 py-6 text-base font-bold bg-primary hover:bg-primary/90 text-primary-foreground glow-primary"
+                >
+                  {isGenerating ? (
+                    <>
+                      <Loader2 className="w-5 h-5 animate-spin mr-2" />
+                      Extracting video features...
+                    </>
+                  ) : (
+                    <>
+                      <Zap className="w-5 h-5 mr-2" />
+                      Generate AI Strategy
+                    </>
+                  )}
+                </Button>
+              </div>
+            )}
           </div>
 
-          {/* Generate Button */}
-          {file && !strategy && (
-            <div className="mb-8 flex justify-center">
-              <Button
-                onClick={handleGenerateStrategy}
-                disabled={isGenerating}
-                size="lg"
-                className="px-10 py-6 text-base font-bold bg-primary hover:bg-primary/90 text-primary-foreground glow-primary"
-              >
-                {isGenerating ? (
-                  <>
-                    <Loader2 className="w-5 h-5 animate-spin mr-2" />
-                    Extracting video features...
-                  </>
-                ) : (
-                  <>
-                    <Zap className="w-5 h-5 mr-2" />
-                    Generate AI Strategy
-                  </>
-                )}
-              </Button>
-            </div>
-          )}
+          {/* RIGHT COLUMN: AI Analysis & Results */}
+          <div className="space-y-6">
+            {/* Video Analysis */}
+            {strategy && (
+              <div className="panel-base rounded-2xl p-6">
+                <h2 className="text-sm font-bold text-primary mb-4 uppercase tracking-wide">
+                  Video Feature Extraction
+                </h2>
+                <VideoAnalysisCard 
+                  data={analysis || mockAnalysis}
+                  isLoading={false}
+                />
+              </div>
+            )}
 
-          {/* Video Analysis Section - Only show after generation */}
-          {strategy && (
-            <div className="mb-8">
-              <h2 className="text-base font-bold text-primary mb-4 flex items-center gap-2 uppercase tracking-wide">
-                Video Feature Extraction
+            {/* Recommended Strategy */}
+            <div className="panel-base rounded-2xl p-6" id="recommended-strategy">
+              <h2 className="text-sm font-bold text-accent mb-4 uppercase tracking-wide">
+                Recommended Strategy
               </h2>
-              <VideoAnalysisCard 
-                data={analysis || mockAnalysis}
-                isLoading={false}
-              />
-            </div>
-          )}
 
-          {/* Recommended Strategy Section */}
-          <div id="recommended-strategy">
-            <h2 className="text-base font-bold text-accent mb-4 flex items-center gap-2 uppercase tracking-wide">
-              Recommended Strategy
-            </h2>
-
-            <div className="grid grid-cols-2 gap-5">
-              <StrategyCard
-                icon={Image}
-                title="Recommended Cover"
-                content={strategy?.cover}
-                coverImageUrl={strategy?.coverImageUrl}
-                placeholder="AI will recommend the perfect thumbnail design based on viral patterns"
-                iconColor="text-chart-1"
-                isEmpty={!strategy}
-                isRegenerating={regeneratingField === 'cover'}
-                onRegenerate={() => handleRegenerateField('cover')}
-              />
-              <StrategyCard
-                icon={FileText}
-                title="Recommended Title"
-                content={strategy?.title}
-                placeholder="AI will generate a high-performing title optimized for clicks"
-                iconColor="text-chart-2"
-                isEmpty={!strategy}
-                isRegenerating={regeneratingField === 'title'}
-                onRegenerate={() => handleRegenerateField('title')}
-              />
-              <div className="col-span-2">
+              <div className="grid grid-cols-1 gap-4">
+                <StrategyCard
+                  icon={Image}
+                  title="Recommended Cover"
+                  content={strategy?.cover}
+                  coverImageUrl={strategy?.coverImageUrl}
+                  placeholder="AI will recommend the perfect thumbnail design based on viral patterns"
+                  iconColor="text-chart-1"
+                  isEmpty={!strategy}
+                  isRegenerating={regeneratingField === 'cover'}
+                  onRegenerate={() => handleRegenerateField('cover')}
+                />
+                <StrategyCard
+                  icon={FileText}
+                  title="Recommended Title"
+                  content={strategy?.title}
+                  placeholder="AI will generate a high-performing title optimized for clicks"
+                  iconColor="text-chart-2"
+                  isEmpty={!strategy}
+                  isRegenerating={regeneratingField === 'title'}
+                  onRegenerate={() => handleRegenerateField('title')}
+                />
                 <StrategyCard
                   icon={AlignLeft}
                   title="Recommended Description"
@@ -484,44 +489,40 @@ export default function Upload() {
                   isRegenerating={regeneratingField === 'description'}
                   onRegenerate={() => handleRegenerateField('description')}
                 />
+                <StrategyCard
+                  icon={Hash}
+                  title="Recommended Hashtags"
+                  content={strategy?.hashtags}
+                  placeholder="AI will suggest trending hashtags to maximize discoverability"
+                  iconColor="text-chart-3"
+                  isEmpty={!strategy}
+                  isRegenerating={regeneratingField === 'hashtags'}
+                  onRegenerate={() => handleRegenerateField('hashtags')}
+                />
+                <StrategyCard
+                  icon={Clock}
+                  title="Recommended Posting Time"
+                  content={strategy?.postingTime}
+                  placeholder="AI will identify optimal posting time based on audience patterns"
+                  iconColor="text-chart-4"
+                  isEmpty={!strategy}
+                  isRegenerating={regeneratingField === 'postingTime'}
+                  onRegenerate={() => handleRegenerateField('postingTime')}
+                />
               </div>
-              <StrategyCard
-                icon={Hash}
-                title="Recommended Hashtags"
-                content={strategy?.hashtags}
-                placeholder="AI will suggest trending hashtags to maximize discoverability"
-                iconColor="text-chart-3"
-                isEmpty={!strategy}
-                isRegenerating={regeneratingField === 'hashtags'}
-                onRegenerate={() => handleRegenerateField('hashtags')}
-              />
-              <StrategyCard
-                icon={Clock}
-                title="Recommended Posting Time"
-                content={strategy?.postingTime}
-                placeholder="AI will identify optimal posting time based on audience patterns"
-                iconColor="text-chart-4"
-                isEmpty={!strategy}
-                isRegenerating={regeneratingField === 'postingTime'}
-                onRegenerate={() => handleRegenerateField('postingTime')}
-              />
             </div>
           </div>
-
-          {/* Strategy Preview */}
-          {strategy && (
-            <div className="mt-8">
-              <h2 className="text-base font-bold text-primary mb-4 flex items-center gap-2 uppercase tracking-wide">
-                Strategy Preview
-              </h2>
-              <StrategyPreview 
-                strategy={strategy}
-                isEmpty={false}
-              />
-            </div>
-          )}
-
         </div>
+
+        {/* Full-Width Strategy Preview */}
+        {strategy && (
+          <div className="panel-base rounded-2xl p-6 mb-8">
+            <StrategyPreview 
+              strategy={strategy}
+              isEmpty={false}
+            />
+          </div>
+        )}
 
             {/* CTA Button */}
             {strategy && (
