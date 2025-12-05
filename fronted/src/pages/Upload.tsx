@@ -6,6 +6,7 @@ import { VideoAnalysisCard } from "@/components/VideoAnalysisCard";
 import { StrategyCard } from "@/components/StrategyCard";
 import { StrategyPreview } from "@/components/StrategyPreview";
 import { BacktestLoadingPipeline } from "@/components/BacktestLoadingPipeline";
+import { AnalysisLoadingPipeline } from "@/components/AnalysisLoadingPipeline";
 import { Button } from "@/components/ui/button";
 import { Image, FileText, Hash, Clock, Loader2, Zap, Sparkles, AlignLeft } from "lucide-react";
 import { mockAnalysis, mockStrategy } from "@/lib/mockData";
@@ -371,8 +372,12 @@ export default function Upload() {
   return (
     <DashboardLayout>
       <div className="max-w-[1100px] mx-auto">
-        {/* Show loading pipeline when running backtest */}
-        {isRunningBacktest ? (
+        {/* Show loading pipeline when generating strategy */}
+        {isGenerating ? (
+          <div className="min-h-[600px] flex items-center justify-center">
+            <AnalysisLoadingPipeline />
+          </div>
+        ) : isRunningBacktest ? (
           <div className="min-h-[600px] flex items-center justify-center">
             <BacktestLoadingPipeline onComplete={handleBacktestComplete} />
           </div>
@@ -462,8 +467,14 @@ export default function Upload() {
 
           {/* RIGHT COLUMN: Strategy Results */}
           <div className="space-y-6">
+            {/* Show loading animation while generating */}
+            {isGenerating && !strategy && (
+              <AnalysisLoadingPipeline />
+            )}
+
             {/* Recommended Strategy */}
-            <div className="panel-base rounded-2xl p-6" id="recommended-strategy">
+            {!isGenerating && (
+              <div className="panel-base rounded-2xl p-6" id="recommended-strategy">
               <h2 className="text-sm font-bold text-accent mb-4 uppercase tracking-wide">
                 Recommended Strategy
               </h2>
@@ -531,6 +542,7 @@ export default function Upload() {
                 </div>
               </div>
             </div>
+            )}
           </div>
         </div>
 
