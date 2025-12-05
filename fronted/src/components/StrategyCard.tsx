@@ -9,6 +9,7 @@ interface StrategyCardProps {
   placeholder?: string;
   iconColor?: string;
   isEmpty?: boolean;
+  isRegenerating?: boolean; // 新增：是否正在重新生成
   onRegenerate?: () => void;
 }
 
@@ -20,6 +21,7 @@ export const StrategyCard = ({
   placeholder,
   iconColor = "text-primary",
   isEmpty = false,
+  isRegenerating = false,
   onRegenerate,
 }: StrategyCardProps) => {
   const colorName = iconColor.replace('text-', '');
@@ -30,7 +32,7 @@ export const StrategyCard = ({
       isEmpty 
         ? 'opacity-60' 
         : 'hover:bg-[hsl(var(--module-bg))]'
-    }`}>
+    } ${isRegenerating ? 'opacity-70' : ''}`}>
       <div className="flex items-start justify-between gap-3 mb-3">
         <div className="flex items-start gap-3">
           <div className={`w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 ${
@@ -49,9 +51,10 @@ export const StrategyCard = ({
             variant="ghost"
             size="sm"
             onClick={onRegenerate}
-            className="h-7 w-7 p-0 hover:bg-primary/10"
+            disabled={isRegenerating}
+            className="h-7 w-7 p-0 hover:bg-primary/10 disabled:opacity-50"
           >
-            <RefreshCw className="w-3.5 h-3.5" />
+            <RefreshCw className={`w-3.5 h-3.5 ${isRegenerating ? 'animate-spin' : ''}`} />
           </Button>
         )}
       </div>

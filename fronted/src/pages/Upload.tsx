@@ -29,6 +29,7 @@ export default function Upload() {
   const [frameUrl, setFrameUrl] = useState<string | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [isRunningBacktest, setIsRunningBacktest] = useState(false);
+  const [regeneratingField, setRegeneratingField] = useState<string | null>(null);
 
   const handleGenerateStrategy = async () => {
     if (!file) return;
@@ -315,6 +316,7 @@ export default function Upload() {
     }
 
     console.log(`🔄 Regenerating ${field}...`);
+    setRegeneratingField(field);
     
     try {
       const payload = {
@@ -355,6 +357,8 @@ export default function Upload() {
         description: error instanceof Error ? error.message : 'Failed to regenerate',
         variant: "destructive",
       });
+    } finally {
+      setRegeneratingField(null);
     }
   };
 
@@ -456,6 +460,7 @@ export default function Upload() {
                 placeholder="AI will recommend the perfect thumbnail design based on viral patterns"
                 iconColor="text-chart-1"
                 isEmpty={!strategy}
+                isRegenerating={regeneratingField === 'cover'}
                 onRegenerate={() => handleRegenerateField('cover')}
               />
               <StrategyCard
@@ -465,6 +470,7 @@ export default function Upload() {
                 placeholder="AI will generate a high-performing title optimized for clicks"
                 iconColor="text-chart-2"
                 isEmpty={!strategy}
+                isRegenerating={regeneratingField === 'title'}
                 onRegenerate={() => handleRegenerateField('title')}
               />
               <div className="col-span-2">
@@ -475,6 +481,7 @@ export default function Upload() {
                   placeholder="AI will create an engaging video description with SEO keywords and call-to-action"
                   iconColor="text-primary"
                   isEmpty={!strategy}
+                  isRegenerating={regeneratingField === 'description'}
                   onRegenerate={() => handleRegenerateField('description')}
                 />
               </div>
@@ -485,6 +492,7 @@ export default function Upload() {
                 placeholder="AI will suggest trending hashtags to maximize discoverability"
                 iconColor="text-chart-3"
                 isEmpty={!strategy}
+                isRegenerating={regeneratingField === 'hashtags'}
                 onRegenerate={() => handleRegenerateField('hashtags')}
               />
               <StrategyCard
@@ -494,6 +502,7 @@ export default function Upload() {
                 placeholder="AI will identify optimal posting time based on audience patterns"
                 iconColor="text-chart-4"
                 isEmpty={!strategy}
+                isRegenerating={regeneratingField === 'postingTime'}
                 onRegenerate={() => handleRegenerateField('postingTime')}
               />
             </div>
