@@ -131,90 +131,77 @@ Provide only the JSON response, no additional text.`;
     title: string
   ): string {
     const aspectRatio = platform === 'youtube' ? '16:9' : '9:16';
-    const isVertical = platform !== 'youtube';
 
-    // Extract key phrase from title (2-4 words max)
+    // Extract key phrase from title (2-3 words max for better fit)
     const headline = title
       .replace(/[🔥💥✨⚡️]/g, '')
       .trim()
       .split(/[:\-]/)[0]
       .trim()
       .split(' ')
-      .slice(0, 4)
+      .slice(0, 3)
       .join(' ')
       .toUpperCase();
 
-    return `Create a high-CTR ${platform} thumbnail in modern YouTube style.
+    return `Create a ${aspectRatio} ${platform} thumbnail with professional YouTube style.
 
-ASPECT RATIO: ${aspectRatio} (${isVertical ? 'vertical mobile-optimized' : 'horizontal YouTube-optimized'})
+🎯 PRIMARY GOAL: Create eye-catching thumbnail where ALL TEXT IS FULLY VISIBLE (not cut off by edges)
 
-CONTENT & SUBJECT:
-- Main subject: ${features.category} content
-- Show the primary subject prominently (person, object, or scene from the video frame)
-- Emphasize the main action or message clearly and visually
-- Strong focal point with depth - subject should be close to camera
+📐 IMAGE SPECIFICATIONS:
+- Aspect ratio: ${aspectRatio}
+- Platform: ${platform}
+- Subject: ${features.category}
 - Emotion: ${features.emotion}
-- Target audience: ${features.audience}
+- Visual style: ${features.visualStyle}
 
-VISUAL STYLE:
-- Bright, bold, clean ${platform} thumbnail aesthetic
-- High contrast and high saturation with visually striking colors
-- Cinematic or studio-quality lighting that highlights the subject
-- Sharp details with smooth background blur to separate subject from background
-- Style reference: ${features.visualStyle}
-- Add minimal energetic accent elements (subtle spark lines, glow, motion cues) only if they enhance clarity
+👤 SUBJECT COMPOSITION:
+- Keep person's face and main subject in CENTER of frame
+- Face should be the primary focal point
+- Use rule-of-thirds for dynamic composition
+- Maintain ${features.emotion} expression
+- High contrast, bright lighting, sharp focus
+- Slightly blur background to emphasize subject
 
-TEXT OVERLAY:
-- Headline: "${headline}"
-- Large, short, bold font at the top or side (NOT center)
-- Use highly readable colors: yellow, white, or neon tones with thick black outline (5-6px stroke)
-- Maximum 2-4 words for instant readability
-- Position text using rule-of-thirds - never dead center
-- Text must NOT cover the main subject's face or key object
+🔤 TEXT OVERLAY - SINGLE LINE ONLY:
+Text content: "${headline}"
 
-CRITICAL TEXT SPACING REQUIREMENTS:
-- **MANDATORY: Keep ALL text at least 15% away from ALL edges (top, bottom, left, right)**
-- **NO text should touch or be close to the image borders**
-- Text should be positioned in the INNER 70% of the image area only
-- Leave generous padding around all text elements
-- If text is at top: position it at least 15% down from top edge
-- If text is at bottom: position it at least 15% up from bottom edge
-- If text is at sides: position it at least 15% inward from left/right edges
-- Think of the image as having an invisible border frame - keep all text inside this safe zone
+TEXT PLACEMENT RULES (CRITICAL - MUST FOLLOW):
+1. Place text in MIDDLE-LEFT or MIDDLE-RIGHT area (vertically centered, horizontally offset)
+2. OR place text in LOWER-CENTER area (bottom third, but NOT at the very bottom)
+3. NEVER place text at the very top, very bottom, or very edges
+4. Text must be FULLY INSIDE the image with large margins
 
-COMPOSITION RULES:
-- Strong rule-of-thirds composition with face or key object as focal point
-- Maintain emotion-focused expressions when humans are present (surprised, excited, confident, curious)
-- Keep layout uncluttered and easy to understand instantly
-- Clear visual hierarchy: subject first, text second, background third
-- All important elements must be within the safe zone (inner 70% of image)
+TEXT SPACING (ABSOLUTE REQUIREMENT):
+- Minimum 20% margin from top edge
+- Minimum 20% margin from bottom edge  
+- Minimum 15% margin from left edge
+- Minimum 15% margin from right edge
+- If you cannot fit text with these margins, make text SMALLER
 
-BACKGROUND TREATMENT:
-- Use the original video frame as base
-- Enhance saturation and contrast for thumbnail visibility
-- Add subtle vignette to darken edges and draw focus to center
-- Subtle glow or shadow behind text for readability
-- Background should support, not compete with subject
+TEXT STYLE:
+- Font: Bold, thick, impact-style
+- Color: Bright yellow (#FFD700) OR white
+- Outline: Thick black stroke (6-8px)
+- Size: Large but must fit within safe margins
+- Add drop shadow for depth
+- Must be readable at thumbnail size
 
-TONE & ENERGY:
-- ${isVertical ? 'Energetic, mobile-first, scroll-stopping' : 'Eye-catching, engaging, professional'}
-- Should instantly communicate video topic without reading title
-- Hook type: ${features.hookType}
-- Create curiosity and urgency through visual composition
+🎨 VISUAL TREATMENT:
+- Enhance colors and contrast
+- Add subtle vignette at edges
+- Glow effect behind text for readability
+- Keep overall composition clean and uncluttered
+- Professional YouTube thumbnail aesthetic
 
-OUTPUT REQUIREMENTS:
-- Ultra sharp, high resolution
-- Optimized for ${platform} thumbnail display
-- All text must be readable even at small thumbnail size
-- Face and subject must be clearly visible and not obscured
-- Professional quality with strong CTR potential
+✅ FINAL CHECKLIST BEFORE GENERATING:
+□ Is the face/subject in the center and fully visible?
+□ Is ALL text at least 20% away from top/bottom edges?
+□ Is ALL text at least 15% away from left/right edges?
+□ Can I see the complete text without any letters cut off?
+□ Is the text large and bold enough to read at small size?
+□ Does the composition look professional and clickable?
 
-⚠️ ABSOLUTE CRITICAL RULE - TEXT EDGE SAFETY:
-DO NOT place text near edges. Imagine the image has a 15% border on all sides that is OFF-LIMITS for text.
-Text placement zone: Only use the central 70% x 70% area of the image.
-Any text touching or near the edges will be REJECTED.
-Keep generous white space between text and image boundaries.
-This is the MOST IMPORTANT rule - violating it makes the thumbnail unusable.`;
+⛔ ABSOLUTE RULE: If text would be cut off by edges, MOVE IT INWARD or MAKE IT SMALLER. Never let text touch edges.`;
   }
 
   /**
