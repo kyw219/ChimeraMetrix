@@ -263,6 +263,14 @@ export default function Upload() {
         body: JSON.stringify(payload),
       });
 
+      console.log('📡 Response status:', response.status, response.statusText);
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('❌ HTTP Error:', response.status, errorText);
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+
       const data = await response.json();
       console.log('📥 Backtest response:', data);
 
