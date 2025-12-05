@@ -7,6 +7,7 @@ interface SavedReportCardProps {
   timestamp: Date;
   strategy: {
     cover: string;
+    coverImageUrl?: string | null;
     title: string;
     hashtags: string[];
     postingTime: string;
@@ -30,14 +31,26 @@ export const SavedReportCard = ({ id, timestamp, strategy, metrics, onClick }: S
     >
       {/* Thumbnail Preview */}
       <div className="relative h-40 bg-gradient-to-br from-primary/20 to-accent/20 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-t from-[hsl(var(--module-bg))] via-transparent to-transparent" />
-        <div className="absolute inset-0 flex items-center justify-center p-4">
-          <div className="text-center">
-            <div className="text-5xl mb-2">🎬</div>
-            <p className="text-[10px] text-muted-foreground/50 font-medium">Video Strategy</p>
-            <p className="text-[9px] text-muted-foreground/40 mt-1">Cover image not stored</p>
-          </div>
-        </div>
+        {strategy.coverImageUrl ? (
+          <>
+            <img 
+              src={strategy.coverImageUrl} 
+              alt={strategy.title}
+              className="w-full h-full object-cover"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-[hsl(var(--module-bg))] via-transparent to-transparent" />
+          </>
+        ) : (
+          <>
+            <div className="absolute inset-0 bg-gradient-to-t from-[hsl(var(--module-bg))] via-transparent to-transparent" />
+            <div className="absolute inset-0 flex items-center justify-center p-4">
+              <div className="text-center">
+                <div className="text-6xl mb-3">🎬</div>
+                <p className="text-[11px] text-muted-foreground/60 font-medium">Saved Strategy Report</p>
+              </div>
+            </div>
+          </>
+        )}
       </div>
 
       {/* Content */}

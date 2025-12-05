@@ -32,6 +32,7 @@ export default function SavedReports() {
     timestamp: new Date(report.timestamp),
     strategy: {
       cover: report.strategy.cover,
+      coverImageUrl: report.strategy.coverImageUrl, // Include compressed image
       title: report.strategy.title,
       hashtags: report.strategy.hashtags.split(' ').filter((h: string) => h.startsWith('#')),
       postingTime: report.strategy.postingTime,

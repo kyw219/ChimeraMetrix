@@ -1,3 +1,5 @@
+import { compressBase64Image } from './imageCompression';
+
 const SAVED_REPORTS_KEY = 'chimeramatrix_saved_reports';
 
 export interface SavedReport {
@@ -11,20 +13,26 @@ export interface SavedReport {
   features: any;
 }
 
-export function saveReport(report: Omit<SavedReport, 'id' | 'timestamp'>): SavedReport {
+export async function saveReport(report: Omit<SavedReport, 'id' | 'timestamp'>): Promise<SavedReport> {
   const newReport: SavedReport = {
     ...report,
     id: crypto.randomUUID(),
     timestamp: Date.now(),
   };
 
-  // Remove large base64 image data to avoid localStorage quota issues
+  // Compress cover image to save space while keeping visual preview
+  let compressedCoverUrl = null;
+  if (newReport.strategy.coverImageUrl && newReport.strategy.coverImageUrl.startsWith('data:image')) {
+    compressedCoverUrl = await compressBase64Image(newReport.strategy.coverImageUrl, 320, 0.6);
+  }
+
+  // Prepare report with compressed images to avoid localStorage quota issues
   const reportToSave = {
     ...newReport,
     strategy: {
       ...newReport.strategy,
-      // Remove coverImageUrl to save space - will use placeholder on display
-      coverImageUrl: null,
+      // Use compressed thumbnail instead of full-size image
+      coverImageUrl: compressedCoverUrl,
     },
     matchedVideos: newReport.matchedVideos.map((video: any) => ({
       ...video,

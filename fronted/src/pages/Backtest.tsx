@@ -139,10 +139,10 @@ export default function Backtest() {
     }
   }, [workflow.backtestResults]);
 
-  const handleSave = () => {
+  const handleSave = async () => {
     try {
-      // Save report to localStorage
-      saveReport({
+      // Save report to localStorage (with image compression)
+      await saveReport({
         platform: workflow.platform,
         strategy,
         predictions,
