@@ -30,8 +30,8 @@ export const StrategyCard = ({
     <div className={`transition-all ${isEmpty ? 'opacity-60' : ''} ${isRegenerating ? 'opacity-70' : ''}`}>
       <div className="flex items-start justify-between gap-3 mb-3">
         <div className="flex items-start gap-2.5">
-          <Icon className={`w-4 h-4 ${iconColor} mt-0.5 flex-shrink-0`} />
-          <h4 className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wide">{title}</h4>
+          <Icon className={`w-4 h-4 ${iconColor} mt-1 flex-shrink-0`} />
+          <h4 className="text-xs font-semibold text-muted-foreground">{title}</h4>
         </div>
         {!isEmpty && onRegenerate && (
           <Button

@@ -49,7 +49,7 @@ export const StrategyPreview = ({
 
   return (
     <div className="subpanel rounded-xl p-6">
-      <h3 className="text-sm font-bold text-primary mb-2 uppercase tracking-wide">
+      <h3 className="text-sm font-bold text-primary mb-2">
         YouTube Home Feed Preview
       </h3>
       <p className="text-xs text-muted-foreground mb-6">

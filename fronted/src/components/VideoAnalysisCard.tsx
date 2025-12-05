@@ -73,7 +73,7 @@ export const VideoAnalysisCard = ({ data, isLoading }: VideoAnalysisCardProps) =
               <Sparkles className="w-5 h-5 text-primary" />
             </div>
             <div className="flex-1 min-w-0">
-              <h3 className="text-xs font-bold text-foreground uppercase tracking-wide">
+              <h3 className="text-sm font-bold text-foreground">
                 Feature Extraction
               </h3>
               <p className="text-[10px] text-muted-foreground truncate">
@@ -108,7 +108,7 @@ export const VideoAnalysisCard = ({ data, isLoading }: VideoAnalysisCardProps) =
         <div className="flex items-start gap-2.5 p-3 rounded-lg bg-[hsl(var(--module-bg))]">
           <Target className="w-4 h-4 text-chart-1 mt-0.5 flex-shrink-0" />
           <div className="flex-1 min-w-0">
-            <p className="text-[10px] font-semibold text-muted-foreground mb-1 uppercase tracking-wide">
+            <p className="text-xs font-semibold text-muted-foreground mb-1">
               Category
             </p>
             <p className="text-sm text-foreground leading-relaxed">{data.category}</p>
@@ -118,7 +118,7 @@ export const VideoAnalysisCard = ({ data, isLoading }: VideoAnalysisCardProps) =
         <div className="flex items-start gap-2.5 p-3 rounded-lg bg-[hsl(var(--module-bg))]">
           <Heart className="w-4 h-4 text-chart-2 mt-0.5 flex-shrink-0" />
           <div className="flex-1 min-w-0">
-            <p className="text-[10px] font-semibold text-muted-foreground mb-1 uppercase tracking-wide">
+            <p className="text-xs font-semibold text-muted-foreground mb-1">
               Emotion
             </p>
             <p className="text-sm text-foreground leading-relaxed">{data.emotion}</p>
@@ -128,7 +128,7 @@ export const VideoAnalysisCard = ({ data, isLoading }: VideoAnalysisCardProps) =
         <div className="flex items-start gap-2.5 p-3 rounded-lg bg-[hsl(var(--module-bg))]">
           <Video className="w-4 h-4 text-chart-3 mt-0.5 flex-shrink-0" />
           <div className="flex-1 min-w-0">
-            <p className="text-[10px] font-semibold text-muted-foreground mb-1 uppercase tracking-wide">
+            <p className="text-xs font-semibold text-muted-foreground mb-1">
               Visual Style
             </p>
             <p className="text-sm text-foreground leading-relaxed">{data.visualStyle}</p>
@@ -138,7 +138,7 @@ export const VideoAnalysisCard = ({ data, isLoading }: VideoAnalysisCardProps) =
         <div className="flex items-start gap-2.5 p-3 rounded-lg bg-[hsl(var(--module-bg))]">
           <Users className="w-4 h-4 text-chart-4 mt-0.5 flex-shrink-0" />
           <div className="flex-1 min-w-0">
-            <p className="text-[10px] font-semibold text-muted-foreground mb-1 uppercase tracking-wide">
+            <p className="text-xs font-semibold text-muted-foreground mb-1">
               Audience
             </p>
             <p className="text-sm text-foreground leading-relaxed">{data.audience}</p>
@@ -148,7 +148,7 @@ export const VideoAnalysisCard = ({ data, isLoading }: VideoAnalysisCardProps) =
         <div className="flex items-start gap-2.5 p-3 rounded-lg bg-[hsl(var(--module-bg))]">
           <Clock className="w-4 h-4 text-chart-1 mt-0.5 flex-shrink-0" />
           <div className="flex-1 min-w-0">
-            <p className="text-[10px] font-semibold text-muted-foreground mb-1 uppercase tracking-wide">
+            <p className="text-xs font-semibold text-muted-foreground mb-1">
               Hook Type
             </p>
             <p className="text-sm text-foreground leading-relaxed">{data.hookType}</p>
@@ -158,7 +158,7 @@ export const VideoAnalysisCard = ({ data, isLoading }: VideoAnalysisCardProps) =
         <div className="flex items-start gap-2.5 p-3 rounded-lg bg-[hsl(var(--module-bg))]">
           <Sparkles className="w-4 h-4 text-chart-5 mt-0.5 flex-shrink-0" />
           <div className="flex-1 min-w-0">
-            <p className="text-[10px] font-semibold text-muted-foreground mb-1 uppercase tracking-wide">
+            <p className="text-xs font-semibold text-muted-foreground mb-1">
               Key Topics
             </p>
             <p className="text-sm text-foreground leading-relaxed">
