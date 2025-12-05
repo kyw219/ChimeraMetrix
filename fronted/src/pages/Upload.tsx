@@ -373,7 +373,6 @@ export default function Upload() {
 
   return (
     <DashboardLayout>
-      <div className="max-w-[1100px] mx-auto">
         {/* Show loading pipeline when running backtest */}
         {isRunningBacktest ? (
           <div className="min-h-[600px] flex items-center justify-center">
@@ -392,10 +391,10 @@ export default function Upload() {
               </p>
             </div>
 
-        {/* Two-Column Layout - 5:7 ratio for better left column width */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-8">
-          {/* LEFT COLUMN: User Input & Analysis - 5 columns (42%) */}
-          <div className="lg:col-span-5 space-y-6">
+        {/* Two-Column Layout - 6:6 ratio for balanced width */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+          {/* LEFT COLUMN: User Input & Analysis */}
+          <div className="space-y-6">
             <div className="panel-base rounded-2xl p-6">
               <h2 className="text-sm font-bold text-primary mb-4 uppercase tracking-wide">
                 Video Upload
@@ -463,8 +462,8 @@ export default function Upload() {
             )}
           </div>
 
-          {/* RIGHT COLUMN: Strategy Results - 7 columns (58%) */}
-          <div className="lg:col-span-7 space-y-6">
+          {/* RIGHT COLUMN: Strategy Results */}
+          <div className="space-y-6">
             {/* Recommended Strategy */}
             <div className="panel-base rounded-2xl p-6" id="recommended-strategy">
               <h2 className="text-sm font-bold text-accent mb-4 uppercase tracking-wide">
@@ -562,7 +561,6 @@ export default function Upload() {
             )}
           </>
         )}
-      </div>
-    </DashboardLayout>
-  );
-}
+      </DashboardLayout>
+    );
+  }

@@ -53,7 +53,7 @@ export const Sidebar = () => {
   }, [location.pathname, hasNewReport]);
 
   return (
-    <aside className="w-[220px] h-screen bg-sidebar border-r border-sidebar-border flex flex-col fixed left-0 top-0">
+    <aside className="w-[280px] h-screen bg-sidebar border-r border-sidebar-border flex flex-col fixed left-0 top-0">
       {/* Logo */}
       <div className="p-6 border-b border-sidebar-border">
         <Link to="/" className="flex items-center gap-2.5 group">

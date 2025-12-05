@@ -202,7 +202,6 @@ export default function Backtest() {
 
   return (
     <DashboardLayout rightPanel={<InsightsPanel strategy={strategy} performanceDrivers={performanceDrivers} matchedVideos={matchedVideos} />}>
-      <div className="max-w-5xl">
         {/* Page Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-primary mb-2 flex items-center gap-3">
@@ -294,7 +293,6 @@ export default function Backtest() {
           <Sparkles className={`w-5 h-5 mr-2 transition-opacity duration-500 ${isSaved ? "opacity-50" : ""}`} />
           {isSaved ? "Saved" : "Save Strategy & Backtest Report"}
         </Button>
-      </div>
-    </DashboardLayout>
-  );
-}
+      </DashboardLayout>
+    );
+  }

@@ -10,7 +10,7 @@ export const DashboardLayout = ({ children, rightPanel }: DashboardLayoutProps) 
   return (
     <div className="min-h-screen bg-background">
       <Sidebar />
-      <div className="ml-[220px] flex">
+      <div className="ml-[280px] flex">
         <main className="flex-1 p-8">{children}</main>
         {rightPanel && (
           <aside className="w-[420px] bg-[hsl(var(--panel-bg))] p-6 sticky top-0 h-screen overflow-y-auto shadow-2xl">
