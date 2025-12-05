@@ -24,27 +24,14 @@ export const StrategyCard = ({
   isRegenerating = false,
   onRegenerate,
 }: StrategyCardProps) => {
-  const colorName = iconColor.replace('text-', '');
   const isCoverCard = title === "Recommended Cover";
   
   return (
-    <div className={`subpanel rounded-xl p-5 transition-all h-full ${
-      isEmpty 
-        ? 'opacity-60' 
-        : 'hover:bg-[hsl(var(--module-bg))]'
-    } ${isRegenerating ? 'opacity-70' : ''}`}>
+    <div className={`transition-all ${isEmpty ? 'opacity-60' : ''} ${isRegenerating ? 'opacity-70' : ''}`}>
       <div className="flex items-start justify-between gap-3 mb-3">
-        <div className="flex items-start gap-3">
-          <div className={`w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 ${
-            colorName === 'chart-1' ? 'bg-chart-1/10' :
-            colorName === 'chart-2' ? 'bg-chart-2/10' :
-            colorName === 'chart-3' ? 'bg-chart-3/10' :
-            colorName === 'chart-4' ? 'bg-chart-4/10' :
-            'bg-primary/10'
-          }`}>
-            <Icon className={`w-4 h-4 ${iconColor}`} />
-          </div>
-          <h4 className="text-xs font-bold text-muted-foreground leading-tight uppercase tracking-wide">{title}</h4>
+        <div className="flex items-start gap-2.5">
+          <Icon className={`w-4 h-4 ${iconColor} mt-0.5 flex-shrink-0`} />
+          <h4 className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wide">{title}</h4>
         </div>
         {!isEmpty && onRegenerate && (
           <Button
