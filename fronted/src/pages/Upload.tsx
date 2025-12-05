@@ -351,9 +351,11 @@ export default function Upload() {
         throw new Error(data.error?.message || 'Failed to regenerate');
       }
 
-      setStrategy(data.data.strategy);
+      const updatedStrategy = data.data.strategy;
+      setStrategy(updatedStrategy);
+      workflow.setStrategy(updatedStrategy); // Update workflow context
       console.log(`✅ ${field} regenerated successfully`);
-      console.log('   - Updated strategy:', data.data.strategy);
+      console.log('   - Updated strategy:', updatedStrategy);
       
       toast({
         title: "Success!",
