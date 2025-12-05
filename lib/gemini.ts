@@ -168,17 +168,26 @@ TEXT OVERLAY:
 - Headline: "${headline}"
 - Large, short, bold font at the top or side (NOT center)
 - Use highly readable colors: yellow, white, or neon tones with thick black outline (5-6px stroke)
-- Keep text AWAY from edges - maintain safe margins (at least 10% from all edges)
-- Text must NOT cover the main subject's face or key object
 - Maximum 2-4 words for instant readability
 - Position text using rule-of-thirds - never dead center
+- Text must NOT cover the main subject's face or key object
+
+CRITICAL TEXT SPACING REQUIREMENTS:
+- **MANDATORY: Keep ALL text at least 15% away from ALL edges (top, bottom, left, right)**
+- **NO text should touch or be close to the image borders**
+- Text should be positioned in the INNER 70% of the image area only
+- Leave generous padding around all text elements
+- If text is at top: position it at least 15% down from top edge
+- If text is at bottom: position it at least 15% up from bottom edge
+- If text is at sides: position it at least 15% inward from left/right edges
+- Think of the image as having an invisible border frame - keep all text inside this safe zone
 
 COMPOSITION RULES:
 - Strong rule-of-thirds composition with face or key object as focal point
 - Maintain emotion-focused expressions when humans are present (surprised, excited, confident, curious)
 - Keep layout uncluttered and easy to understand instantly
 - Clear visual hierarchy: subject first, text second, background third
-- Ensure all important elements are within safe zone (avoid edge cropping)
+- All important elements must be within the safe zone (inner 70% of image)
 
 BACKGROUND TREATMENT:
 - Use the original video frame as base
@@ -200,7 +209,12 @@ OUTPUT REQUIREMENTS:
 - Face and subject must be clearly visible and not obscured
 - Professional quality with strong CTR potential
 
-CRITICAL: Maintain proper spacing from edges. Text and key elements should never be cut off or too close to borders.`;
+⚠️ ABSOLUTE CRITICAL RULE - TEXT EDGE SAFETY:
+DO NOT place text near edges. Imagine the image has a 15% border on all sides that is OFF-LIMITS for text.
+Text placement zone: Only use the central 70% x 70% area of the image.
+Any text touching or near the edges will be REJECTED.
+Keep generous white space between text and image boundaries.
+This is the MOST IMPORTANT rule - violating it makes the thumbnail unusable.`;
   }
 
   /**
