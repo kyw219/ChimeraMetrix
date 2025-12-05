@@ -403,50 +403,76 @@ export default function Upload() {
                 Video Upload
               </h2>
               
-              <VideoUploadSection
-                onFileUpload={(newFile) => {
-                  setFile(newFile);
-                  workflow.setFile(newFile, null, newFile.name);
-                  // Create video URL for preview
-                  const url = URL.createObjectURL(newFile);
-                  setVideoUrl(url);
-                }}
-                onThumbnailGenerated={(thumbnail) => {
-                  if (file) {
-                    workflow.setFile(file, thumbnail, file.name);
-                  }
-                }}
-                platform={platform}
-                onPlatformChange={(newPlatform) => {
-                  setPlatform(newPlatform);
-                  workflow.setPlatform(newPlatform);
-                }}
-                onRemove={handleReset}
-                initialThumbnail={workflow.videoPreviewUrl}
-                initialFileName={workflow.videoFileName}
-              />
+              {/* Only show upload section when no strategy yet */}
+              {!strategy && (
+                <>
+                  <VideoUploadSection
+                    onFileUpload={(newFile) => {
+                      setFile(newFile);
+                      workflow.setFile(newFile, null, newFile.name);
+                      // Create video URL for preview
+                      const url = URL.createObjectURL(newFile);
+                      setVideoUrl(url);
+                    }}
+                    onThumbnailGenerated={(thumbnail) => {
+                      if (file) {
+                        workflow.setFile(file, thumbnail, file.name);
+                      }
+                    }}
+                    platform={platform}
+                    onPlatformChange={(newPlatform) => {
+                      setPlatform(newPlatform);
+                      workflow.setPlatform(newPlatform);
+                    }}
+                    onRemove={handleReset}
+                    initialThumbnail={workflow.videoPreviewUrl}
+                    initialFileName={workflow.videoFileName}
+                  />
 
-              {/* Generate Button */}
-              {file && !strategy && (
-                <div className="mt-6 flex justify-center">
-                  <Button
-                    onClick={handleGenerateStrategy}
-                    disabled={isGenerating}
-                    size="lg"
-                    className="w-full px-10 py-6 text-base font-bold bg-primary hover:bg-primary/90 text-primary-foreground glow-primary"
-                  >
-                    {isGenerating ? (
-                      <>
-                        <Loader2 className="w-5 h-5 animate-spin mr-2" />
-                        Extracting video features...
-                      </>
-                    ) : (
-                      <>
-                        <Zap className="w-5 h-5 mr-2" />
-                        Generate AI Strategy
-                      </>
-                    )}
-                  </Button>
+                  {/* Generate Button */}
+                  {file && (
+                    <div className="mt-6 flex justify-center">
+                      <Button
+                        onClick={handleGenerateStrategy}
+                        disabled={isGenerating}
+                        size="lg"
+                        className="w-full px-10 py-6 text-base font-bold bg-primary hover:bg-primary/90 text-primary-foreground glow-primary"
+                      >
+                        {isGenerating ? (
+                          <>
+                            <Loader2 className="w-5 h-5 animate-spin mr-2" />
+                            Extracting video features...
+                          </>
+                        ) : (
+                          <>
+                            <Zap className="w-5 h-5 mr-2" />
+                            Generate AI Strategy
+                          </>
+                        )}
+                      </Button>
+                    </div>
+                  )}
+                </>
+              )}
+
+              {/* Show video thumbnail after generation */}
+              {strategy && file && (
+                <div className="flex items-center gap-3 p-3 bg-[hsl(var(--module-bg))] rounded-lg">
+                  {workflow.videoPreviewUrl && (
+                    <img 
+                      src={workflow.videoPreviewUrl} 
+                      alt="Video thumbnail" 
+                      className="w-20 h-20 rounded object-cover"
+                    />
+                  )}
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs font-medium text-foreground truncate">
+                      {workflow.videoFileName || 'Video uploaded'}
+                    </p>
+                    <p className="text-[10px] text-muted-foreground">
+                      {platform.charAt(0).toUpperCase() + platform.slice(1)}
+                    </p>
+                  </div>
                 </div>
               )}
             </div>
