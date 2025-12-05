@@ -32,6 +32,7 @@ export default function Upload() {
   const [loadingMessage, setLoadingMessage] = useState('Extracting video features...');
   const [isRunningBacktest, setIsRunningBacktest] = useState(false);
   const [regeneratingField, setRegeneratingField] = useState<string | null>(null);
+  const [backtestResultsRef, setBacktestResultsRef] = useState<any>(null);
 
   const handleGenerateStrategy = async () => {
     if (!file) return;
@@ -282,10 +283,8 @@ export default function Upload() {
       console.log('💾 Saving backtest results to workflow context:', backtestResults);
       workflow.setBacktestResults(backtestResults);
       
-      // Verify it was saved
-      setTimeout(() => {
-        console.log('🔍 Verifying saved data:', workflow.backtestResults ? 'Data exists' : 'No data found');
-      }, 50);
+      // Also save to local ref for immediate access (React state updates are async)
+      setBacktestResultsRef(backtestResults);
       
       // Animation will complete automatically after 9 seconds (3 steps × 3s each)
     } catch (error) {
@@ -303,21 +302,18 @@ export default function Upload() {
     // Called when animation finishes (after 9 seconds)
     setIsRunningBacktest(false);
     
-    // Add a small delay to ensure workflow context has saved to localStorage
-    setTimeout(() => {
-      // Verify data exists before navigating
-      if (workflow.backtestResults) {
-        console.log('✅ Navigating to backtest page with results');
-        navigate("/backtest");
-      } else {
-        console.error('❌ No backtest results found after animation');
-        toast({
-          title: "Error",
-          description: "Backtest results not found. Please try again.",
-          variant: "destructive",
-        });
-      }
-    }, 100);
+    // Check if we have backtest results (use ref since React state is async)
+    if (backtestResultsRef) {
+      console.log('✅ Navigating to backtest page with results');
+      navigate("/backtest");
+    } else {
+      console.error('❌ No backtest results found after animation');
+      toast({
+        title: "Error",
+        description: "Backtest results not found. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleReset = () => {
@@ -326,6 +322,7 @@ export default function Upload() {
     setAnalysis(null);
     setSessionId(null);
     setFrameUrl(null);
+    setBacktestResultsRef(null);
     // Revoke video URL to free memory
     if (videoUrl) {
       URL.revokeObjectURL(videoUrl);
