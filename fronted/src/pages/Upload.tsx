@@ -465,7 +465,7 @@ export default function Upload() {
           {/* RIGHT COLUMN: Strategy Results */}
           <div className="space-y-6">
             {/* Recommended Strategy */}
-            <div className="panel-base rounded-2xl p-6" id="recommended-strategy">
+            <div id="recommended-strategy">
               <h2 className="text-lg font-bold text-primary mb-6">
                 Recommended Strategy
               </h2>
