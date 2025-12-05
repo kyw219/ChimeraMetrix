@@ -315,11 +315,11 @@ export default function Upload() {
                          workflow.backtestResults.predictions &&
                          workflow.backtestResults.matchedVideos;
       
-      console.log('🔍 Checking backtest results:', {
-        hasBacktestResults: !!workflow.backtestResults,
-        hasPredictions: !!workflow.backtestResults?.predictions,
-        hasMatchedVideos: !!workflow.backtestResults?.matchedVideos,
-      });
+      console.log('🔍 Checking backtest results:');
+      console.log('   - workflow.backtestResults:', workflow.backtestResults);
+      console.log('   - hasBacktestResults:', !!workflow.backtestResults);
+      console.log('   - hasPredictions:', !!workflow.backtestResults?.predictions);
+      console.log('   - hasMatchedVideos:', !!workflow.backtestResults?.matchedVideos);
       
       if (hasResults) {
         console.log('✅ Navigating to backtest page with results');
