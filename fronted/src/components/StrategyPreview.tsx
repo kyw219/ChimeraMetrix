@@ -76,7 +76,10 @@ export const StrategyPreview = ({
             {strategy.title || "No title generated"}
           </h4>
         </div>
-      </div>/50 text-white border-white/20 text-[10px]">
+        
+        {/* Platform Badge */}
+        <div className="absolute top-3 right-3">
+          <Badge className="bg-black/50 text-white border-white/20 text-[10px]">
             {strategy.coverImageUrl ? 'AI Generated' : 'Preview'}
           </Badge>
         </div>
