@@ -313,7 +313,7 @@ export default function Upload() {
     }
   };
 
-  const handleBacktestComplete = () => {
+  const handleBacktestComplete = useCallback(() => {
     // Called when animation finishes (after 9 seconds)
     setIsRunningBacktest(false);
     
@@ -345,7 +345,7 @@ export default function Upload() {
         });
       }
     }, 100);
-  };
+  }, [workflow.backtestResults, navigate, toast]);
 
   const handleReset = () => {
     setFile(null);
