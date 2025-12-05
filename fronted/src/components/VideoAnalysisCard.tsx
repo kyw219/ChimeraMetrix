@@ -20,7 +20,7 @@ interface VideoAnalysisCardProps {
 }
 
 export const VideoAnalysisCard = ({ data, isLoading }: VideoAnalysisCardProps) => {
-  const [isExpanded, setIsExpanded] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(true);
 
   if (isLoading) {
     return (

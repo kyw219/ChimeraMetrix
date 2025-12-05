@@ -391,63 +391,62 @@ export default function Upload() {
 
         {/* Two-Column Layout */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-          {/* LEFT COLUMN: User Input */}
-          <div className="panel-base rounded-2xl p-6">
-            <h2 className="text-sm font-bold text-primary mb-4 uppercase tracking-wide">
-              Video Upload
-            </h2>
-            
-            <VideoUploadSection
-              onFileUpload={(newFile) => {
-                setFile(newFile);
-                workflow.setFile(newFile, null, newFile.name);
-                // Create video URL for preview
-                const url = URL.createObjectURL(newFile);
-                setVideoUrl(url);
-              }}
-              onThumbnailGenerated={(thumbnail) => {
-                if (file) {
-                  workflow.setFile(file, thumbnail, file.name);
-                }
-              }}
-              platform={platform}
-              onPlatformChange={(newPlatform) => {
-                setPlatform(newPlatform);
-                workflow.setPlatform(newPlatform);
-              }}
-              onRemove={handleReset}
-              initialThumbnail={workflow.videoPreviewUrl}
-              initialFileName={workflow.videoFileName}
-            />
-
-            {/* Generate Button */}
-            {file && !strategy && (
-              <div className="mt-6 flex justify-center">
-                <Button
-                  onClick={handleGenerateStrategy}
-                  disabled={isGenerating}
-                  size="lg"
-                  className="w-full px-10 py-6 text-base font-bold bg-primary hover:bg-primary/90 text-primary-foreground glow-primary"
-                >
-                  {isGenerating ? (
-                    <>
-                      <Loader2 className="w-5 h-5 animate-spin mr-2" />
-                      Extracting video features...
-                    </>
-                  ) : (
-                    <>
-                      <Zap className="w-5 h-5 mr-2" />
-                      Generate AI Strategy
-                    </>
-                  )}
-                </Button>
-              </div>
-            )}
-          </div>
-
-          {/* RIGHT COLUMN: AI Analysis & Results */}
+          {/* LEFT COLUMN: User Input & Analysis */}
           <div className="space-y-6">
-            {/* Video Analysis */}
+            <div className="panel-base rounded-2xl p-6">
+              <h2 className="text-sm font-bold text-primary mb-4 uppercase tracking-wide">
+                Video Upload
+              </h2>
+              
+              <VideoUploadSection
+                onFileUpload={(newFile) => {
+                  setFile(newFile);
+                  workflow.setFile(newFile, null, newFile.name);
+                  // Create video URL for preview
+                  const url = URL.createObjectURL(newFile);
+                  setVideoUrl(url);
+                }}
+                onThumbnailGenerated={(thumbnail) => {
+                  if (file) {
+                    workflow.setFile(file, thumbnail, file.name);
+                  }
+                }}
+                platform={platform}
+                onPlatformChange={(newPlatform) => {
+                  setPlatform(newPlatform);
+                  workflow.setPlatform(newPlatform);
+                }}
+                onRemove={handleReset}
+                initialThumbnail={workflow.videoPreviewUrl}
+                initialFileName={workflow.videoFileName}
+              />
+
+              {/* Generate Button */}
+              {file && !strategy && (
+                <div className="mt-6 flex justify-center">
+                  <Button
+                    onClick={handleGenerateStrategy}
+                    disabled={isGenerating}
+                    size="lg"
+                    className="w-full px-10 py-6 text-base font-bold bg-primary hover:bg-primary/90 text-primary-foreground glow-primary"
+                  >
+                    {isGenerating ? (
+                      <>
+                        <Loader2 className="w-5 h-5 animate-spin mr-2" />
+                        Extracting video features...
+                      </>
+                    ) : (
+                      <>
+                        <Zap className="w-5 h-5 mr-2" />
+                        Generate AI Strategy
+                      </>
+                    )}
+                  </Button>
+                </div>
+              )}
+            </div>
+
+            {/* Video Analysis - Moved to left column */}
             {strategy && (
               <div className="panel-base rounded-2xl p-6">
                 <h2 className="text-sm font-bold text-primary mb-4 uppercase tracking-wide">
@@ -459,7 +458,10 @@ export default function Upload() {
                 />
               </div>
             )}
+          </div>
 
+          {/* RIGHT COLUMN: Strategy Results */}
+          <div className="space-y-6">
             {/* Recommended Strategy */}
             <div className="panel-base rounded-2xl p-6" id="recommended-strategy">
               <h2 className="text-sm font-bold text-accent mb-4 uppercase tracking-wide">
