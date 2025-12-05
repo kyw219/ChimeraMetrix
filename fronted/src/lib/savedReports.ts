@@ -23,13 +23,13 @@ export function saveReport(report: Omit<SavedReport, 'id' | 'timestamp'>): Saved
     ...newReport,
     strategy: {
       ...newReport.strategy,
-      // Keep coverImageUrl as null or empty to save space
-      coverImageUrl: newReport.strategy.coverImageUrl ? '[Image data removed to save space]' : null,
+      // Remove coverImageUrl to save space - will use placeholder on display
+      coverImageUrl: null,
     },
     matchedVideos: newReport.matchedVideos.map((video: any) => ({
       ...video,
-      // Remove thumbnail data from matched videos
-      thumbnail: video.thumbnail ? '[Thumbnail removed]' : null,
+      // Keep thumbnail emoji/icon but remove any base64 data
+      thumbnail: video.thumbnail && !video.thumbnail.startsWith('data:') ? video.thumbnail : '🎬',
     })),
   };
 

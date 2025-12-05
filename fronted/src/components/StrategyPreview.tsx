@@ -58,15 +58,40 @@ export const StrategyPreview = ({
       
       {/* YouTube Preview Card - No background, direct display */}
       <div className="flex justify-center">
-        <YouTubePreviewCard
-          thumbnailUrl={strategy.coverImageUrl || "https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=640&h=360&fit=crop"}
-          duration="10:24"
-          title={strategy.title || "No title generated"}
-          channelName="Your Channel"
-          views={35000}
-          publishedTime="1 month ago"
-          videoUrl={videoUrl}
-        />
+        {strategy.coverImageUrl ? (
+          <YouTubePreviewCard
+            thumbnailUrl={strategy.coverImageUrl}
+            duration="10:24"
+            title={strategy.title || "No title generated"}
+            channelName="Your Channel"
+            views={35000}
+            publishedTime="1 month ago"
+            videoUrl={videoUrl}
+          />
+        ) : (
+          <div className="w-full max-w-[360px] space-y-3">
+            {/* Placeholder thumbnail */}
+            <div className="w-full aspect-video bg-gradient-to-br from-primary/20 to-accent/20 rounded-xl flex items-center justify-center">
+              <div className="text-center">
+                <div className="text-6xl mb-2">🎬</div>
+                <p className="text-xs text-muted-foreground/60">Cover image not available</p>
+              </div>
+            </div>
+            {/* Title and metadata */}
+            <div className="space-y-2">
+              <h4 className="text-sm font-semibold text-foreground line-clamp-2">
+                {strategy.title || "No title generated"}
+              </h4>
+              <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                <span>Your Channel</span>
+                <span>•</span>
+                <span>35K views</span>
+                <span>•</span>
+                <span>1 month ago</span>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
