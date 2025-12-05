@@ -28,7 +28,7 @@ export const YouTubePreviewCard = ({
   };
 
   return (
-    <div className="w-full max-w-[400px] cursor-pointer transition-transform hover:scale-[1.02] duration-200">
+    <div className="w-full max-w-[560px] cursor-pointer transition-transform hover:scale-[1.02] duration-200">
       {/* Thumbnail Container - Full Width */}
       <div className="relative w-full aspect-video rounded-xl overflow-hidden bg-[#0f0f0f] mb-3">
         <img
