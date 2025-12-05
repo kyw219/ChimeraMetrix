@@ -49,7 +49,7 @@ export const StrategyPreview = ({
 
   return (
     <div>
-      <h3 className="text-sm font-bold text-primary mb-2">
+      <h3 className="text-base font-bold text-primary mb-2">
         YouTube Home Feed Preview
       </h3>
       <p className="text-xs text-muted-foreground mb-6">

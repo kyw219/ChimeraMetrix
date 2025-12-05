@@ -396,7 +396,7 @@ export default function Upload() {
           {/* LEFT COLUMN: User Input & Analysis */}
           <div className="space-y-6">
             <div>
-              <h2 className="text-lg font-bold text-primary mb-4">
+              <h2 className="text-lg font-bold text-primary mb-6">
                 Video Upload
               </h2>
               
