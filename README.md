@@ -1,36 +1,105 @@
-# ChimeraMatrix Backend
+# ChimeraMatrix
 
-AI-powered video content analysis and performance prediction backend built with Vercel Serverless Functions and Google Gemini API.
+<div align="center">
 
-## Features
+![ChimeraMatrix Cover](./cover_with_face.png)
+
+**AI-Powered Video Content Analysis & Performance Prediction Platform**
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue.svg)](https://www.typescriptlang.org/)
+[![Vercel](https://img.shields.io/badge/Deployed%20on-Vercel-black.svg)](https://vercel.com)
+
+[Demo](https://your-demo-url.vercel.app) • [Documentation](./docs) • [Report Bug](https://github.com/yourusername/chimeramatrix/issues)
+
+</div>
+
+---
+
+## 📖 Overview
+
+ChimeraMatrix is an AI-powered video content analysis and performance prediction platform that helps content creators optimize their video metadata before publishing. Using Google Gemini's multimodal AI, it analyzes video content, generates optimized strategies (cover images, titles, hashtags, posting times), and predicts performance based on historical data.
+
+**Supported Platforms:** YouTube, TikTok, YouTube Shorts
+
+## ✨ Features
+
+### Core Capabilities
 
 - 🎥 **Video Analysis**: Extract features from video content using Gemini multimodal AI
-- 🎯 **Strategy Generation**: Generate optimized content strategies (cover, title, hashtags, posting time)
-- 🔄 **Strategy Regeneration**: Regenerate specific strategy fields or entire strategy
-- 📊 **Performance Prediction**: Predict video performance based on historical data and semantic matching
-- 🔒 **Secure**: CORS protection, input validation, and API key management
-- ⚡ **Serverless**: Deployed on Vercel with automatic scaling
+  - Category detection
+  - Emotion analysis
+  - Visual style identification
+  - Keyword extraction
+  - Audience targeting
+  - Hook type classification
 
-## Tech Stack
+- 🎯 **Strategy Generation**: AI-generated optimized content strategies
+  - Cover image generation (Gemini 2.5-flash-image)
+  - Engaging titles
+  - Trending hashtags
+  - Optimal posting times
 
-- **Runtime**: Node.js 18+ (Vercel Serverless)
-- **Language**: TypeScript
-- **AI**: Google Gemini API (@google/generative-ai)
+- 🔄 **Strategy Regeneration**: Regenerate specific fields or entire strategy
+  - Individual field regeneration (cover, title, hashtags, posting time)
+  - Full strategy refresh
+
+- 📊 **Performance Prediction**: Data-driven performance forecasting
+  - Views, CTR, and likes predictions (1h, 3h, 6h, 12h, 24h)
+  - Semantic matching with historical data
+  - Performance driver analysis
+
+- 🔒 **Enterprise-Ready**: Production-grade security and reliability
+  - CORS protection
+  - Input validation
+  - API key management
+  - Error handling with retry logic
+
+- ⚡ **Serverless Architecture**: Scalable and cost-effective
+  - Deployed on Vercel
+  - Automatic scaling
+  - In-memory caching
+
+## 🛠️ Tech Stack
+
+### Backend
+- **Runtime**: Node.js 18+ (Vercel Serverless Functions)
+- **Language**: TypeScript with strict mode
+- **AI**: Google Gemini API (@google/generative-ai, @google/genai)
+- **Image Processing**: fal.ai for video frame extraction
 - **Data**: CSV-based historical data with in-memory caching
 - **Testing**: Jest + fast-check (property-based testing)
 
-## Setup
+### Frontend
+- **Framework**: React 18 + TypeScript
+- **Build Tool**: Vite
+- **UI**: shadcn/ui components + Radix UI primitives
+- **Styling**: Tailwind CSS
+- **Routing**: React Router v6
+- **State**: React Context + TanStack Query
+- **Charts**: Recharts
+
+### Deployment
+- **Platform**: Vercel (serverless functions + static hosting)
+- **Function timeout**: 60 seconds
+- **Function memory**: 1024MB
+
+## 🚀 Quick Start
 
 ### Prerequisites
 
 - Node.js 18 or higher
+- npm or bun
 - Vercel account (for deployment)
 - Google Gemini API key
+- fal.ai API key (for video frame extraction)
 
 ### Installation
 
+#### Backend Setup
+
 ```bash
-# Install dependencies
+# Install backend dependencies
 npm install
 
 # Copy environment variables
@@ -39,17 +108,34 @@ cp .env.example .env
 # Edit .env and add your API keys
 ```
 
+#### Frontend Setup
+
+```bash
+# Navigate to frontend directory
+cd fronted
+
+# Install frontend dependencies
+npm install
+
+# Start development server
+npm run dev
+```
+
 ### Environment Variables
 
-Create a `.env` file with the following variables:
+Create a `.env` file in the root directory:
 
 ```bash
 # Gemini API Configuration
 GEMINI_API_KEY=your_gemini_api_key_here
 GEMINI_MODEL=gemini-1.5-pro
+GEMINI_IMAGE_MODEL=gemini-2.5-flash-image
+
+# fal.ai Configuration
+FAL_KEY=your_fal_api_key_here
 
 # CORS Configuration
-ALLOWED_ORIGINS=https://your-frontend-domain.vercel.app,http://localhost:3000
+ALLOWED_ORIGINS=https://your-frontend-domain.vercel.app,http://localhost:3000,http://localhost:5173
 
 # File Upload Configuration
 MAX_FILE_SIZE=104857600
@@ -59,7 +145,9 @@ ALLOWED_FILE_TYPES=mp4,mov,avi,webm
 SESSION_TIMEOUT=3600
 ```
 
-## Development
+## 💻 Development
+
+### Backend Development
 
 ```bash
 # Run tests
@@ -75,7 +163,22 @@ npm run test:coverage
 npm run type-check
 
 # Local development (requires Vercel CLI)
+vercel dev
+```
+
+### Frontend Development
+
+```bash
+cd fronted
+
+# Start dev server
 npm run dev
+
+# Build for production
+npm run build
+
+# Preview production build
+npm run preview
 ```
 
 ## API Endpoints
@@ -249,21 +352,36 @@ All endpoints return errors in the following format:
 - `API_ERROR`: External API failure (502)
 - `INTERNAL_ERROR`: Unexpected server error (500)
 
-## Deployment
+## 🚢 Deployment
 
 ### Deploy to Vercel
+
+#### Backend Deployment
 
 ```bash
 # Install Vercel CLI
 npm i -g vercel
 
-# Deploy
+# Deploy backend
 vercel
 
-# Set environment variables in Vercel dashboard
-# or use CLI:
+# Set environment variables in Vercel dashboard or use CLI:
 vercel env add GEMINI_API_KEY
+vercel env add FAL_KEY
 vercel env add ALLOWED_ORIGINS
+```
+
+#### Frontend Deployment
+
+```bash
+cd fronted
+
+# Deploy frontend
+vercel
+
+# Or build and deploy manually
+npm run build
+vercel --prod
 ```
 
 ### Vercel Configuration
@@ -272,6 +390,10 @@ The project includes `vercel.json` with optimized settings:
 - Function timeout: 60 seconds
 - Memory: 1024MB
 - Node.js 18+ runtime
+- Automatic HTTPS
+- Edge caching
+
+For detailed deployment instructions, see [docs/DEPLOYMENT.md](./docs/DEPLOYMENT.md)
 
 ## Testing
 
@@ -295,41 +417,68 @@ npm test -- tests/property/
 npm run test:coverage
 ```
 
-## Project Structure
+## 📁 Project Structure
 
 ```
 .
-├── api/                    # Vercel serverless functions
-│   ├── analyze.ts         # Video upload & analysis
-│   ├── generate-strategy.ts
-│   ├── regenerate-strategy.ts
-│   └── backtest.ts
-├── lib/                    # Shared utilities
-│   ├── gemini.ts          # Gemini API client
-│   ├── csv-db.ts          # CSV database access
-│   ├── file-handler.ts    # File upload handling
-│   ├── session.ts         # Session management
-│   ├── validators.ts      # Input validation
-│   ├── errors.ts          # Error handling
-│   └── cors.ts            # CORS & security
-├── types/                  # TypeScript type definitions
-│   └── index.ts
-├── tests/                  # Test suites
-│   ├── unit/              # Unit tests
-│   ├── property/          # Property-based tests
-│   └── integration/       # Integration tests
-├── backtest-data.csv      # Historical performance data
-├── package.json
-├── tsconfig.json
-├── vercel.json
-└── README.md
+├── api/                          # Vercel serverless functions (backend endpoints)
+│   ├── analyze.ts               # POST /api/analyze - Video upload & analysis
+│   ├── generate-strategy.ts     # POST /api/generate-strategy - Generate content strategy
+│   ├── regenerate-strategy.ts   # POST /api/regenerate-strategy - Regenerate strategy fields
+│   ├── backtest.ts              # POST /api/backtest - Performance prediction
+│   ├── health.ts                # GET /api/health - Health check
+│   └── index.ts                 # GET /api - API info
+│
+├── lib/                          # Shared backend utilities
+│   ├── gemini.ts                # GeminiClient class - AI operations
+│   ├── csv-db.ts                # CSV database access with caching
+│   ├── file-handler.ts          # File upload handling & validation
+│   ├── session.ts               # In-memory session management
+│   ├── validators.ts            # Input validation functions
+│   ├── errors.ts                # Error classes & logging
+│   ├── cors.ts                  # CORS & security middleware
+│   ├── fal-client.ts            # fal.ai video frame extraction
+│   └── simple-matcher.ts        # Fallback similarity matching
+│
+├── types/                        # TypeScript type definitions
+│   └── index.ts                 # All shared types (VideoFeatures, Strategy, etc.)
+│
+├── tests/                        # Test suites
+│   ├── unit/                    # Unit tests for individual functions
+│   ├── property/                # Property-based tests (fast-check)
+│   └── integration/             # End-to-end API tests
+│
+├── fronted/                      # React frontend
+│   ├── src/
+│   │   ├── components/          # React components
+│   │   │   ├── ui/             # shadcn/ui base components
+│   │   │   └── *.tsx           # Feature components
+│   │   ├── pages/              # Route pages (Upload, Backtest, SavedReports, Settings)
+│   │   ├── contexts/           # React Context providers
+│   │   ├── hooks/              # Custom React hooks
+│   │   ├── lib/                # Frontend utilities
+│   │   ├── config.ts           # API configuration
+│   │   └── main.tsx            # App entry point
+│   ├── public/                  # Static assets
+│   ├── package.json
+│   └── vite.config.ts
+│
+├── docs/                         # Documentation
+│   ├── DEPLOYMENT.md            # Deployment guide
+│   └── IMAGE_GENERATION.md      # Image generation details
+│
+├── backtest-data.csv            # Historical performance data
+├── vercel.json                  # Vercel deployment config
+├── tsconfig.json                # TypeScript config (backend)
+├── package.json                 # Backend dependencies
+└── README.md                    # This file
 ```
 
-## Performance
+## 📊 Performance Metrics
 
 - **API Response Times**:
   - `/api/analyze`: < 5 seconds (video analysis)
-  - `/api/generate-strategy`: < 3 seconds
+  - `/api/generate-strategy`: < 3 seconds (with image generation)
   - `/api/regenerate-strategy`: < 3 seconds
   - `/api/backtest`: < 3 seconds
 
@@ -337,7 +486,11 @@ npm run test:coverage
   - CSV data cached in memory after first load
   - Session data stored in memory (1 hour timeout)
 
-## Security
+- **Scalability**:
+  - Serverless architecture scales automatically
+  - No cold start issues with Vercel Edge Functions
+
+## 🔐 Security
 
 - ✅ CORS protection with origin whitelist
 - ✅ Input validation for all endpoints
@@ -345,11 +498,47 @@ npm run test:coverage
 - ✅ Path traversal prevention
 - ✅ API key sanitization in responses
 - ✅ Error message sanitization in production
+- ✅ Rate limiting (Vercel built-in)
 
-## License
+## 📚 Documentation
 
-MIT
+- [Deployment Guide](./docs/DEPLOYMENT.md)
+- [Image Generation Details](./docs/IMAGE_GENERATION.md)
+- [Demo Script](./DEMO_SCRIPT.md)
+- [Limitations](./LIMITATIONS.md)
+- [Project Submission](./PROJECT_SUBMISSION.md)
 
-## Support
+## 🤝 Contributing
 
-For issues and questions, please open an issue on GitHub.
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+## 📝 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🙏 Acknowledgments
+
+- Google Gemini API for multimodal AI capabilities
+- fal.ai for video frame extraction
+- Vercel for serverless hosting
+- shadcn/ui for beautiful UI components
+
+## 📧 Support
+
+For issues and questions:
+- Open an issue on [GitHub Issues](https://github.com/yourusername/chimeramatrix/issues)
+- Check existing [documentation](./docs)
+
+---
+
+<div align="center">
+
+Made with ❤️ by ChimeraMatrix Team
+
+</div>
