@@ -273,6 +273,12 @@ export default function Upload() {
 
       const data = await response.json();
       console.log('📥 Backtest response:', data);
+      console.log('📊 Response structure check:');
+      console.log('   - data.success:', data.success);
+      console.log('   - data.data:', data.data);
+      console.log('   - data.data.predictions:', data.data?.predictions);
+      console.log('   - data.data.matchedVideos:', data.data?.matchedVideos);
+      console.log('   - data.data.performanceDrivers:', data.data?.performanceDrivers);
 
       if (!data.success) {
         throw new Error(data.error?.message || 'Failed to run backtest');
@@ -288,6 +294,9 @@ export default function Upload() {
       };
       
       console.log('💾 Saving backtest results to workflow context:', backtestResults);
+      console.log('   - predictions keys:', Object.keys(backtestResults.predictions || {}));
+      console.log('   - matchedVideos count:', backtestResults.matchedVideos?.length);
+      console.log('   - performanceDrivers keys:', Object.keys(backtestResults.performanceDrivers || {}));
       
       // Save to workflow context
       workflow.setBacktestResults(backtestResults);
@@ -315,9 +324,12 @@ export default function Upload() {
                          workflow.backtestResults.predictions &&
                          workflow.backtestResults.matchedVideos;
       
-      console.log('🔍 Checking backtest results:');
+      console.log('🔍 Checking backtest results after animation:');
       console.log('   - workflow.backtestResults:', workflow.backtestResults);
       console.log('   - hasBacktestResults:', !!workflow.backtestResults);
+      console.log('   - predictions:', workflow.backtestResults?.predictions);
+      console.log('   - matchedVideos:', workflow.backtestResults?.matchedVideos);
+      console.log('   - performanceDrivers:', workflow.backtestResults?.performanceDrivers);
       console.log('   - hasPredictions:', !!workflow.backtestResults?.predictions);
       console.log('   - hasMatchedVideos:', !!workflow.backtestResults?.matchedVideos);
       

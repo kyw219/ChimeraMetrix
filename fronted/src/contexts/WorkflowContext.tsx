@@ -106,7 +106,12 @@ export function WorkflowProvider({ children }: { children: ReactNode }) {
   };
 
   const setBacktestResults = (results: any) => {
+    console.log('📝 WorkflowContext.setBacktestResults called with:', results);
+    console.log('   - predictions:', results?.predictions);
+    console.log('   - matchedVideos:', results?.matchedVideos);
+    console.log('   - performanceDrivers:', results?.performanceDrivers);
     setBacktestResultsState(results);
+    console.log('✅ WorkflowContext.backtestResults state updated');
   };
 
   const clearAll = () => {

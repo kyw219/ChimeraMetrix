@@ -164,6 +164,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       performanceDrivers,
     };
 
+    logger.info('Backtest response prepared', {
+      hasPredictions: !!aggregatedMetrics,
+      hasMatchedVideos: enrichedSimilarVideos.length,
+      hasPerformanceDrivers: !!performanceDrivers,
+      predictionsKeys: Object.keys(aggregatedMetrics || {}),
+    });
+
     res.status(STATUS_CODES.OK).json({
       success: true,
       data: response,
