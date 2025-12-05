@@ -126,13 +126,22 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         postingHour: parseInt(row.posting_hour) || 0,
       }));
 
+      // Remove coverImageUrl from strategy to avoid sending large base64 data to Gemini
+      const strategyForAnalysis = {
+        cover: strategy.cover,
+        title: strategy.title,
+        description: strategy.description,
+        hashtags: strategy.hashtags,
+        postingTime: strategy.postingTime,
+      };
+
       // Set a timeout for this API call
       const timeoutPromise = new Promise((_, reject) => 
         setTimeout(() => reject(new Error('Performance analysis timeout')), 45000)
       );
       
       performanceDrivers = await Promise.race([
-        geminiClient.analyzePerformanceDrivers(strategy, videoMetadata),
+        geminiClient.analyzePerformanceDrivers(strategyForAnalysis, videoMetadata),
         timeoutPromise
       ]) as PerformanceDrivers;
 
