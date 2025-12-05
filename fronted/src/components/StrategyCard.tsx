@@ -44,7 +44,7 @@ export const StrategyCard = ({
           }`}>
             <Icon className={`w-4 h-4 ${iconColor}`} />
           </div>
-          <h4 className="text-xs font-bold text-foreground leading-tight uppercase tracking-wide">{title}</h4>
+          <h4 className="text-xs font-bold text-muted-foreground leading-tight uppercase tracking-wide">{title}</h4>
         </div>
         {!isEmpty && onRegenerate && (
           <Button
@@ -98,7 +98,7 @@ export const StrategyCard = ({
         </div>
       ) : (
         <p className={`text-sm leading-relaxed whitespace-pre-wrap ${
-          isEmpty ? 'text-muted-foreground/50 italic' : 'text-muted-foreground'
+          isEmpty ? 'text-muted-foreground/50 italic' : 'text-foreground'
         }`}>
           {isEmpty ? placeholder : content}
         </p>

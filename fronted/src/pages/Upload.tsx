@@ -6,7 +6,6 @@ import { VideoAnalysisCard } from "@/components/VideoAnalysisCard";
 import { StrategyCard } from "@/components/StrategyCard";
 import { StrategyPreview } from "@/components/StrategyPreview";
 import { BacktestLoadingPipeline } from "@/components/BacktestLoadingPipeline";
-import { AnalysisLoadingPipeline } from "@/components/AnalysisLoadingPipeline";
 import { Button } from "@/components/ui/button";
 import { Image, FileText, Hash, Clock, Loader2, Zap, Sparkles, AlignLeft } from "lucide-react";
 import { mockAnalysis, mockStrategy } from "@/lib/mockData";
@@ -403,76 +402,50 @@ export default function Upload() {
                 Video Upload
               </h2>
               
-              {/* Only show upload section when no strategy yet */}
-              {!strategy && (
-                <>
-                  <VideoUploadSection
-                    onFileUpload={(newFile) => {
-                      setFile(newFile);
-                      workflow.setFile(newFile, null, newFile.name);
-                      // Create video URL for preview
-                      const url = URL.createObjectURL(newFile);
-                      setVideoUrl(url);
-                    }}
-                    onThumbnailGenerated={(thumbnail) => {
-                      if (file) {
-                        workflow.setFile(file, thumbnail, file.name);
-                      }
-                    }}
-                    platform={platform}
-                    onPlatformChange={(newPlatform) => {
-                      setPlatform(newPlatform);
-                      workflow.setPlatform(newPlatform);
-                    }}
-                    onRemove={handleReset}
-                    initialThumbnail={workflow.videoPreviewUrl}
-                    initialFileName={workflow.videoFileName}
-                  />
+              <VideoUploadSection
+                onFileUpload={(newFile) => {
+                  setFile(newFile);
+                  workflow.setFile(newFile, null, newFile.name);
+                  // Create video URL for preview
+                  const url = URL.createObjectURL(newFile);
+                  setVideoUrl(url);
+                }}
+                onThumbnailGenerated={(thumbnail) => {
+                  if (file) {
+                    workflow.setFile(file, thumbnail, file.name);
+                  }
+                }}
+                platform={platform}
+                onPlatformChange={(newPlatform) => {
+                  setPlatform(newPlatform);
+                  workflow.setPlatform(newPlatform);
+                }}
+                onRemove={handleReset}
+                initialThumbnail={workflow.videoPreviewUrl}
+                initialFileName={workflow.videoFileName}
+              />
 
-                  {/* Generate Button */}
-                  {file && (
-                    <div className="mt-6 flex justify-center">
-                      <Button
-                        onClick={handleGenerateStrategy}
-                        disabled={isGenerating}
-                        size="lg"
-                        className="w-full px-10 py-6 text-base font-bold bg-primary hover:bg-primary/90 text-primary-foreground glow-primary"
-                      >
-                        {isGenerating ? (
-                          <>
-                            <Loader2 className="w-5 h-5 animate-spin mr-2" />
-                            Extracting video features...
-                          </>
-                        ) : (
-                          <>
-                            <Zap className="w-5 h-5 mr-2" />
-                            Generate AI Strategy
-                          </>
-                        )}
-                      </Button>
-                    </div>
-                  )}
-                </>
-              )}
-
-              {/* Show video thumbnail after generation */}
-              {strategy && file && (
-                <div className="flex items-center gap-3 p-3 bg-[hsl(var(--module-bg))] rounded-lg">
-                  {workflow.videoPreviewUrl && (
-                    <img 
-                      src={workflow.videoPreviewUrl} 
-                      alt="Video thumbnail" 
-                      className="w-20 h-20 rounded object-cover"
-                    />
-                  )}
-                  <div className="flex-1 min-w-0">
-                    <p className="text-xs font-medium text-foreground truncate">
-                      {workflow.videoFileName || 'Video uploaded'}
-                    </p>
-                    <p className="text-[10px] text-muted-foreground">
-                      {platform.charAt(0).toUpperCase() + platform.slice(1)}
-                    </p>
-                  </div>
+              {/* Generate Button */}
+              {file && !strategy && (
+                <div className="mt-6 flex justify-center">
+                  <Button
+                    onClick={handleGenerateStrategy}
+                    disabled={isGenerating}
+                    size="lg"
+                    className="w-full px-10 py-6 text-base font-bold bg-primary hover:bg-primary/90 text-primary-foreground glow-primary"
+                  >
+                    {isGenerating ? (
+                      <>
+                        <Loader2 className="w-5 h-5 animate-spin mr-2" />
+                        Extracting video features...
+                      </>
+                    ) : (
+                      <>
+                        <Zap className="w-5 h-5 mr-2" />
+                        Generate AI Strategy
+                      </>
+                    )}
+                  </Button>
                 </div>
               )}
             </div>
@@ -493,14 +466,8 @@ export default function Upload() {
 
           {/* RIGHT COLUMN: Strategy Results */}
           <div className="space-y-6">
-            {/* Show loading animation while generating */}
-            {isGenerating && !strategy && (
-              <AnalysisLoadingPipeline />
-            )}
-
             {/* Recommended Strategy */}
-            {!isGenerating && (
-              <div className="panel-base rounded-2xl p-6" id="recommended-strategy">
+            <div className="panel-base rounded-2xl p-6" id="recommended-strategy">
               <h2 className="text-sm font-bold text-accent mb-4 uppercase tracking-wide">
                 Recommended Strategy
               </h2>
@@ -568,7 +535,6 @@ export default function Upload() {
                 </div>
               </div>
             </div>
-            )}
           </div>
         </div>
 
