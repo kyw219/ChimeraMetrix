@@ -73,9 +73,49 @@ export function WorkflowProvider({ children }: { children: ReactNode }) {
         videoPreviewUrl,
         videoFileName,
       };
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      const stateStr = JSON.stringify(state);
+      
+      // Check localStorage quota (typically 5-10MB)
+      if (stateStr.length > 5 * 1024 * 1024) {
+        console.warn('⚠️ Workflow state too large for localStorage, storing without images');
+        // Store without cover image to save space
+        const lightState = {
+          ...state,
+          strategy: state.strategy ? {
+            ...state.strategy,
+            coverImageUrl: undefined, // Remove base64 image
+          } : null,
+        };
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(lightState));
+      } else {
+        localStorage.setItem(STORAGE_KEY, stateStr);
+      }
+      console.log('💾 Workflow state saved to localStorage');
     } catch (error) {
-      console.error('Failed to save workflow state:', error);
+      console.error('❌ Failed to save workflow state:', error);
+      // Try to save minimal state without images
+      try {
+        const minimalState = {
+          platform,
+          sessionId,
+          analysis,
+          strategy: strategy ? {
+            cover: strategy.cover,
+            title: strategy.title,
+            description: strategy.description,
+            hashtags: strategy.hashtags,
+            postingTime: strategy.postingTime,
+            // Omit coverImageUrl
+          } : null,
+          backtestResults,
+          videoPreviewUrl: null, // Remove preview
+          videoFileName,
+        };
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(minimalState));
+        console.log('💾 Minimal workflow state saved (without images)');
+      } catch (fallbackError) {
+        console.error('❌ Failed to save even minimal state:', fallbackError);
+      }
     }
   }, [platform, sessionId, analysis, strategy, backtestResults, videoPreviewUrl, videoFileName]);
 

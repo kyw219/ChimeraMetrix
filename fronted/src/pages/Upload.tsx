@@ -298,8 +298,16 @@ export default function Upload() {
       console.log('   - matchedVideos count:', backtestResults.matchedVideos?.length);
       console.log('   - performanceDrivers keys:', Object.keys(backtestResults.performanceDrivers || {}));
       
-      // Save to workflow context
+      // Save to workflow context immediately
       workflow.setBacktestResults(backtestResults);
+      
+      // Verify save was successful
+      setTimeout(() => {
+        console.log('🔍 Verifying backtest results saved:');
+        console.log('   - workflow.backtestResults:', !!workflow.backtestResults);
+        console.log('   - predictions:', !!workflow.backtestResults?.predictions);
+        console.log('   - matchedVideos:', workflow.backtestResults?.matchedVideos?.length);
+      }, 100);
       
       // Animation will complete automatically after 9 seconds (3 steps × 3s each)
     } catch (error) {
@@ -315,37 +323,32 @@ export default function Upload() {
 
   const handleBacktestComplete = useCallback(() => {
     // Called when animation finishes (after 9 seconds)
-    setIsRunningBacktest(false);
+    console.log('🎬 Animation complete, checking results...');
     
-    // Small delay to ensure state has been updated
-    setTimeout(() => {
-      // Check workflow context for backtest results
-      const hasResults = workflow.backtestResults && 
-                         workflow.backtestResults.predictions &&
-                         workflow.backtestResults.matchedVideos;
-      
-      console.log('🔍 Checking backtest results after animation:');
-      console.log('   - workflow.backtestResults:', workflow.backtestResults);
-      console.log('   - hasBacktestResults:', !!workflow.backtestResults);
-      console.log('   - predictions:', workflow.backtestResults?.predictions);
-      console.log('   - matchedVideos:', workflow.backtestResults?.matchedVideos);
-      console.log('   - performanceDrivers:', workflow.backtestResults?.performanceDrivers);
-      console.log('   - hasPredictions:', !!workflow.backtestResults?.predictions);
-      console.log('   - hasMatchedVideos:', !!workflow.backtestResults?.matchedVideos);
-      
-      if (hasResults) {
-        console.log('✅ Navigating to backtest page with results');
-        navigate("/backtest");
-      } else {
-        console.error('❌ No backtest results found after animation');
-        toast({
-          title: "Error",
-          description: "Backtest results not found. Please try again.",
-          variant: "destructive",
-        });
-      }
-    }, 100);
-  }, [workflow.backtestResults, navigate, toast]);
+    // Check workflow context for backtest results
+    const hasResults = workflow.backtestResults && 
+                       workflow.backtestResults.predictions &&
+                       workflow.backtestResults.matchedVideos;
+    
+    console.log('🔍 Backtest results check:');
+    console.log('   - hasResults:', hasResults);
+    console.log('   - predictions:', !!workflow.backtestResults?.predictions);
+    console.log('   - matchedVideos:', workflow.backtestResults?.matchedVideos?.length);
+    
+    if (hasResults) {
+      console.log('✅ Navigating to backtest page');
+      setIsRunningBacktest(false);
+      navigate("/backtest");
+    } else {
+      console.error('❌ No backtest results found');
+      setIsRunningBacktest(false);
+      toast({
+        title: "Error",
+        description: "Backtest results not found. Please try again.",
+        variant: "destructive",
+      });
+    }
+  }, [workflow.backtestResults, navigate, toast, setIsRunningBacktest]);
 
   const handleReset = () => {
     setFile(null);
