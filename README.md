@@ -60,6 +60,28 @@ ChimeraMatrix is an AI-powered video content analysis and performance prediction
   - Automatic scaling
   - In-memory caching
 
+## � Screhenshots
+
+### 1. Generating AI Strategy
+After uploading your video, ChimeraMatrix analyzes the content and generates an optimized strategy using AI.
+
+![Generating Strategy](./1.%20generating%20strategy%20.png)
+
+### 2. Generated Strategy
+View your AI-generated content strategy including cover image, title, hashtags, and optimal posting time.
+
+![Strategy Result](./2.%20strategy.png)
+
+### 3. Backtest Results
+Predict your video's performance with data-driven insights including views, CTR, and engagement metrics.
+
+![Backtest Result](./3.%20backtest%20result.png)
+
+### 4. Saved Reports
+Access and manage all your analyzed videos and strategies in one place.
+
+![Saved Reports](./4%20saved%20report.png)
+
 ## 🛠️ Tech Stack
 
 ### Backend
