@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { MetricCard } from "@/components/MetricCard";
 import { PerformanceChart } from "@/components/PerformanceChart";
@@ -7,7 +7,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Eye, TrendingUp, Heart, Sparkles } from "lucide-react";
-import { mockBacktestData, mockMatchedVideos, mockInsights, mockStrategy } from "@/lib/mockData";
 import { useWorkflow } from "@/contexts/WorkflowContext";
 import { saveReport } from "@/lib/savedReports";
 import { useToast } from "@/hooks/use-toast";
@@ -15,7 +14,7 @@ import { useToast } from "@/hooks/use-toast";
 const InsightsPanel = ({ strategy, performanceDrivers, matchedVideos }: any) => {
   const [expandedFactor, setExpandedFactor] = useState<number | null>(null);
 
-  // Convert performanceDrivers to factors format
+  // Convert performanceDrivers to factors format - NO FALLBACK
   const factors = performanceDrivers ? [
     {
       name: "Cover Design",
@@ -37,27 +36,30 @@ const InsightsPanel = ({ strategy, performanceDrivers, matchedVideos }: any) => 
       impact: performanceDrivers.postingTime.impact === "High" ? "High Impact" : performanceDrivers.postingTime.impact === "Medium" ? "Medium Impact" : "Low Impact",
       description: performanceDrivers.postingTime.reason,
     },
-  ] : mockInsights.factors;
+  ] : [];
 
-  const videos = matchedVideos || mockMatchedVideos;
+  const videos = matchedVideos || [];
 
   return (
     <div className="space-y-6">
       {/* Strategy Preview Snapshot */}
-      <div>
-        <StrategyPreview 
-          strategy={strategy || mockStrategy}
-          label="Strategy used for model prediction"
-        />
-      </div>
+      {strategy && (
+        <div>
+          <StrategyPreview 
+            strategy={strategy}
+            label="Strategy used for model prediction"
+          />
+        </div>
+      )}
 
       {/* Performance Factors */}
-      <div>
-        <h3 className="text-sm font-bold text-accent mb-3 uppercase tracking-wide">
-          Performance Drivers
-        </h3>
-        <div className="space-y-2">
-          {factors.map((factor, index) => (
+      {factors.length > 0 && (
+        <div>
+          <h3 className="text-sm font-bold text-accent mb-3 uppercase tracking-wide">
+            Performance Drivers
+          </h3>
+          <div className="space-y-2">
+            {factors.map((factor, index) => (
             <div 
               key={index} 
               className="subpanel rounded-xl p-3 hover:bg-[hsl(var(--module-bg))] transition-all cursor-pointer"
@@ -78,20 +80,22 @@ const InsightsPanel = ({ strategy, performanceDrivers, matchedVideos }: any) => 
                 </p>
               )}
             </div>
-          ))}
+            ))}
+          </div>
+          <p className="text-[9px] text-muted-foreground/60 mt-2 italic">
+            💡 Click to view details
+          </p>
         </div>
-        <p className="text-[9px] text-muted-foreground/60 mt-2 italic">
-          💡 Click to view details
-        </p>
-      </div>
+      )}
 
       {/* Matched Videos */}
-      <div>
-        <h3 className="text-sm font-bold text-info mb-3 uppercase tracking-wide">
-          Similar Videos ({videos.length})
-        </h3>
-        <div className="space-y-2">
-          {videos.map((video: any, index: number) => (
+      {videos.length > 0 && (
+        <div>
+          <h3 className="text-sm font-bold text-info mb-3 uppercase tracking-wide">
+            Similar Videos ({videos.length})
+          </h3>
+          <div className="space-y-2">
+            {videos.map((video: any, index: number) => (
             <div key={index} className="subpanel rounded-xl p-3 hover:bg-[hsl(var(--module-bg))] transition-all">
               <div className="flex items-start gap-3">
                 <div className="w-10 h-10 bg-muted/30 rounded-lg flex items-center justify-center text-lg shrink-0">
@@ -112,9 +116,10 @@ const InsightsPanel = ({ strategy, performanceDrivers, matchedVideos }: any) => 
                 </div>
               </div>
             </div>
-          ))}
+            ))}
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };
@@ -125,19 +130,15 @@ export default function Backtest() {
   const [activeTab, setActiveTab] = useState("views");
   const [isSaved, setIsSaved] = useState(false);
 
-  // Get data from workflow context
-  const predictions = workflow.backtestResults?.predictions || mockBacktestData;
-  const matchedVideos = workflow.backtestResults?.matchedVideos || mockMatchedVideos;
+  // Get data from workflow context - NO FALLBACK TO MOCK DATA
+  const predictions = workflow.backtestResults?.predictions;
+  const matchedVideos = workflow.backtestResults?.matchedVideos;
   const performanceDrivers = workflow.backtestResults?.performanceDrivers;
-  const strategy = workflow.strategy || mockStrategy;
+  const strategy = workflow.strategy;
   const backtestData = predictions;
 
-  // Warn if no data
-  useEffect(() => {
-    if (!workflow.backtestResults) {
-      console.warn('No backtest data found, using mock data');
-    }
-  }, [workflow.backtestResults]);
+  // Check if we have real backtest data
+  const hasBacktestData = !!workflow.backtestResults;
 
   const handleSave = async () => {
     try {
@@ -175,6 +176,7 @@ export default function Backtest() {
   };
 
   const getChartData = () => {
+    if (!backtestData) return [];
     switch (activeTab) {
       case "views":
         return backtestData.views;
@@ -183,7 +185,7 @@ export default function Backtest() {
       case "likes":
         return backtestData.likes;
       default:
-        return mockBacktestData.views;
+        return [];
     }
   };
 
@@ -199,6 +201,32 @@ export default function Backtest() {
         return "";
     }
   };
+
+  // If no backtest data, show empty state
+  if (!hasBacktestData) {
+    return (
+      <DashboardLayout>
+        <div className="flex flex-col items-center justify-center min-h-[600px] text-center px-4">
+          <div className="w-20 h-20 rounded-full bg-muted/30 flex items-center justify-center mb-6">
+            <Sparkles className="w-10 h-10 text-muted-foreground/50" />
+          </div>
+          <h2 className="text-2xl font-bold text-foreground mb-3">
+            No Backtest Results Yet
+          </h2>
+          <p className="text-muted-foreground max-w-md mb-8">
+            Please upload a video and generate a strategy first, then run the backtest to see performance predictions.
+          </p>
+          <Button
+            onClick={() => window.location.href = '/upload'}
+            size="lg"
+            className="px-10 py-6 text-base font-bold"
+          >
+            Go to Upload Page
+          </Button>
+        </div>
+      </DashboardLayout>
+    );
+  }
 
   return (
     <DashboardLayout rightPanel={<InsightsPanel strategy={strategy} performanceDrivers={performanceDrivers} matchedVideos={matchedVideos} />}>
@@ -216,16 +244,16 @@ export default function Backtest() {
         {/* Metrics Summary - 3 Cards */}
         <div className="grid md:grid-cols-3 gap-5 mb-8">
           <MetricCard
-            icon={TrendingUp}
-            label="Predicted 24h CTR"
-            value={backtestData.metrics.ctr24h}
-            iconColor="text-chart-2"
-          />
-          <MetricCard
             icon={Eye}
             label="Predicted 24h Views"
             value={backtestData.metrics.views24h}
             iconColor="text-chart-1"
+          />
+          <MetricCard
+            icon={TrendingUp}
+            label="Predicted 24h CTR"
+            value={backtestData.metrics.ctr24h}
+            iconColor="text-chart-2"
           />
           <MetricCard
             icon={Heart}

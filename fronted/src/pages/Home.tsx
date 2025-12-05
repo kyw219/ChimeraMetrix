@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { Sparkles, Video, TrendingUp, Target, ArrowRight, Zap, Brain, BarChart3 } from "lucide-react";
 import { useWorkflow } from "@/contexts/WorkflowContext";
+import { clearAllReports } from "@/lib/savedReports";
 
 export default function Home() {
   const navigate = useNavigate();
@@ -10,6 +11,8 @@ export default function Home() {
   const handleStartAnalyzing = () => {
     // Clear all previous workflow data when starting fresh
     workflow.clearAll();
+    // Also clear all saved reports
+    clearAllReports();
     navigate("/upload");
   };
 
