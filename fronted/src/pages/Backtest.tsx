@@ -216,6 +216,12 @@ export default function Backtest() {
         {/* Metrics Summary - 3 Cards */}
         <div className="grid md:grid-cols-3 gap-5 mb-8">
           <MetricCard
+            icon={TrendingUp}
+            label="Predicted 24h CTR"
+            value={backtestData.metrics.ctr24h}
+            iconColor="text-chart-2"
+          />
+          <MetricCard
             icon={Eye}
             label="Predicted 24h Views"
             value={backtestData.metrics.views24h}
@@ -226,12 +232,6 @@ export default function Backtest() {
             label="Predicted 24h Likes"
             value={backtestData.metrics.likes24h}
             iconColor="text-chart-3"
-          />
-          <MetricCard
-            icon={TrendingUp}
-            label="Predicted 24h CTR"
-            value={backtestData.metrics.ctr24h}
-            iconColor="text-chart-2"
           />
         </div>
 
