@@ -121,7 +121,7 @@ export const AnalysisLoadingPipeline = ({ onComplete }: AnalysisLoadingPipelineP
     : 'generation';
 
   return (
-    <div className="panel-base rounded-2xl p-6">
+    <div className="subpanel rounded-2xl p-6">
       <div className="mb-4">
         <h3 className="text-sm font-bold text-primary mb-2 uppercase tracking-wide">
           {currentPhase === 'analysis' ? 'Extracting Video Features' : 'Generating Strategy'}
