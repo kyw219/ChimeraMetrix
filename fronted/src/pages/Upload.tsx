@@ -395,7 +395,7 @@ export default function Upload() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
           {/* LEFT COLUMN: User Input & Analysis */}
           <div className="space-y-6">
-            <div className="panel-base rounded-2xl p-6">
+            <div>
               <h2 className="text-lg font-bold text-primary mb-4">
                 Video Upload
               </h2>
