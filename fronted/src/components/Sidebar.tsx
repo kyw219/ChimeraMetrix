@@ -7,7 +7,7 @@ const navItems = [
   {
     title: "Upload & Strategy",
     icon: Upload,
-    href: "/",
+    href: "/upload",
   },
   {
     title: "Backtest Results",

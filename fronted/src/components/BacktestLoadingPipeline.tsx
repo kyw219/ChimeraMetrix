@@ -4,6 +4,7 @@ import { CheckCircle2, Loader2 } from "lucide-react";
 interface BacktestLoadingPipelineProps {
   onComplete: () => void;
   onError?: (error: Error) => void;
+  isApiComplete?: boolean; // Signal from parent that API has finished
 }
 
 interface Step {
@@ -19,33 +20,42 @@ const steps: Step[] = [
     id: 1,
     title: "Matching Similar Videos",
     subtitle: "Finding most similar videos using semantic search…",
-    duration: 3000, // 3 seconds
+    duration: 4000, // 4 seconds
     animationType: 'pulse'
   },
   {
     id: 2,
     title: "Analyzing Historical Performance",
     subtitle: "Aggregating metrics: views, CTR, impressions, likes…",
-    duration: 3000, // 3 seconds
+    duration: 4000, // 4 seconds
     animationType: 'chart'
   },
   {
     id: 3,
     title: "Generating Predictions",
     subtitle: "Building 24-hour temporal curve and model outputs…",
-    duration: 3000, // 3 seconds
+    duration: 4000, // 4 seconds
     animationType: 'curve'
   }
 ];
 
-export const BacktestLoadingPipeline = ({ onComplete }: BacktestLoadingPipelineProps) => {
+export const BacktestLoadingPipeline = ({ onComplete, isApiComplete = false }: BacktestLoadingPipelineProps) => {
   const [currentStep, setCurrentStep] = useState(0);
   const [completedSteps, setCompletedSteps] = useState<number[]>([]);
+  const [waitingForApi, setWaitingForApi] = useState(false);
 
   useEffect(() => {
     if (currentStep >= steps.length) {
-      const timer = setTimeout(onComplete, 300);
-      return () => clearTimeout(timer);
+      // Animation has finished all steps
+      if (isApiComplete) {
+        console.log('🎬 Animation finished and API complete, calling onComplete');
+        const timer = setTimeout(onComplete, 300);
+        return () => clearTimeout(timer);
+      } else {
+        console.log('⏳ Animation finished but waiting for API to complete...');
+        setWaitingForApi(true);
+        return;
+      }
     }
 
     const timer = setTimeout(() => {
@@ -54,19 +64,30 @@ export const BacktestLoadingPipeline = ({ onComplete }: BacktestLoadingPipelineP
     }, steps[currentStep].duration);
 
     return () => clearTimeout(timer);
-  }, [currentStep, onComplete]);
+  }, [currentStep, onComplete, isApiComplete]);
+
+  // When API completes while we're waiting, trigger completion
+  useEffect(() => {
+    if (waitingForApi && isApiComplete) {
+      console.log('✅ API completed while waiting, finishing animation');
+      const timer = setTimeout(onComplete, 300);
+      return () => clearTimeout(timer);
+    }
+  }, [waitingForApi, isApiComplete, onComplete]);
 
   return (
     <div className="panel-base rounded-2xl p-8 max-w-3xl mx-auto">
       <div className="text-center mb-8">
         <h2 className="text-2xl font-bold text-primary mb-2">Running Backtest Model</h2>
-        <p className="text-sm text-muted-foreground">AI-powered prediction pipeline in progress</p>
+        <p className="text-sm text-muted-foreground">
+          {waitingForApi ? 'Finalizing predictions...' : 'AI-powered prediction pipeline in progress'}
+        </p>
       </div>
 
       <div className="space-y-6">
         {steps.map((step, index) => {
-          const isActive = currentStep === index;
-          const isCompleted = completedSteps.includes(index);
+          const isActive = currentStep === index || (waitingForApi && index === steps.length - 1);
+          const isCompleted = completedSteps.includes(index) && !(waitingForApi && index === steps.length - 1);
           const isPending = currentStep < index;
 
           return (

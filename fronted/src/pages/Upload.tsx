@@ -31,6 +31,7 @@ export default function Upload() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [loadingMessage, setLoadingMessage] = useState('Extracting video features...');
   const [isRunningBacktest, setIsRunningBacktest] = useState(false);
+  const [backtestCompleted, setBacktestCompleted] = useState(false);
   const [regeneratingField, setRegeneratingField] = useState<string | null>(null);
 
   const handleGenerateStrategy = async () => {
@@ -243,6 +244,7 @@ export default function Upload() {
     }
 
     setIsRunningBacktest(true);
+    setBacktestCompleted(false);
     console.log('\n🔬 Starting backtest...');
 
     try {
@@ -301,11 +303,19 @@ export default function Upload() {
       // Save to workflow context
       workflow.setBacktestResults(backtestResults);
       
-      // Animation will complete automatically after 9 seconds (3 steps × 3s each)
+      // Signal that backtest is complete - animation can now finish
+      setBacktestCompleted(true);
+      console.log('🎯 Backtest API completed, animation can now finish');
+      
+      // Mark backtest as completed so animation can navigate
+      setBacktestCompleted(true);
+      
+      // Animation will complete automatically after 12 seconds (3 steps × 4s each)
       // The Backtest page will read from workflow.backtestResults when it loads
     } catch (error) {
       console.error('❌ Backtest failed:', error);
       setIsRunningBacktest(false);
+      setBacktestCompleted(false);
       toast({
         title: "Error",
         description: error instanceof Error ? error.message : 'Failed to run backtest',
@@ -315,13 +325,17 @@ export default function Upload() {
   };
 
   const handleBacktestComplete = useCallback(() => {
-    // Called when animation finishes (after 9 seconds)
-    console.log('🎬 Animation complete, navigating to backtest page...');
-    
-    // Always navigate - the Backtest page will handle missing data
-    setIsRunningBacktest(false);
-    navigate("/backtest");
-  }, [navigate]);
+    // Called when animation wants to finish
+    // Only navigate if API has completed
+    if (backtestCompleted) {
+      console.log('🎬 Animation complete and API ready, navigating to backtest page...');
+      setIsRunningBacktest(false);
+      navigate("/backtest");
+    } else {
+      console.log('⏳ Animation complete but API still running, waiting...');
+      // Animation will stay on last step until API completes
+    }
+  }, [backtestCompleted, navigate]);
 
   const handleReset = () => {
     setFile(null);
@@ -404,7 +418,10 @@ export default function Upload() {
         {/* Show loading pipeline when running backtest */}
         {isRunningBacktest ? (
           <div className="min-h-[600px] flex items-center justify-center">
-            <BacktestLoadingPipeline onComplete={handleBacktestComplete} />
+            <BacktestLoadingPipeline 
+              onComplete={handleBacktestComplete}
+              isApiComplete={backtestCompleted}
+            />
           </div>
         ) : (
           <>
