@@ -32,7 +32,6 @@ export default function Upload() {
   const [loadingMessage, setLoadingMessage] = useState('Extracting video features...');
   const [isRunningBacktest, setIsRunningBacktest] = useState(false);
   const [regeneratingField, setRegeneratingField] = useState<string | null>(null);
-  const [backtestResultsRef, setBacktestResultsRef] = useState<any>(null);
 
   const handleGenerateStrategy = async () => {
     if (!file) return;
@@ -281,10 +280,9 @@ export default function Upload() {
       };
       
       console.log('💾 Saving backtest results to workflow context:', backtestResults);
-      workflow.setBacktestResults(backtestResults);
       
-      // Also save to local ref for immediate access (React state updates are async)
-      setBacktestResultsRef(backtestResults);
+      // Save to workflow context
+      workflow.setBacktestResults(backtestResults);
       
       // Animation will complete automatically after 9 seconds (3 steps × 3s each)
     } catch (error) {
@@ -302,8 +300,12 @@ export default function Upload() {
     // Called when animation finishes (after 9 seconds)
     setIsRunningBacktest(false);
     
-    // Check if we have backtest results (use ref since React state is async)
-    if (backtestResultsRef) {
+    // Check workflow context for backtest results
+    const hasResults = workflow.backtestResults && 
+                       workflow.backtestResults.predictions &&
+                       workflow.backtestResults.matchedVideos;
+    
+    if (hasResults) {
       console.log('✅ Navigating to backtest page with results');
       navigate("/backtest");
     } else {
@@ -322,7 +324,6 @@ export default function Upload() {
     setAnalysis(null);
     setSessionId(null);
     setFrameUrl(null);
-    setBacktestResultsRef(null);
     // Revoke video URL to free memory
     if (videoUrl) {
       URL.revokeObjectURL(videoUrl);
