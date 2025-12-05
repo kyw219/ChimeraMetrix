@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { MetricCard } from "@/components/MetricCard";
 import { PerformanceChart } from "@/components/PerformanceChart";
@@ -121,7 +120,6 @@ const InsightsPanel = ({ strategy, performanceDrivers, matchedVideos }: any) => 
 };
 
 export default function Backtest() {
-  const navigate = useNavigate();
   const workflow = useWorkflow();
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState("views");

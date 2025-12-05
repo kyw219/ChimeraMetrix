@@ -109,7 +109,7 @@ export default function Upload() {
       console.log('   - Status:', analyzeResponse.status, analyzeResponse.statusText);
       console.log('   - Headers:', Object.fromEntries(analyzeResponse.headers.entries()));
       
-      let analyzeData;
+      let analyzeData: { success: boolean; data?: { sessionId: string; features: any; frameUrl?: string }; error?: { code?: string; message?: string; details?: any } };
       try {
         analyzeData = await analyzeResponse.json();
         console.log('📊 Analyze response data:', JSON.stringify(analyzeData, null, 2));

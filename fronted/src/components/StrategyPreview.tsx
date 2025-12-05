@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 interface StrategyPreviewProps {
   strategy?: {
     cover?: string;
+    coverImageUrl?: string; // AI 生成的封面图片 URL
     title?: string;
     hashtags?: string;
     postingTime?: string;
@@ -54,16 +55,20 @@ export const StrategyPreview = ({
       
       {/* Visual Mock Preview */}
       <div className="relative w-full aspect-video bg-gradient-to-br from-[hsl(var(--module-bg))] to-[hsl(var(--subpanel-bg))] rounded-lg overflow-hidden border border-primary/10">
-        {/* Mock Thumbnail Background */}
-        <div className="absolute inset-0 bg-[hsl(var(--module-bg))]">
-          {strategy.cover && (
-            <div className="absolute inset-0 flex items-center justify-center p-8 bg-gradient-to-br from-chart-1/5 to-chart-2/5">
-              <p className="text-xs text-center text-muted-foreground/70 leading-relaxed line-clamp-4">
-                {strategy.cover}
-              </p>
-            </div>
-          )}
-        </div>
+        {/* Cover Image or Description */}
+        {strategy.coverImageUrl ? (
+          <img 
+            src={strategy.coverImageUrl} 
+            alt="AI Generated Cover" 
+            className="w-full h-full object-cover"
+          />
+        ) : strategy.cover ? (
+          <div className="absolute inset-0 flex items-center justify-center p-8 bg-gradient-to-br from-chart-1/5 to-chart-2/5">
+            <p className="text-xs text-center text-muted-foreground/70 leading-relaxed line-clamp-4">
+              {strategy.cover}
+            </p>
+          </div>
+        ) : null}
         
         {/* Title Overlay */}
         <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/60 to-transparent p-4">
@@ -71,11 +76,8 @@ export const StrategyPreview = ({
             {strategy.title || "No title generated"}
           </h4>
         </div>
-        
-        {/* Platform Badge */}
-        <div className="absolute top-3 right-3">
-          <Badge className="bg-black/50 text-white border-white/20 text-[10px]">
-            Preview
+      </div>/50 text-white border-white/20 text-[10px]">
+            {strategy.coverImageUrl ? 'AI Generated' : 'Preview'}
           </Badge>
         </div>
       </div>
