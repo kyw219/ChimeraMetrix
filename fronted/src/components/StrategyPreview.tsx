@@ -6,6 +6,7 @@ interface StrategyPreviewProps {
     cover?: string;
     coverImageUrl?: string; // AI 生成的封面图片 URL
     title?: string;
+    description?: string; // 视频简介
     hashtags?: string;
     postingTime?: string;
   } | null;
@@ -87,6 +88,15 @@ export const StrategyPreview = ({
       
       {/* Metadata Below Preview */}
       <div className="mt-4 space-y-3">
+        {/* Description */}
+        {strategy.description && (
+          <div className="p-3 bg-[hsl(var(--module-bg))] rounded-lg border border-border/30">
+            <p className="text-xs text-muted-foreground leading-relaxed whitespace-pre-wrap">
+              {strategy.description}
+            </p>
+          </div>
+        )}
+        
         {/* Hashtags */}
         <div className="flex gap-2 flex-wrap">
           {hashtags.length > 0 ? (

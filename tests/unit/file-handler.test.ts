@@ -1,5 +1,4 @@
 import { FileUploadHandler } from '../../lib/file-handler';
-import { ValidationError } from '../../lib/errors';
 
 describe('FileUploadHandler', () => {
   let handler: FileUploadHandler;

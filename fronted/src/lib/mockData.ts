@@ -10,11 +10,13 @@ export const mockAnalysis = {
 export const mockStrategy = {
   cover: "High-contrast close-up noodle pull with bold white text overlay: 'SPICIEST NOODLES IN NYC'. Steam visible, vibrant red sauce, chopsticks mid-pull creating dramatic strings.",
   title: "I Tried NYC's SPICIEST Noodles Challenge 🔥 (Instant Regret)",
+  description: "I ventured into NYC's most notorious spicy noodle spot and immediately regretted my life choices! 🔥🥵\n\nIn this video, I take on the infamous 'Dragon's Breath' noodle challenge - a dish so spicy, only 3% of customers finish it. Watch as I struggle through tears, sweat, and pure determination to conquer these fiery noodles.\n\n🌶️ What's in the video:\n• First impressions of the restaurant\n• The moment I realized I made a mistake\n• My honest reaction (spoiler: lots of regret)\n• Would I do it again?\n\nIf you enjoyed this spicy food challenge, don't forget to LIKE and SUBSCRIBE for more food adventures around NYC! Drop a comment if you've tried this place or have other spicy challenges I should attempt.\n\n📍 Location: [Restaurant Name], East Village, NYC\n🎵 Music: [Credits]\n\n#SpicyFoodChallenge #NYCFood #FoodieAdventure",
   hashtags: "#spicyfood #foodchallenge #noodlesasmr #streetfood #foodie #mukbang #nyceats #spicynoodles",
   postingTime: "7:00 PM EST (Peak dinner browsing time)",
   reasoning: {
     cover: "High-contrast food close-ups with action (noodle pull) generate 47% higher CTR on food content. Bold text overlay with emoji increases stop-scroll rate by 32%.",
     title: "First-person narrative ('I Tried') creates relatability. Specificity ('NYC's SPICIEST') builds curiosity. Emoji and parenthetical commentary add personality and humor.",
+    description: "Engaging description with clear structure: hook, content preview, call-to-action, and relevant details. Uses emojis for visual appeal and includes SEO keywords naturally.",
     hashtags: "Mix of trending food tags (#spicyfood, #mukbang) with location (#nyceats) and content type (#foodchallenge). 8 hashtags optimal for maximum reach without spam.",
     time: "7 PM EST targets users browsing during dinner decision-making. Food content performs 64% better 6-8 PM when users are hungry and seeking inspiration.",
   },

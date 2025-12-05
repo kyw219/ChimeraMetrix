@@ -23,6 +23,7 @@ describe('POST /api/generate-strategy Integration Tests', () => {
       cover: 'Eye-catching tech visual',
       coverImageUrl: 'https://example.com/cover.jpg',
       title: 'Amazing AI Technology',
+      description: 'Discover the latest AI technology trends and innovations. Learn how artificial intelligence is transforming the tech industry.',
       hashtags: '#ai #tech #innovation',
       postingTime: '7:00 PM EST',
     };
@@ -30,6 +31,7 @@ describe('POST /api/generate-strategy Integration Tests', () => {
     expect(mockStrategy).toHaveProperty('cover');
     expect(mockStrategy).toHaveProperty('coverImageUrl');
     expect(mockStrategy).toHaveProperty('title');
+    expect(mockStrategy).toHaveProperty('description');
     expect(mockStrategy).toHaveProperty('hashtags');
     expect(mockStrategy).toHaveProperty('postingTime');
   });

@@ -13,6 +13,7 @@ export interface Strategy {
   coverImageUrl?: string; // base64 图片数据或 URL
   coverPrompt?: CoverPrompt; // 详细的封面生成描述
   title: string;
+  description: string; // 视频简介（对 YouTube 特别重要）
   hashtags: string;
   postingTime: string;
 }
@@ -116,7 +117,7 @@ export interface RegenerateStrategyRequest {
   sessionId: string;
   features: VideoFeatures;
   platform: string;
-  field?: 'cover' | 'title' | 'hashtags' | 'postingTime';
+  field?: 'cover' | 'title' | 'description' | 'hashtags' | 'postingTime';
   currentStrategy?: Strategy;
   frameUrl?: string; // URL of extracted video frame for cover generation
 }

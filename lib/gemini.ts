@@ -216,7 +216,7 @@ TEXT STYLE:
       try {
         console.log('📝 Step 1: Generating strategy text...');
         
-        // Step 1: 生成策略文字（title, hashtags, postingTime）
+        // Step 1: 生成策略文字（title, description, hashtags, postingTime）
         const strategyPrompt = `Based on these video features for ${platform}, generate a content strategy in JSON format:
 
 Features:
@@ -225,6 +225,7 @@ ${JSON.stringify(features, null, 2)}
 Generate:
 {
   "title": "engaging title optimized for ${platform} (concise, under 60 characters)",
+  "description": "compelling video description (2-3 sentences, include key points and call-to-action)",
   "hashtags": "space-separated relevant hashtags",
   "postingTime": "optimal posting time (e.g., 7:00 PM EST)"
 }
@@ -323,6 +324,7 @@ Provide only the JSON response, no additional text.`;
           cover: coverDescription,
           coverImageUrl,
           title: strategyData.title,
+          description: strategyData.description,
           hashtags: strategyData.hashtags,
           postingTime: strategyData.postingTime,
         };

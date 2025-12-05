@@ -44,9 +44,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     // Validate field if specified
-    if (field && !['cover', 'title', 'hashtags', 'postingTime'].includes(field)) {
+    if (field && !['cover', 'title', 'description', 'hashtags', 'postingTime'].includes(field)) {
       res.status(STATUS_CODES.BAD_REQUEST).json(
-        formatErrorResponse(new Error('Invalid field. Must be cover, title, hashtags, or postingTime'))
+        formatErrorResponse(new Error('Invalid field. Must be cover, title, description, hashtags, or postingTime'))
       );
       return;
     }

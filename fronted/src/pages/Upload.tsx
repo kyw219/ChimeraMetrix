@@ -7,7 +7,7 @@ import { StrategyCard } from "@/components/StrategyCard";
 import { StrategyPreview } from "@/components/StrategyPreview";
 import { BacktestLoadingPipeline } from "@/components/BacktestLoadingPipeline";
 import { Button } from "@/components/ui/button";
-import { Image, FileText, Hash, Clock, Loader2, Zap, Sparkles } from "lucide-react";
+import { Image, FileText, Hash, Clock, Loader2, Zap, Sparkles, AlignLeft } from "lucide-react";
 import { mockAnalysis, mockStrategy } from "@/lib/mockData";
 import { useToast } from "@/hooks/use-toast";
 import { useWorkflow } from "@/contexts/WorkflowContext";
@@ -467,6 +467,17 @@ export default function Upload() {
                 isEmpty={!strategy}
                 onRegenerate={() => handleRegenerateField('title')}
               />
+              <div className="col-span-2">
+                <StrategyCard
+                  icon={AlignLeft}
+                  title="Recommended Description"
+                  content={strategy?.description}
+                  placeholder="AI will create an engaging video description with SEO keywords and call-to-action"
+                  iconColor="text-primary"
+                  isEmpty={!strategy}
+                  onRegenerate={() => handleRegenerateField('description')}
+                />
+              </div>
               <StrategyCard
                 icon={Hash}
                 title="Recommended Hashtags"

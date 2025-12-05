@@ -94,7 +94,7 @@ export const StrategyCard = ({
           </p>
         </div>
       ) : (
-        <p className={`text-sm leading-relaxed ${
+        <p className={`text-sm leading-relaxed whitespace-pre-wrap ${
           isEmpty ? 'text-muted-foreground/50 italic' : 'text-muted-foreground'
         }`}>
           {isEmpty ? placeholder : content}
