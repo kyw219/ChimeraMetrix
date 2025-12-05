@@ -450,8 +450,8 @@ export default function Upload() {
 
             {/* Video Analysis - Moved to left column */}
             {strategy && (
-              <div className="panel-base rounded-2xl p-6">
-                <h2 className="text-sm font-bold text-primary mb-4 uppercase tracking-wide">
+              <div>
+                <h2 className="text-lg font-bold text-primary mb-6">
                   Video Feature Extraction
                 </h2>
                 <VideoAnalysisCard 
