@@ -385,7 +385,7 @@ export default function Upload() {
             {/* Page Header */}
             <div className="mb-8">
               <h1 className="text-3xl font-bold text-primary mb-2 flex items-center gap-3">
-                <Sparkles className="w-8 h-8" />
+                <img src="/logo.jpg" alt="ChimeraMatrix Logo" className="w-8 h-8 object-cover rounded-lg" />
                 ChimeraMatrix
               </h1>
               <p className="text-sm text-muted-foreground">

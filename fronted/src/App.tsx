@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { WorkflowProvider } from "./contexts/WorkflowContext";
+import Home from "./pages/Home";
 import Upload from "./pages/Upload";
 import Backtest from "./pages/Backtest";
 import SavedReports from "./pages/SavedReports";
@@ -20,7 +21,8 @@ const App = () => (
         <Sonner />
         <BrowserRouter>
           <Routes>
-            <Route path="/" element={<Upload />} />
+            <Route path="/" element={<Home />} />
+            <Route path="/upload" element={<Upload />} />
             <Route path="/backtest" element={<Backtest />} />
             <Route path="/saved-reports" element={<SavedReports />} />
             <Route path="/settings" element={<Settings />} />
