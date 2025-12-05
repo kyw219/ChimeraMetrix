@@ -29,6 +29,7 @@ export default function Upload() {
   const [frameUrl, setFrameUrl] = useState<string | null>(null);
   const [videoUrl, setVideoUrl] = useState<string | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [loadingMessage, setLoadingMessage] = useState('Extracting video features...');
   const [isRunningBacktest, setIsRunningBacktest] = useState(false);
   const [regeneratingField, setRegeneratingField] = useState<string | null>(null);
 
@@ -85,6 +86,7 @@ export default function Upload() {
     }
     
     setIsGenerating(true);
+    setLoadingMessage('Extracting video features...');
     console.log('\n🚀 Step 1: Starting video analysis...');
     console.log('📁 File details:');
     console.log('   - Name:', file.name);
@@ -150,6 +152,7 @@ export default function Upload() {
 
       // Step 2: Generate strategy
       console.log('\n🎨 Step 2: Generating strategy...');
+      setLoadingMessage('Generating strategy...');
       
       const strategyPayload = {
         sessionId: newSessionId,
@@ -433,7 +436,7 @@ export default function Upload() {
                     {isGenerating ? (
                       <>
                         <Loader2 className="w-5 h-5 animate-spin mr-2" />
-                        Extracting video features...
+                        {loadingMessage}
                       </>
                     ) : (
                       <>
