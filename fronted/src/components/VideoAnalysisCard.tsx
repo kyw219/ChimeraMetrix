@@ -66,7 +66,7 @@ export const VideoAnalysisCard = ({ data, isLoading }: VideoAnalysisCardProps) =
 
   return (
     <Collapsible open={isExpanded} onOpenChange={setIsExpanded}>
-      <div className="subpanel rounded-xl p-5">
+      <div>
         {/* Compact Summary */}
         <div className="flex items-center justify-between gap-3 mb-3">
           <div className="flex items-center gap-3 flex-1 min-w-0">
@@ -124,7 +124,7 @@ export const VideoAnalysisCard = ({ data, isLoading }: VideoAnalysisCardProps) =
             <p className="text-[10px] font-semibold text-muted-foreground mb-1 uppercase tracking-wide">
               Emotion
             </p>
-            <p className="text-xs text-foreground font-medium leading-tight">{data.emotion}</p>
+            <p className="text-sm text-foreground leading-relaxed">{data.emotion}</p>
           </div>
         </div>
 
@@ -134,7 +134,7 @@ export const VideoAnalysisCard = ({ data, isLoading }: VideoAnalysisCardProps) =
             <p className="text-[10px] font-semibold text-muted-foreground mb-1 uppercase tracking-wide">
               Visual Style
             </p>
-            <p className="text-xs text-foreground font-medium leading-tight">{data.visualStyle}</p>
+            <p className="text-sm text-foreground leading-relaxed">{data.visualStyle}</p>
           </div>
         </div>
 
@@ -144,7 +144,7 @@ export const VideoAnalysisCard = ({ data, isLoading }: VideoAnalysisCardProps) =
             <p className="text-[10px] font-semibold text-muted-foreground mb-1 uppercase tracking-wide">
               Audience
             </p>
-            <p className="text-xs text-foreground font-medium leading-tight">{data.audience}</p>
+            <p className="text-sm text-foreground leading-relaxed">{data.audience}</p>
           </div>
         </div>
 
@@ -154,7 +154,7 @@ export const VideoAnalysisCard = ({ data, isLoading }: VideoAnalysisCardProps) =
             <p className="text-[10px] font-semibold text-muted-foreground mb-1 uppercase tracking-wide">
               Hook Type
             </p>
-            <p className="text-xs text-foreground font-medium leading-tight">{data.hookType}</p>
+            <p className="text-sm text-foreground leading-relaxed">{data.hookType}</p>
           </div>
         </div>
 
