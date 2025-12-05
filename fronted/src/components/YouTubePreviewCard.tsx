@@ -5,7 +5,7 @@ interface YouTubePreviewCardProps {
   avatarUrl?: string; // Optional, will show placeholder if not provided
   channelName: string;
   views: number;
-  publishedTime: string; // "1个月前", "3周前", etc.
+  publishedTime: string; // "1 month ago", "3 weeks ago", etc.
 }
 
 export const YouTubePreviewCard = ({
@@ -17,21 +17,19 @@ export const YouTubePreviewCard = ({
   views,
   publishedTime,
 }: YouTubePreviewCardProps) => {
-  // Format views to Chinese format (e.g., 435000 → "43.5万")
+  // Format views to English format (e.g., 435000 → "435K")
   const formatViews = (count: number): string => {
-    if (count >= 100000000) {
-      return `${(count / 100000000).toFixed(1)}亿`;
-    } else if (count >= 10000) {
-      return `${(count / 10000).toFixed(1)}万`;
+    if (count >= 1000000) {
+      return `${(count / 1000000).toFixed(1)}M`;
     } else if (count >= 1000) {
-      return `${(count / 1000).toFixed(1)}千`;
+      return `${(count / 1000).toFixed(1)}K`;
     }
     return count.toString();
   };
 
   return (
-    <div className="w-full max-w-[360px] cursor-pointer">
-      {/* Thumbnail Container */}
+    <div className="w-full max-w-[400px] cursor-pointer transition-transform hover:scale-[1.02] duration-200">
+      {/* Thumbnail Container - Full Width */}
       <div className="relative w-full aspect-video rounded-xl overflow-hidden bg-[#0f0f0f] mb-3">
         <img
           src={thumbnailUrl}
@@ -39,15 +37,15 @@ export const YouTubePreviewCard = ({
           className="w-full h-full object-cover"
         />
         
-        {/* Duration Badge - Bottom Right */}
-        <div className="absolute bottom-1 right-1 bg-black/80 text-white text-xs font-medium px-1 py-0.5 rounded">
+        {/* Duration Badge - Bottom Right (YouTube style) */}
+        <div className="absolute bottom-1.5 right-1.5 bg-black/90 text-white text-[11px] font-semibold px-1.5 py-0.5 rounded-sm">
           {duration}
         </div>
       </div>
 
       {/* Video Info */}
       <div className="flex gap-3">
-        {/* Channel Avatar */}
+        {/* Channel Avatar - Smaller, aligned with title */}
         <div className="flex-shrink-0 w-9 h-9 rounded-full overflow-hidden bg-[#272727]">
           {avatarUrl ? (
             <img
@@ -64,19 +62,19 @@ export const YouTubePreviewCard = ({
 
         {/* Title and Metadata */}
         <div className="flex-1 min-w-0">
-          {/* Title - Max 2 lines with ellipsis */}
-          <h3 className="text-sm font-medium text-foreground leading-5 line-clamp-2 mb-1">
+          {/* Title - Max 2 lines, bold, pure white */}
+          <h3 className="text-[15px] font-semibold text-white leading-[1.4] line-clamp-2 mb-1">
             {title}
           </h3>
 
-          {/* Channel Name */}
-          <p className="text-xs text-muted-foreground leading-[18px]">
+          {/* Channel Name - Small, gray */}
+          <p className="text-[12px] text-[#aaa] leading-[18px]">
             {channelName}
           </p>
 
-          {/* Views and Time */}
-          <p className="text-xs text-muted-foreground leading-[18px]">
-            {formatViews(views)}次观看 · {publishedTime}
+          {/* Views and Time - Small, gray */}
+          <p className="text-[12px] text-[#aaa] leading-[18px]">
+            {formatViews(views)} views · {publishedTime}
           </p>
         </div>
       </div>
