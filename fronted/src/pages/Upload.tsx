@@ -298,18 +298,11 @@ export default function Upload() {
       console.log('   - matchedVideos count:', backtestResults.matchedVideos?.length);
       console.log('   - performanceDrivers keys:', Object.keys(backtestResults.performanceDrivers || {}));
       
-      // Save to workflow context immediately
+      // Save to workflow context
       workflow.setBacktestResults(backtestResults);
       
-      // Verify save was successful
-      setTimeout(() => {
-        console.log('🔍 Verifying backtest results saved:');
-        console.log('   - workflow.backtestResults:', !!workflow.backtestResults);
-        console.log('   - predictions:', !!workflow.backtestResults?.predictions);
-        console.log('   - matchedVideos:', workflow.backtestResults?.matchedVideos?.length);
-      }, 100);
-      
       // Animation will complete automatically after 9 seconds (3 steps × 3s each)
+      // The Backtest page will read from workflow.backtestResults when it loads
     } catch (error) {
       console.error('❌ Backtest failed:', error);
       setIsRunningBacktest(false);
@@ -323,32 +316,12 @@ export default function Upload() {
 
   const handleBacktestComplete = useCallback(() => {
     // Called when animation finishes (after 9 seconds)
-    console.log('🎬 Animation complete, checking results...');
+    console.log('🎬 Animation complete, navigating to backtest page...');
     
-    // Check workflow context for backtest results
-    const hasResults = workflow.backtestResults && 
-                       workflow.backtestResults.predictions &&
-                       workflow.backtestResults.matchedVideos;
-    
-    console.log('🔍 Backtest results check:');
-    console.log('   - hasResults:', hasResults);
-    console.log('   - predictions:', !!workflow.backtestResults?.predictions);
-    console.log('   - matchedVideos:', workflow.backtestResults?.matchedVideos?.length);
-    
-    if (hasResults) {
-      console.log('✅ Navigating to backtest page');
-      setIsRunningBacktest(false);
-      navigate("/backtest");
-    } else {
-      console.error('❌ No backtest results found');
-      setIsRunningBacktest(false);
-      toast({
-        title: "Error",
-        description: "Backtest results not found. Please try again.",
-        variant: "destructive",
-      });
-    }
-  }, [workflow.backtestResults, navigate, toast, setIsRunningBacktest]);
+    // Always navigate - the Backtest page will handle missing data
+    setIsRunningBacktest(false);
+    navigate("/backtest");
+  }, [navigate]);
 
   const handleReset = () => {
     setFile(null);

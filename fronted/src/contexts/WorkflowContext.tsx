@@ -44,10 +44,16 @@ export function WorkflowProvider({ children }: { children: ReactNode }) {
 
   // Load state from localStorage on mount
   useEffect(() => {
+    console.log('🔄 WorkflowContext initializing...');
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
       if (saved) {
+        console.log('📦 Loading saved workflow state from localStorage');
         const state = JSON.parse(saved);
+        console.log('   - Has backtestResults:', !!state.backtestResults);
+        console.log('   - Has predictions:', !!state.backtestResults?.predictions);
+        console.log('   - Has matchedVideos:', state.backtestResults?.matchedVideos?.length);
+        
         setPlatformState(state.platform || 'youtube');
         setSessionIdState(state.sessionId || null);
         setAnalysisState(state.analysis || null);
@@ -55,9 +61,13 @@ export function WorkflowProvider({ children }: { children: ReactNode }) {
         setBacktestResultsState(state.backtestResults || null);
         setVideoPreviewUrlState(state.videoPreviewUrl || null);
         setVideoFileNameState(state.videoFileName || null);
+        
+        console.log('✅ Workflow state loaded successfully');
+      } else {
+        console.log('ℹ️ No saved workflow state found');
       }
     } catch (error) {
-      console.error('Failed to load workflow state:', error);
+      console.error('❌ Failed to load workflow state:', error);
     }
   }, []);
 
@@ -148,10 +158,44 @@ export function WorkflowProvider({ children }: { children: ReactNode }) {
   const setBacktestResults = (results: any) => {
     console.log('📝 WorkflowContext.setBacktestResults called with:', results);
     console.log('   - predictions:', results?.predictions);
-    console.log('   - matchedVideos:', results?.matchedVideos);
+    console.log('   - matchedVideos:', results?.matchedVideos?.length, 'videos');
     console.log('   - performanceDrivers:', results?.performanceDrivers);
+    
     setBacktestResultsState(results);
-    console.log('✅ WorkflowContext.backtestResults state updated');
+    
+    // Force immediate localStorage save (bypass useEffect delay)
+    try {
+      const state = {
+        platform,
+        sessionId,
+        analysis,
+        strategy,
+        backtestResults: results, // Use the new results directly
+        videoPreviewUrl,
+        videoFileName,
+      };
+      
+      const stateStr = JSON.stringify(state);
+      
+      // Check size and save
+      if (stateStr.length > 5 * 1024 * 1024) {
+        console.warn('⚠️ State too large, saving without images');
+        const lightState = {
+          ...state,
+          strategy: state.strategy ? {
+            ...state.strategy,
+            coverImageUrl: undefined,
+          } : null,
+        };
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(lightState));
+      } else {
+        localStorage.setItem(STORAGE_KEY, stateStr);
+      }
+      
+      console.log('✅ Backtest results saved to localStorage immediately');
+    } catch (error) {
+      console.error('❌ Failed to save backtest results:', error);
+    }
   };
 
   const clearAll = () => {

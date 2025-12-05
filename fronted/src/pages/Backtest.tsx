@@ -140,6 +140,14 @@ export default function Backtest() {
   // Check if we have real backtest data
   const hasBacktestData = !!workflow.backtestResults;
 
+  // Debug logging
+  console.log('📊 Backtest page loaded');
+  console.log('   - hasBacktestData:', hasBacktestData);
+  console.log('   - workflow.backtestResults:', workflow.backtestResults);
+  console.log('   - predictions:', !!predictions);
+  console.log('   - matchedVideos:', matchedVideos?.length);
+  console.log('   - performanceDrivers:', !!performanceDrivers);
+
   const handleSave = async () => {
     try {
       // Save report to localStorage (with image compression)
