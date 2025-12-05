@@ -1,8 +1,8 @@
-// 示例：如何在前端使用后端 API
+// Example: How to use backend API in frontend
 
 import { API_ENDPOINTS, apiCall } from './config';
 
-// 1. 上传视频并分析
+// 1. Upload and analyze video
 export async function analyzeVideo(videoFile: File, platform: 'youtube' | 'tiktok' | 'shorts') {
   const formData = new FormData();
   formData.append('video', videoFile);
@@ -25,7 +25,7 @@ export async function analyzeVideo(videoFile: File, platform: 'youtube' | 'tikto
   }
 }
 
-// 2. 生成策略
+// 2. Generate strategy
 export async function generateStrategy(sessionId: string, features: any, platform: string) {
   return apiCall(API_ENDPOINTS.GENERATE_STRATEGY, {
     method: 'POST',
@@ -40,7 +40,7 @@ export async function generateStrategy(sessionId: string, features: any, platfor
   });
 }
 
-// 3. 重新生成策略（可选：指定字段）
+// 3. Regenerate strategy (optional: specify field)
 export async function regenerateStrategy(
   sessionId: string,
   features: any,
@@ -61,7 +61,7 @@ export async function regenerateStrategy(
   });
 }
 
-// 4. 回测性能预测
+// 4. Backtest performance prediction
 export async function backtest(
   sessionId: string,
   strategy: any,
@@ -82,21 +82,21 @@ export async function backtest(
   });
 }
 
-// 完整流程示例
+// Complete workflow example
 export async function completeWorkflow(videoFile: File, platform: 'youtube' | 'tiktok' | 'shorts') {
   try {
-    // 1. 分析视频
+    // 1. Analyze video
     console.log('Analyzing video...');
     const { sessionId, features } = await analyzeVideo(videoFile, platform);
     console.log('Features:', features);
 
-    // 2. 生成策略
+    // 2. Generate strategy
     console.log('Generating strategy...');
     const strategyResponse = await generateStrategy(sessionId, features, platform);
     const strategy = strategyResponse.data.strategy;
     console.log('Strategy:', strategy);
 
-    // 3. 回测预测
+    // 3. Run backtest
     console.log('Running backtest...');
     const backtestResponse = await backtest(sessionId, strategy, features, platform);
     const predictions = backtestResponse.data;

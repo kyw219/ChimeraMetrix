@@ -3,13 +3,13 @@ import { YouTubePreviewCard } from "./YouTubePreviewCard";
 interface StrategyPreviewProps {
   strategy?: {
     cover?: string;
-    coverImageUrl?: string; // AI 生成的封面图片 URL
+    coverImageUrl?: string; // AI-generated cover image URL
     title?: string;
-    description?: string; // 视频简介
+    description?: string; // Video description
     hashtags?: string;
     postingTime?: string;
   } | null;
-  videoUrl?: string; // 原始视频 URL for hover preview
+  videoUrl?: string; // Original video URL for hover preview
   isEmpty?: boolean;
   label?: string;
 }

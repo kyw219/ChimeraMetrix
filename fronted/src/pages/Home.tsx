@@ -1,9 +1,17 @@
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { Sparkles, Video, TrendingUp, Target, ArrowRight, Zap, Brain, BarChart3 } from "lucide-react";
+import { useWorkflow } from "@/contexts/WorkflowContext";
 
 export default function Home() {
   const navigate = useNavigate();
+  const workflow = useWorkflow();
+
+  const handleStartAnalyzing = () => {
+    // Clear all previous workflow data when starting fresh
+    workflow.clearAll();
+    navigate("/upload");
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background via-background to-muted/20">
@@ -31,7 +39,7 @@ export default function Home() {
           {/* CTA Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-4">
             <Button
-              onClick={() => navigate("/upload")}
+              onClick={handleStartAnalyzing}
               size="lg"
               className="px-10 py-7 text-lg font-bold bg-primary hover:bg-primary/90 text-primary-foreground glow-primary group"
             >
@@ -190,7 +198,7 @@ export default function Home() {
             Start using ChimeraMatrix today and let AI help you create more engaging video content
           </p>
           <Button
-            onClick={() => navigate("/upload")}
+            onClick={handleStartAnalyzing}
             size="lg"
             className="px-12 py-7 text-lg font-bold bg-primary hover:bg-primary/90 text-primary-foreground glow-primary group"
           >

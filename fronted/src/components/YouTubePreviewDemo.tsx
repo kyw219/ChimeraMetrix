@@ -12,7 +12,7 @@ export const YouTubePreviewDemo = () => {
           YouTube 首页预览效果
         </h2>
         <p className="text-sm text-muted-foreground mb-6">
-          这是你的视频在 YouTube 首页推荐流中的真实显示效果
+          This is how your video will appear in YouTube's homepage recommendation feed
         </p>
 
         {/* Example 1: With AI-generated cover */}
