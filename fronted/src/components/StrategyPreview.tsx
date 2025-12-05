@@ -9,12 +9,14 @@ interface StrategyPreviewProps {
     hashtags?: string;
     postingTime?: string;
   } | null;
+  videoUrl?: string; // 原始视频 URL for hover preview
   isEmpty?: boolean;
   label?: string;
 }
 
 export const StrategyPreview = ({ 
-  strategy, 
+  strategy,
+  videoUrl,
   isEmpty = false,
   label = "Strategy Preview"
 }: StrategyPreviewProps) => {
@@ -63,6 +65,7 @@ export const StrategyPreview = ({
           channelName="Your Channel"
           views={35000}
           publishedTime="1 month ago"
+          videoUrl={videoUrl}
         />
       </div>
     </div>

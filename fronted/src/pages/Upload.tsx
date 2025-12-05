@@ -27,6 +27,7 @@ export default function Upload() {
   const [analysis, setAnalysis] = useState<any>(workflow.analysis);
   const [sessionId, setSessionId] = useState<string | null>(workflow.sessionId);
   const [frameUrl, setFrameUrl] = useState<string | null>(null);
+  const [videoUrl, setVideoUrl] = useState<string | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [isRunningBacktest, setIsRunningBacktest] = useState(false);
   const [regeneratingField, setRegeneratingField] = useState<string | null>(null);
@@ -299,6 +300,11 @@ export default function Upload() {
     setAnalysis(null);
     setSessionId(null);
     setFrameUrl(null);
+    // Revoke video URL to free memory
+    if (videoUrl) {
+      URL.revokeObjectURL(videoUrl);
+      setVideoUrl(null);
+    }
     setIsGenerating(false);
     setIsRunningBacktest(false);
     // Clear workflow context
@@ -395,6 +401,9 @@ export default function Upload() {
               onFileUpload={(newFile) => {
                 setFile(newFile);
                 workflow.setFile(newFile, null, newFile.name);
+                // Create video URL for preview
+                const url = URL.createObjectURL(newFile);
+                setVideoUrl(url);
               }}
               onThumbnailGenerated={(thumbnail) => {
                 if (file) {
@@ -528,6 +537,7 @@ export default function Upload() {
           <div className="panel-base rounded-2xl p-6 mb-8">
             <StrategyPreview 
               strategy={strategy}
+              videoUrl={videoUrl || undefined}
               isEmpty={false}
             />
           </div>
