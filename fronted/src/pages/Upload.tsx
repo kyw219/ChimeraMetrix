@@ -300,22 +300,31 @@ export default function Upload() {
     // Called when animation finishes (after 9 seconds)
     setIsRunningBacktest(false);
     
-    // Check workflow context for backtest results
-    const hasResults = workflow.backtestResults && 
-                       workflow.backtestResults.predictions &&
-                       workflow.backtestResults.matchedVideos;
-    
-    if (hasResults) {
-      console.log('✅ Navigating to backtest page with results');
-      navigate("/backtest");
-    } else {
-      console.error('❌ No backtest results found after animation');
-      toast({
-        title: "Error",
-        description: "Backtest results not found. Please try again.",
-        variant: "destructive",
+    // Small delay to ensure state has been updated
+    setTimeout(() => {
+      // Check workflow context for backtest results
+      const hasResults = workflow.backtestResults && 
+                         workflow.backtestResults.predictions &&
+                         workflow.backtestResults.matchedVideos;
+      
+      console.log('🔍 Checking backtest results:', {
+        hasBacktestResults: !!workflow.backtestResults,
+        hasPredictions: !!workflow.backtestResults?.predictions,
+        hasMatchedVideos: !!workflow.backtestResults?.matchedVideos,
       });
-    }
+      
+      if (hasResults) {
+        console.log('✅ Navigating to backtest page with results');
+        navigate("/backtest");
+      } else {
+        console.error('❌ No backtest results found after animation');
+        toast({
+          title: "Error",
+          description: "Backtest results not found. Please try again.",
+          variant: "destructive",
+        });
+      }
+    }, 100);
   };
 
   const handleReset = () => {
