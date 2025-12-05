@@ -508,29 +508,29 @@ export default function Upload() {
                   onRegenerate={() => handleRegenerateField('description')}
                 />
 
-                {/* Hashtags & Posting Time - Side by Side */}
-                <div className="grid grid-cols-2 gap-6">
-                  <StrategyCard
-                    icon={Hash}
-                    title="Recommended Hashtags"
-                    content={strategy?.hashtags}
-                    placeholder="AI will suggest trending hashtags to maximize discoverability"
-                    iconColor="text-chart-3"
-                    isEmpty={!strategy}
-                    isRegenerating={regeneratingField === 'hashtags'}
-                    onRegenerate={() => handleRegenerateField('hashtags')}
-                  />
-                  <StrategyCard
-                    icon={Clock}
-                    title="Recommended Posting Time"
-                    content={strategy?.postingTime}
-                    placeholder="AI will identify optimal posting time based on audience patterns"
-                    iconColor="text-chart-4"
-                    isEmpty={!strategy}
-                    isRegenerating={regeneratingField === 'postingTime'}
-                    onRegenerate={() => handleRegenerateField('postingTime')}
-                  />
-                </div>
+                {/* Hashtags - Full Width */}
+                <StrategyCard
+                  icon={Hash}
+                  title="Recommended Hashtags"
+                  content={strategy?.hashtags}
+                  placeholder="AI will suggest trending hashtags to maximize discoverability"
+                  iconColor="text-chart-3"
+                  isEmpty={!strategy}
+                  isRegenerating={regeneratingField === 'hashtags'}
+                  onRegenerate={() => handleRegenerateField('hashtags')}
+                />
+
+                {/* Posting Time - Full Width */}
+                <StrategyCard
+                  icon={Clock}
+                  title="Recommended Posting Time"
+                  content={strategy?.postingTime}
+                  placeholder="AI will identify optimal posting time based on audience patterns"
+                  iconColor="text-chart-4"
+                  isEmpty={!strategy}
+                  isRegenerating={regeneratingField === 'postingTime'}
+                  onRegenerate={() => handleRegenerateField('postingTime')}
+                />
               </div>
             </div>
           </div>

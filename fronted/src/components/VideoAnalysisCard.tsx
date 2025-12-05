@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { Badge } from "./ui/badge";
 import { Skeleton } from "./ui/skeleton";
 import { Button } from "./ui/button";
 import { Video, Users, Heart, Sparkles, Clock, Target, ChevronDown, ChevronUp } from "lucide-react";
@@ -112,9 +111,7 @@ export const VideoAnalysisCard = ({ data, isLoading }: VideoAnalysisCardProps) =
             <p className="text-[10px] font-semibold text-muted-foreground mb-1 uppercase tracking-wide">
               Category
             </p>
-            <Badge variant="secondary" className="text-[9px] px-2 py-0.5">
-              {data.category}
-            </Badge>
+            <p className="text-sm text-foreground leading-relaxed">{data.category}</p>
           </div>
         </div>
 
@@ -164,19 +161,11 @@ export const VideoAnalysisCard = ({ data, isLoading }: VideoAnalysisCardProps) =
             <p className="text-[10px] font-semibold text-muted-foreground mb-1 uppercase tracking-wide">
               Key Topics
             </p>
-            <div className="flex flex-wrap gap-1">
-              {data.keywords.slice(0, 2).map((keyword, index) => (
-                <Badge
-                  key={index}
-                  variant="outline"
-                  className="text-[8px] font-normal px-1.5 py-0.5"
-                >
-                  {keyword}
-                </Badge>
-              ))}
-            </div>
-            </div>
+            <p className="text-sm text-foreground leading-relaxed">
+              {data.keywords.slice(0, 3).join(', ')}
+            </p>
           </div>
+        </div>
           </div>
         </CollapsibleContent>
       </div>
