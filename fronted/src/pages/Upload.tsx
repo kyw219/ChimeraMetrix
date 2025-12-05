@@ -7,7 +7,7 @@ import { StrategyCard } from "@/components/StrategyCard";
 import { StrategyPreview } from "@/components/StrategyPreview";
 import { BacktestLoadingPipeline } from "@/components/BacktestLoadingPipeline";
 import { Button } from "@/components/ui/button";
-import { Image, FileText, Hash, Clock, Loader2, Zap, Sparkles, AlignLeft } from "lucide-react";
+import { Image, FileText, Hash, Clock, Loader2, Zap, AlignLeft } from "lucide-react";
 import { mockAnalysis, mockStrategy } from "@/lib/mockData";
 import { useToast } from "@/hooks/use-toast";
 import { useWorkflow } from "@/contexts/WorkflowContext";
@@ -273,11 +273,19 @@ export default function Upload() {
       console.log('✅ Backtest completed successfully');
 
       // Save backtest results to workflow context
-      workflow.setBacktestResults({
+      const backtestResults = {
         predictions: data.data.predictions,
         matchedVideos: data.data.matchedVideos,
         performanceDrivers: data.data.performanceDrivers,
-      });
+      };
+      
+      console.log('💾 Saving backtest results to workflow context:', backtestResults);
+      workflow.setBacktestResults(backtestResults);
+      
+      // Verify it was saved
+      setTimeout(() => {
+        console.log('🔍 Verifying saved data:', workflow.backtestResults ? 'Data exists' : 'No data found');
+      }, 50);
       
       // Animation will complete automatically after 9 seconds (3 steps × 3s each)
     } catch (error) {
@@ -292,9 +300,24 @@ export default function Upload() {
   };
 
   const handleBacktestComplete = () => {
-    // Called when animation finishes (after 15 seconds)
+    // Called when animation finishes (after 9 seconds)
     setIsRunningBacktest(false);
-    navigate("/backtest");
+    
+    // Add a small delay to ensure workflow context has saved to localStorage
+    setTimeout(() => {
+      // Verify data exists before navigating
+      if (workflow.backtestResults) {
+        console.log('✅ Navigating to backtest page with results');
+        navigate("/backtest");
+      } else {
+        console.error('❌ No backtest results found after animation');
+        toast({
+          title: "Error",
+          description: "Backtest results not found. Please try again.",
+          variant: "destructive",
+        });
+      }
+    }, 100);
   };
 
   const handleReset = () => {
