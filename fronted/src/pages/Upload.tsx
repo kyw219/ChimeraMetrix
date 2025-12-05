@@ -470,7 +470,7 @@ export default function Upload() {
                 Recommended Strategy
               </h2>
 
-              <div className="space-y-5">
+              <div className="space-y-6">
                 {/* Cover - Full Width */}
                 <StrategyCard
                   icon={Image}
@@ -484,8 +484,6 @@ export default function Upload() {
                   onRegenerate={() => handleRegenerateField('cover')}
                 />
 
-                <div className="border-t border-border/30" />
-
                 {/* Title - Full Width */}
                 <StrategyCard
                   icon={FileText}
@@ -498,8 +496,6 @@ export default function Upload() {
                   onRegenerate={() => handleRegenerateField('title')}
                 />
 
-                <div className="border-t border-border/30" />
-
                 {/* Description - Full Width */}
                 <StrategyCard
                   icon={AlignLeft}
@@ -511,8 +507,6 @@ export default function Upload() {
                   isRegenerating={regeneratingField === 'description'}
                   onRegenerate={() => handleRegenerateField('description')}
                 />
-
-                <div className="border-t border-border/30" />
 
                 {/* Hashtags & Posting Time - Side by Side */}
                 <div className="grid grid-cols-2 gap-6">
