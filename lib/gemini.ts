@@ -156,11 +156,13 @@ Provide only the JSON response, no additional text.`;
 
 👤 SUBJECT COMPOSITION:
 - Keep person's face and main subject in CENTER of frame
-- Face should be the primary focal point
+- Face should be the primary focal point with exaggerated ${features.emotion} expression
 - Use rule-of-thirds for dynamic composition
-- Maintain ${features.emotion} expression
-- High contrast, bright lighting, sharp focus
-- Slightly blur background to emphasize subject
+- High contrast, dramatic lighting with rim lights
+- Sharp focus on subject, artistic bokeh blur on background
+- Add subtle glow or halo effect around subject
+- Enhance facial features and expressions for maximum impact
+- Use dynamic angles (slight tilt) for energy
 
 🔤 TEXT OVERLAY - SINGLE LINE ONLY:
 Text content: "${headline}"
@@ -179,19 +181,33 @@ TEXT SPACING (ABSOLUTE REQUIREMENT):
 - If you cannot fit text with these margins, make text SMALLER
 
 TEXT STYLE:
-- Font: Bold, thick, impact-style
-- Color: Bright yellow (#FFD700) OR white
-- Outline: Thick black stroke (6-8px)
-- Size: Large but must fit within safe margins
-- Add drop shadow for depth
-- Must be readable at thumbnail size
+- Font: Bold, thick, impact-style (like YouTube thumbnails)
+- Color: Bright yellow (#FFD700), white, or vibrant red (#FF0000) based on emotion
+- Outline: Thick black stroke (8-10px) for maximum contrast
+- Size: Large and bold but must fit within safe margins
+- Add strong drop shadow for 3D depth effect
+- Add outer glow effect for extra pop
+- Slight perspective or 3D effect for dynamic look
+- Must be readable at thumbnail size (test at 320px width)
 
-🎨 VISUAL TREATMENT:
-- Enhance colors and contrast
-- Add subtle vignette at edges
-- Glow effect behind text for readability
-- Keep overall composition clean and uncluttered
-- Professional YouTube thumbnail aesthetic
+🎨 VISUAL TREATMENT & EFFECTS:
+- Enhance colors and contrast dramatically (boost saturation by 30%)
+- Add dynamic lighting effects (rim lighting, dramatic shadows)
+- Add subtle vignette at edges to focus attention
+- Strong glow effect behind text for maximum readability
+- Add energy particles or light rays if appropriate for content
+- Use color grading to match emotion (warm for joy, cool for calm, vibrant for energy)
+- Add subtle motion blur or speed lines for dynamic content
+- Professional YouTube thumbnail aesthetic with high visual impact
+
+🔥 HOOK ELEMENTS (Add 1-2 of these):
+- Emoji reactions (😱🤯🔥💥✨) placed strategically near face
+- Arrows or circles highlighting key elements
+- "Before/After" split if applicable
+- Question marks or exclamation points for curiosity
+- Glowing borders or frames around subject
+- Sparkle/shine effects on important elements
+- Color pop effect (desaturate background, keep subject vibrant)
 
 ✅ FINAL CHECKLIST BEFORE GENERATING:
 □ Is the face/subject in the center and fully visible?
