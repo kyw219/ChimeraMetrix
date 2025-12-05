@@ -57,8 +57,8 @@ export const Sidebar = () => {
       {/* Logo */}
       <div className="p-6 border-b border-sidebar-border">
         <Link to="/" className="flex items-center gap-2.5 group">
-          <div className="w-9 h-9 bg-sidebar-primary/10 border border-sidebar-primary/30 rounded-lg flex items-center justify-center group-hover:bg-sidebar-primary/20 transition-all">
-            <Sparkles className="w-5 h-5 text-sidebar-primary" />
+          <div className="w-9 h-9 rounded-lg overflow-hidden flex items-center justify-center group-hover:opacity-90 transition-all">
+            <img src="/logo.jpg" alt="ChimeraMatrix Logo" className="w-full h-full object-cover" />
           </div>
           <div className="flex flex-col">
             <span className="font-bold text-base text-sidebar-primary group-hover:text-sidebar-primary/90 transition-colors leading-none">

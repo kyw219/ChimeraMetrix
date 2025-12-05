@@ -22,7 +22,7 @@ export const MetricCard = ({
     <div className="subpanel rounded-xl p-5 hover:bg-[hsl(var(--module-bg))] transition-all">
       <div className="flex items-start justify-between mb-3">
         <div className="flex-1">
-          <p className="text-[10px] font-bold text-muted-foreground mb-2 uppercase tracking-wider">{label}</p>
+          <p className="text-sm font-bold text-accent mb-2 uppercase tracking-wide">{label}</p>
           <p className="text-2xl font-bold text-foreground">{value}</p>
         </div>
         <div className={`${iconColor} bg-primary/5 p-2.5 rounded-lg`}>

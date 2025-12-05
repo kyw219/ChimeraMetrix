@@ -219,25 +219,19 @@ export default function Backtest() {
             icon={Eye}
             label="Predicted 24h Views"
             value={backtestData.metrics.views24h}
-            note="Based on averaged performance of matched videos"
-            badge={`${matchedVideos?.length || mockMatchedVideos.length} matched videos`}
             iconColor="text-chart-1"
-          />
-          <MetricCard
-            icon={TrendingUp}
-            label="Predicted 24h CTR"
-            value={backtestData.metrics.ctr24h}
-            note="Based on averaged performance of matched videos"
-            badge={`${matchedVideos?.length || mockMatchedVideos.length} matched videos`}
-            iconColor="text-chart-2"
           />
           <MetricCard
             icon={Heart}
             label="Predicted 24h Likes"
             value={backtestData.metrics.likes24h}
-            note="Based on averaged performance of matched videos"
-            badge={`${matchedVideos?.length || mockMatchedVideos.length} matched videos`}
             iconColor="text-chart-3"
+          />
+          <MetricCard
+            icon={TrendingUp}
+            label="Predicted 24h CTR"
+            value={backtestData.metrics.ctr24h}
+            iconColor="text-chart-2"
           />
         </div>
 
