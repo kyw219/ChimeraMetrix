@@ -371,12 +371,8 @@ export default function Upload() {
   return (
     <DashboardLayout>
       <div className="max-w-[1100px] mx-auto">
-        {/* Show loading pipeline when generating strategy */}
-        {isGenerating ? (
-          <div className="min-h-[600px] flex items-center justify-center">
-            <AnalysisLoadingPipeline />
-          </div>
-        ) : isRunningBacktest ? (
+        {/* Show loading pipeline when running backtest */}
+        {isRunningBacktest ? (
           <div className="min-h-[600px] flex items-center justify-center">
             <BacktestLoadingPipeline onComplete={handleBacktestComplete} />
           </div>
