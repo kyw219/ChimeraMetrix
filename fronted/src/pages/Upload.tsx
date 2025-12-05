@@ -276,7 +276,7 @@ export default function Upload() {
         performanceDrivers: data.data.performanceDrivers,
       });
       
-      // Animation will complete automatically after 15 seconds (3 steps × 5s each)
+      // Animation will complete automatically after 9 seconds (3 steps × 3s each)
     } catch (error) {
       console.error('❌ Backtest failed:', error);
       setIsRunningBacktest(false);
